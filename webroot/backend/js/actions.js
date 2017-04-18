@@ -6,6 +6,10 @@ var page_actions = function(){
 
     var html_click_avail = true;
 
+    $(document).on('ready', function(){
+        page_content_onresize();
+    });
+
     $("html").on("click", function(){
         if(html_click_avail)
             $(".x-navigation-horizontal li,.x-navigation-minimized li").removeClass('active');

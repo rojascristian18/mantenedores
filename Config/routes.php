@@ -1,8 +1,13 @@
 <?php
 Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
 
-Router::connect('/admin', array('controller' => 'administradores', 'action' => 'index', 'admin' => true));
+# Administración
+Router::connect('/admin', array('controller' => 'tareas', 'action' => 'index', 'admin' => true));
 Router::connect('/admin/login', array('controller' => 'administradores', 'action' => 'login', 'admin' => true));
+
+# Mantenedores
+Router::connect('/maintainers', array('controller' => 'tareas', 'action' => 'index', 'maintainers' => true));
+Router::connect('/maintainers/login', array('controller' => 'usuarios', 'action' => 'login', 'maintainers' => true));
 
 Router::connect('/seccion/*', array('controller' => 'pages', 'action' => 'display'));
 

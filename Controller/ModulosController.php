@@ -26,7 +26,7 @@ class ModulosController extends AppController
 				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
 			}
 		}
-		$parentModulos	= $this->Modulo->ParentModulo->find('list');
+		$parentModulos	= $this->Modulo->ParentModulo->find('list', array('conditions' => array('parent_id' => NULL)));
 		$roles	= $this->Modulo->Rol->find('list');
 		$this->set(compact('parentModulos', 'roles'));
 	}
@@ -54,10 +54,13 @@ class ModulosController extends AppController
 		else
 		{
 			$this->request->data	= $this->Modulo->find('first', array(
-				'conditions'	=> array('Modulo.id' => $id)
+				'conditions'	=> array('Modulo.id' => $id),
+				'contain'		=> array('Rol')
 			));
 		}
-		$parentModulos	= $this->Modulo->ParentModulo->find('list');
+
+		$parentModulos	= $this->Modulo->ParentModulo->find('list', array('conditions' => array('parent_id' => NULL)));
+
 		$roles	= $this->Modulo->Rol->find('list');
 		$this->set(compact('parentModulos', 'roles'));
 	}
@@ -90,5 +93,39 @@ class ModulosController extends AppController
 		$modelo			= $this->Modulo->alias;
 
 		$this->set(compact('datos', 'campos', 'modelo'));
+	}
+
+	public function admin_activar( $id = null ) {
+		$this->Modulo->id = $id;
+		if ( ! $this->Modulo->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Modulo->saveField('activo', 1) )
+		{
+			$this->Session->setFlash('Registro activado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al activar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
+
+	public function admin_desactivar( $id = null ) {
+		$this->Modulo->id = $id;
+		if ( ! $this->Modulo->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Modulo->saveField('activo', 0) )
+		{
+			$this->Session->setFlash('Registro desactivado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al desactivar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
 	}
 }

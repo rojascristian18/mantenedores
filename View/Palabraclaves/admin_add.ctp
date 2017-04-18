@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Palabraclaves</h2>
+	<h2><span class="fa fa-key"></span> Palabras claves</h2>
 </div>
 <?= $this->Form->create('Palabraclave', array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <div class="page-content-wrap">
@@ -7,28 +7,20 @@
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Nuevo Palabraclave</h3>
+					<h3 class="panel-title">Nueva Palabra clave</h3>
 				</div>
 				<div class="panel-body">
 					<div class="table-responsive">
 						<table class="table">
-																				<tr>
-												<th><?= $this->Form->label('nombre', 'Nombre'); ?></th>
-												<td><?= $this->Form->input('nombre'); ?></td>
-											</tr>
-																				<tr>
-												<th><?= $this->Form->label('activo', 'Activo'); ?></th>
-												<td><?= $this->Form->input('activo', array('class' => 'icheckbox')); ?></td>
-											</tr>
-																							<tr>
-									<th><?= $this->Form->label('Producto', 'Producto'); ?></th>
-									<td><?= $this->Form->input('Producto'); ?></td>
-								</tr>
-											<tr>
-									<th><?= $this->Form->label('Tarea', 'Tarea'); ?></th>
-									<td><?= $this->Form->input('Tarea'); ?></td>
-								</tr>
-												</table>
+							<tr>
+								<th><?= $this->Form->label('nombre', 'Nombre'); ?></th>
+								<td><?= $this->Form->input('nombre'); ?></td>
+							</tr>
+							<tr>
+								<th><?= $this->Form->label('activo', 'Activo'); ?></th>
+								<td><?= $this->Form->input('activo', array('class' => 'icheckbox')); ?></td>
+							</tr>
+						</table>
 					</div>
 				</div>
 				<div class="panel-footer">

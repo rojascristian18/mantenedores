@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<?= $this->Html->meta('icon'); ?>
 		<?= $this->Html->css(array(
-			'/backend/css/theme-default',
+			sprintf('/backend/css/theme-%s', $this->Session->read('Tienda.tema')),
 			'/backend/css/custom',
 			/*
 			'/backend/css/ion/ion.rangeSlider',
@@ -24,6 +24,8 @@
 			//'/backend/js/plugins/jquery/jquery-ui.min',
 			'/backend/js/plugins/bootstrap/bootstrap.min',
 			'/backend/js/plugins/bootstrap/bootstrap-select',
+			'/backend/js/actions',
+			'/backend/js/custom',
 			/*
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
 
@@ -57,6 +59,7 @@
             <div class="page-content">
                 <?= $this->element('admin_menu_superior'); ?>
 				<?= $this->element('admin_alertas'); ?>
+				<?= $this->element('breadcrumbs'); ?>
 				<?= $this->fetch('content'); ?>
 			</div>
 		</div>

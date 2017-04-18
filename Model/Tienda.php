@@ -14,10 +14,9 @@ class Tienda extends AppModel
 		/**
 		 * IMAGE UPLOAD
 		 */
-		/*
 		'Image'		=> array(
 			'fields'	=> array(
-				'imagen'	=> array(
+				'logo'	=> array(
 					'versions'	=> array(
 						array(
 							'prefix'	=> 'mini',
@@ -29,7 +28,6 @@ class Tienda extends AppModel
 				)
 			)
 		)
-		*/
 	);
 
 	/**

@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Tareas</h2>
+	<h2><span class="fa fa-pencil-square-o"></span> Tareas</h2>
 </div>
 
 <div class="page-content-wrap">
@@ -18,25 +18,25 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
-													<th><?= $this->Paginator->sort('usuario_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('administrador_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('parent_id', 'Tarea padre', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('categoriatarea_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-													<th>Acciones</th>
+									<th><?= $this->Paginator->sort('usuario_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('administrador_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('parent_id', 'Tarea padre', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('categoriatarea_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th>Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( $tareas as $tarea ) : ?>
 								<tr>
-											<td><?= $this->Html->link($tarea['Usuario']['nombre'], array('controller' => 'usuarios', 'action' => 'edit', $tarea['Usuario']['id'])); ?></td>
-											<td><?= $this->Html->link($tarea['Administrador']['nombre'], array('controller' => 'administradores', 'action' => 'edit', $tarea['Administrador']['id'])); ?></td>
-											<td><?= $this->Html->link($tarea['ParentTarea']['nombre'], array('controller' => 'tareas', 'action' => 'edit', $tarea['ParentTarea']['id'])); ?></td>
-											<td><?= $this->Html->link($tarea['Categoriatarea']['nombre'], array('controller' => 'categoriatareas', 'action' => 'edit', $tarea['Categoriatarea']['id'])); ?></td>
-											<td><?= $this->Html->link($tarea['Tienda']['nombre'], array('controller' => 'tiendas', 'action' => 'edit', $tarea['Tienda']['id'])); ?></td>
-											<td>
-										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
-										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<td><?= $this->Html->link($tarea['Usuario']['nombre'], array('controller' => 'usuarios', 'action' => 'edit', $tarea['Usuario']['id'])); ?></td>
+									<td><?= $this->Html->link($tarea['Administrador']['nombre'], array('controller' => 'administradores', 'action' => 'edit', $tarea['Administrador']['id'])); ?></td>
+									<td><?= $this->Html->link($tarea['ParentTarea']['nombre'], array('controller' => 'tareas', 'action' => 'edit', $tarea['ParentTarea']['id'])); ?></td>
+									<td><?= $this->Html->link($tarea['Categoriatarea']['nombre'], array('controller' => 'categoriatareas', 'action' => 'edit', $tarea['Categoriatarea']['id'])); ?></td>
+									<td><?= $this->Html->link($tarea['Tienda']['nombre'], array('controller' => 'tiendas', 'action' => 'edit', $tarea['Tienda']['id'])); ?></td>
+									<td>
+								<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+								<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>

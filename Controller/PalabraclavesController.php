@@ -3,12 +3,53 @@ App::uses('AppController', 'Controller');
 class PalabraclavesController extends AppController
 {
 	public function admin_index()
-	{
-		$this->paginate		= array(
-			'recursive'			=> 0
-		);
+	{	
+		$paginate = array(
+			'recursive' => 0
+			); 
+    	$conditions = array();
+    	$total = 0;
+    	$totalMostrados = 0;
+
+    	$textoBuscar = null;
+
+    	// Filtrado de productos por formulario
+		if ( $this->request->is('post') ) {
+			if ( empty($this->request->data['Filtro']['palabra']) ) {
+				$this->Session->setFlash('Ingrese alguna coincidencia' , null, array(), 'danger');
+				$this->redirect(array('action' => 'index'));
+			}
+			if ( ! empty($this->request->data['Filtro']['palabra']) ) {
+				$this->redirect(array('controller' => 'palabraclaves', 'action' => 'index', 'palabra' => $this->request->data['Filtro']['palabra']));
+			}
+		}
+
+		/**
+		* Buscar por
+		*/
+		if ( ! empty($this->request->params['named']['palabra']) ) {
+			$paginate		= array_replace_recursive($paginate, array(
+				'conditions'	=> array(
+					'Palabraclave.nombre LIKE "%' . trim($this->request->params['named']['palabra']) . '%"'
+				)
+			));
+
+			// Texto ingresado en el campo buscar
+			$textoBuscar = $this->request->params['named']['palabra'];
+			
+		}else if ( ! empty($this->request->params['named']['palabra'])) {
+			$this->Session->setFlash('No se aceptan campos vacios.' ,  null, array(), 'danger');
+		}
+
+		$total = $this->Palabraclave->find('count');
+
+		$this->paginate		= $paginate;
+
 		$palabraclaves	= $this->paginate();
-		$this->set(compact('palabraclaves'));
+
+		$totalMostrados = count($palabraclaves);
+
+		$this->set(compact('palabraclaves', 'total', 'totalMostrados', 'textoBuscar'));
 	}
 
 	public function admin_add()
@@ -90,5 +131,40 @@ class PalabraclavesController extends AppController
 		$modelo			= $this->Palabraclave->alias;
 
 		$this->set(compact('datos', 'campos', 'modelo'));
+	}
+
+
+	public function admin_activar( $id = null ) {
+		$this->Palabraclave->id = $id;
+		if ( ! $this->Palabraclave->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Palabraclave->saveField('activo', 1) )
+		{
+			$this->Session->setFlash('Registro activado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al activar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
+
+	public function admin_desactivar( $id = null ) {
+		$this->Palabraclave->id = $id;
+		if ( ! $this->Palabraclave->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Palabraclave->saveField('activo', 0) )
+		{
+			$this->Session->setFlash('Registro desactivado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al desactivar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
 	}
 }

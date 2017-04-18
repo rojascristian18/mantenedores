@@ -1,5 +1,7 @@
 @charset 'utf-8';
-
+html, body {
+	height: 100%;
+}
 .query-historial-versiones pre.query {
 	display: none;
 	font-size: 10px;
@@ -24,4 +26,32 @@
 	padding: 1px 5px;
 	line-height: normal;
 	margin-left: 5px;
+}
+
+.icons-list li {width: 50%;}
+.select-icon {cursor: pointer;}
+.table-responsive {overflow-x: inherit; }
+
+.aviso {
+	background: #fea223;
+	padding: 5px 10px;
+	border-radius: 5px;
+	color: #fff;
+}
+
+.x-navigation .xn-search::before {
+    content: '\f290' !important;
+    color: #fff;
+}
+
+.btn.btn-buscar {
+    margin-top: 22px;
+}
+
+.image-perfil-list {
+	width: 55px;
+}
+
+.usuarios-tabla td {
+	vertical-align: middle !important;
 }

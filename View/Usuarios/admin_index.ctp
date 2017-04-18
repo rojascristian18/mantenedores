@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Usuarios</h2>
+	<h2><span class="fa fa-user"></span> Mantenedores</h2>
 </div>
 
 <div class="page-content-wrap">
@@ -7,36 +7,53 @@
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Listado de Usuarios</h3>
+					<h3 class="panel-title">Listado de mentenedores</h3>
 					<div class="btn-group pull-right">
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Usuario', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? if ($permisos['agregar']) : ?>
+						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Mantenedor', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? endif; ?>
+					<? if ($permisos['exportar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+					<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
 					<div class="table-responsive">
-						<table class="table">
+						<table class="table usuarios-tabla">
 							<thead>
 								<tr class="sort">
-													<th><?= $this->Paginator->sort('rut', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('apellidos', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('email', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('codigo_fono', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-													<th>Acciones</th>
+									<th><?= $this->Paginator->sort('imagen', 'Mantenedor', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('rut', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('apellidos', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('email', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('calificacion_media', 'Calificaciones', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th>Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( $usuarios as $usuario ) : ?>
 								<tr>
-													<td><?= h($usuario['Usuario']['rut']); ?>&nbsp;</td>
-													<td><?= h($usuario['Usuario']['nombre']); ?>&nbsp;</td>
-													<td><?= h($usuario['Usuario']['apellidos']); ?>&nbsp;</td>
-													<td><?= h($usuario['Usuario']['email']); ?>&nbsp;</td>
-													<td><?= h($usuario['Usuario']['codigo_fono']); ?>&nbsp;</td>
-											<td>
+									<td><?= $imagenPerfil = (!empty($usuario['Usuario']['imagen'])) ? $this->Html->image($usuario['Usuario']['imagen']['mini'], array('class' => 'img-responsive img-circle', 'alt' => $usuario['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $usuario['Usuario']['nombre'])) ; ?></td>
+									<td valign="center"><?= h($usuario['Usuario']['rut']); ?>&nbsp;</td>
+									<td valign="center"><?= h($usuario['Usuario']['nombre']); ?>&nbsp;</td>
+									<td valign="center"><?= h($usuario['Usuario']['apellidos']); ?>&nbsp;</td>
+									<td valign="center"><?= h($usuario['Usuario']['email']); ?>&nbsp;</td>
+									<td valign="center"><?= $this->Html->estrellas($usuario['Usuario']['calificacion_media']); ?>&nbsp;</td>
+									<td valign="center">
+									<? if ($permisos['editar']) : ?>
 										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['eliminar']) : ?>
 										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['activar']) : ?>
+										<? if ($usuario['Usuario']['activo']) : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-primary confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?>
+										<? else : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-success confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?>
+										<? endif; ?>
+									<? endif; ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>

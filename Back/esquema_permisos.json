@@ -1,0 +1,178 @@
+{
+	"adjuntos" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"administradores" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"calificaciones" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"categoriatareas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"comentarios" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"grupocaracteristicas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"imagenes" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"importancias" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"modulos" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"modulos_roles" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"notificaciones" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"palabraclaves" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"palabraclaves_productos" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"palabraclaves_tareas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"pregunta_frecuentes" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"productos" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"productos_caracteristicas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"roles" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"tareas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"tareas_usuarios" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"tiendas" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	},
+	"usuarios" : {
+		"agregar" 	: 1,
+		"editar"	: 1,
+		"ver"		: 1,
+		"eliminar"	: 1,
+		"activar"	: 1,
+		"exportar"	: 1
+	}
+}

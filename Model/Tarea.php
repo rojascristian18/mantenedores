@@ -300,21 +300,14 @@ class Tarea extends AppModel
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
-		),
-		'Usuario' => array(
-			'className'				=> 'Usuario',
-			'joinTable'				=> 'tareas_usuarios',
-			'foreignKey'			=> 'tarea_id',
-			'associationForeignKey'	=> 'usuario_id',
-			'unique'				=> true,
-			'conditions'			=> '',
-			'fields'				=> '',
-			'order'					=> '',
-			'limit'					=> '',
-			'offset'				=> '',
-			'finderQuery'			=> '',
-			'deleteQuery'			=> '',
-			'insertQuery'			=> ''
 		)
 	);
+
+	public function beforeSave($options = array()) {
+
+		if ( ! isset($this->data['Tarea']['tienda_id'])) {
+			$this->data['Tarea']['tienda_id'] = CakeSession::read('Tienda.id');
+		}
+		
+	}
 }

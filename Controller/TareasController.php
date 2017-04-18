@@ -3,11 +3,29 @@ App::uses('AppController', 'Controller');
 class TareasController extends AppController
 {
 	public function admin_index()
-	{
-		$this->paginate		= array(
-			'recursive'			=> 0
-		);
+	{	
+
+		$paginate = array();
+
+		// Opciones de paginación
+		$paginate = array_replace_recursive(array(
+			'limit' => 10,
+			//'fields' => array(),
+			//'joins' => array(),
+			//'contain' => array(),
+			'conditions' => array(
+					'Tarea.tienda_id' => $this->Session->read('Tienda.id'),
+					'Tarea.parent_id' => null
+				),
+			'recursive'	=> 0,
+			'order' => 'Tarea.id DESC'
+		));
+
+
+
+		$this->paginate		= $paginate;
 		$tareas	= $this->paginate();
+
 		$this->set(compact('tareas'));
 	}
 
@@ -32,8 +50,11 @@ class TareasController extends AppController
 		$categoriatareas	= $this->Tarea->Categoriatarea->find('list');
 		$tiendas	= $this->Tarea->Tienda->find('list');
 		$palabraclaves	= $this->Tarea->Palabraclave->find('list');
-		$usuarios	= $this->Tarea->Usuario->find('list');
-		$this->set(compact('usuarios', 'administradores', 'parentTareas', 'categoriatareas', 'tiendas', 'palabraclaves', 'usuarios'));
+		$impuestos = $this->obtenerImpuestoTarea();
+		$idiomas = $this->obtenerIdiomaTarea();
+		$shops = $this->obtenerShopTarea();
+
+		$this->set(compact('usuarios', 'impuestos', 'idiomas', 'shops','administradores', 'parentTareas', 'categoriatareas', 'tiendas', 'palabraclaves'));
 	}
 
 	public function admin_edit($id = null)
@@ -45,7 +66,10 @@ class TareasController extends AppController
 		}
 
 		if ( $this->request->is('post') || $this->request->is('put') )
-		{
+		{	
+			# Guardar Revisión
+			$this->guardarRevision();
+			
 			if ( $this->Tarea->save($this->request->data) )
 			{
 				$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
@@ -68,8 +92,11 @@ class TareasController extends AppController
 		$categoriatareas	= $this->Tarea->Categoriatarea->find('list');
 		$tiendas	= $this->Tarea->Tienda->find('list');
 		$palabraclaves	= $this->Tarea->Palabraclave->find('list');
-		$usuarios	= $this->Tarea->Usuario->find('list');
-		$this->set(compact('usuarios', 'administradores', 'parentTareas', 'categoriatareas', 'tiendas', 'palabraclaves', 'usuarios'));
+		$impuestos = $this->obtenerImpuestoTarea();
+		$idiomas = $this->obtenerIdiomaTarea();
+		$shops = $this->obtenerShopTarea();
+
+		$this->set(compact('usuarios', 'impuestos', 'idiomas', 'shops','administradores', 'parentTareas', 'categoriatareas', 'tiendas', 'palabraclaves'));
 	}
 
 	public function admin_delete($id = null)
@@ -100,5 +127,23 @@ class TareasController extends AppController
 		$modelo			= $this->Tarea->alias;
 
 		$this->set(compact('datos', 'campos', 'modelo'));
+	}
+
+
+	public function guardarRevision() {
+
+		$revision = $this->request->data;
+		$revision['Tarea']['parent_id'] = $revision['Tarea']['id'];
+		unset($revision['Tarea']['id']);
+
+		$this->Tarea->create();
+		if ( $this->Tarea->save($revision) )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

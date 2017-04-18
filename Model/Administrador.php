@@ -14,7 +14,6 @@ class Administrador extends AppModel
 		/**
 		 * IMAGE UPLOAD
 		 */
-		/*
 		'Image'		=> array(
 			'fields'	=> array(
 				'imagen'	=> array(
@@ -29,7 +28,6 @@ class Administrador extends AppModel
 				)
 			)
 		)
-		*/
 	);
 
 	/**
@@ -57,16 +55,6 @@ class Administrador extends AppModel
 			),
 		),
 		'clave' => array(
-			'notBlank' => array(
-				'rule'			=> array('notBlank'),
-				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
-				//'allowEmpty'	=> true,
-				//'required'		=> false,
-				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
-			),
-		),
-		'codigo_fono' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
@@ -140,6 +128,15 @@ class Administrador extends AppModel
 			'order'					=> '',
 			'counterCache'			=> true,
 			//'counterScope'			=> array('Asociado.modelo' => 'Rol')
+		),
+		'Codigopaise' => array(
+			'className'				=> 'Codigopaise',
+			'foreignKey'			=> 'codigopais_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Codigopais')
 		)
 	);
 	public $hasMany = array(

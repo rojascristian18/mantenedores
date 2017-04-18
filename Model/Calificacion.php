@@ -71,4 +71,39 @@ class Calificacion extends AppModel
 			//'counterScope'			=> array('Asociado.modelo' => 'Usuario')
 		)
 	);
+
+
+	public function afterSave($created = true, $options = array()) {
+		parent::afterSave($created, $options);
+
+		if ( ! empty($this->data[$this->alias]) ) {
+			#Buscamos al usuario que se calificó
+			$usuario = ClassRegistry::init('Usuario')->find('first', array(
+				'conditions' => array(
+					'Usuario.id' => $this->data[$this->alias]['usuario_id']
+					),
+				'contain' => array(
+					sprintf('%s', $this->alias)
+					)
+				));
+
+			$media = 0;
+			$cantidad = 0;
+			# Calculamos la media de las calificaciones
+			foreach ($usuario[$this->alias] as $indice => $calificacion) {
+				$media = $media + $calificacion['calificacion'];
+				$cantidad++;
+			}
+
+			$mediaCalificaciones = round($media / $cantidad);
+
+
+			$usuario['Usuario']['calificacion_media'] = $mediaCalificaciones;
+
+			# actualizamos el campo al usuario
+			ClassRegistry::init('Usuario')->save($usuario);
+
+
+		}		
+	}
 }

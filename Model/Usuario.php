@@ -14,7 +14,6 @@ class Usuario extends AppModel
 		/**
 		 * IMAGE UPLOAD
 		 */
-		/*
 		'Image'		=> array(
 			'fields'	=> array(
 				'imagen'	=> array(
@@ -29,7 +28,6 @@ class Usuario extends AppModel
 				)
 			)
 		)
-		*/
 	);
 
 	/**
@@ -172,21 +170,16 @@ class Usuario extends AppModel
 			'counterQuery'			=> ''
 		)
 	);
-	public $hasAndBelongsToMany = array(
-		'Tarea' => array(
-			'className'				=> 'Tarea',
-			'joinTable'				=> 'tareas_usuarios',
-			'foreignKey'			=> 'usuario_id',
-			'associationForeignKey'	=> 'tarea_id',
-			'unique'				=> true,
+
+	public $belongsTo = array(
+		'Codigopaise' => array(
+			'className'				=> 'Codigopaise',
+			'foreignKey'			=> 'codigopais_id',
 			'conditions'			=> '',
 			'fields'				=> '',
 			'order'					=> '',
-			'limit'					=> '',
-			'offset'				=> '',
-			'finderQuery'			=> '',
-			'deleteQuery'			=> '',
-			'insertQuery'			=> ''
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Codigopais')
 		)
 	);
 
