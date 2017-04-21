@@ -55,6 +55,22 @@ Class Especificacion extends AppModel {
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Grupocaracteristica' => array(
+			'className'				=> 'Grupocaracteristica',
+			'joinTable'				=> 'grupocaracteristicas_especificaciones',
+			'foreignKey'			=> 'id_feature',
+			'associationForeignKey'	=> 'grupocaracteristica_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaEspecificacion',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 }

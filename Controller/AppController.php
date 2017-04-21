@@ -226,11 +226,11 @@ class AppController extends Controller
 		}
 
 		if (empty($jsonPermisos['Rol']['permisos']) && $this->request->params['action'] != 'admin_login' && $this->request->params['action'] != 'admin_logout') {
-		 	throw new Exception('Falta Json con información de permisos.', 11);
+		 	//throw new Exception('Falta Json con información de permisos.', 11);
 		}
 
 		if ( $this->request->params['action'] == 'admin_login' || $this->request->params['action'] == 'admin_logout' ) {
-			throw new Exception('Acceso público.', 66);
+			//throw new Exception('Acceso público.', 66);
 		}
 
 		$json = json_decode( $jsonPermisos['Rol']['permisos'], true );
@@ -238,17 +238,16 @@ class AppController extends Controller
 		$controladorActual = $this->request->params['controller'];
 
 		$accionActual = $this->request->params['action'];
-
 		
 
 		if( ! array_key_exists($controladorActual, $json) ){
-			throw new Exception('No existe el controlador en el json.', 12);
+			//throw new Exception('No existe el controlador en el json.', 12);
 		}
 
 		$permisosControladorActual = $json[$controladorActual];
 	
 		if( empty($permisosControladorActual) ) {
-			throw new Exception('No existe información de permisos del controlador.', 13);
+			//throw new Exception('No existe información de permisos del controlador.', 13);
 		}else {
 			return $permisosControladorActual;
 		}	
@@ -457,9 +456,6 @@ class AppController extends Controller
 		$especificaciones = ClassRegistry::init('Especificacion')->find('all', array(
 			'contain' => array(
 				'Idioma',
-				'EspecificacionValor' => array(
-					'Idioma'
-					)
 				),
 			'limit' => 100
 			));		

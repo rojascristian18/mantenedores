@@ -97,4 +97,25 @@ class Grupocaracteristica extends AppModel
 			'counterQuery'			=> ''
 		)
 	);
+
+
+	public $hasAndBelongsToMany = array(
+		'Especificacion' => array(
+			'className'				=> 'Especificacion',
+			'joinTable'				=> 'grupocaracteristicas_especificaciones',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'id_feature',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaEspecificacion',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
+		)
+	);
+
 }

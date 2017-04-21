@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Grupocaracteristicas</h2>
+	<h2><span class="fa fa-folder"></span> Grupos de características</h2>
 </div>
 
 <div class="page-content-wrap">
@@ -7,10 +7,14 @@
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Listado de Grupocaracteristicas</h3>
+					<h3 class="panel-title">Listado de grupos de características</h3>
 					<div class="btn-group pull-right">
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Grupocaracteristica', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? if ($permisos['agregar']) : ?>
+						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Grupo', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? endif; ?>
+					<? if ($permisos['exportar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+					<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -18,25 +22,36 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
-													<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('desripcion', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('count_caracteristicas', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-													<th>Acciones</th>
+									<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('desripcion', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('count_caracteristicas', 'Cant. características', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th>Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( $grupocaracteristicas as $grupocaracteristica ) : ?>
 								<tr>
-											<td><?= $this->Html->link($grupocaracteristica['Tienda']['nombre'], array('controller' => 'tiendas', 'action' => 'edit', $grupocaracteristica['Tienda']['id'])); ?></td>
-													<td><?= h($grupocaracteristica['Grupocaracteristica']['nombre']); ?>&nbsp;</td>
-													<td><?= h($grupocaracteristica['Grupocaracteristica']['desripcion']); ?>&nbsp;</td>
-													<td><?= h($grupocaracteristica['Grupocaracteristica']['count_caracteristicas']); ?>&nbsp;</td>
-													<td><?= ($grupocaracteristica['Grupocaracteristica']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
-											<td>
+									<td><?= h($grupocaracteristica['Tienda']['nombre']); ?>&nbsp;</td>
+									<td><?= h($grupocaracteristica['Grupocaracteristica']['nombre']); ?>&nbsp;</td>
+									<td><?= h($grupocaracteristica['Grupocaracteristica']['desripcion']); ?>&nbsp;</td>
+									<td><?= h($grupocaracteristica['Grupocaracteristica']['count_caracteristicas']); ?>&nbsp;</td>
+									<td><?= ($grupocaracteristica['Grupocaracteristica']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
+									<td>
+									<? if ($permisos['editar']) : ?>
 										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $grupocaracteristica['Grupocaracteristica']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['eliminar']) : ?>
 										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $grupocaracteristica['Grupocaracteristica']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['activar']) : ?>
+										<? if ($grupocaracteristica['Grupocaracteristica']['activo']) : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $grupocaracteristica['Grupocaracteristica']['id']), array('class' => 'btn btn-xs btn-primary confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?>
+										<? else : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $grupocaracteristica['Grupocaracteristica']['id']), array('class' => 'btn btn-xs btn-success confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?>
+										<? endif; ?>
+									<? endif; ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>

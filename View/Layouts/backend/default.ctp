@@ -21,10 +21,11 @@
 		<?= $this->Html->scriptBlock("var fullwebroot = '{$this->Html->url('', true)}';"); ?>
 		<?= $this->Html->script(array(
 			'/backend/js/plugins/jquery/jquery.min',
-			//'/backend/js/plugins/jquery/jquery-ui.min',
+			'/backend/js/plugins/jquery/jquery-ui.min',
 			'/backend/js/plugins/bootstrap/bootstrap.min',
 			'/backend/js/plugins/bootstrap/bootstrap-select',
-			'/backend/js/actions',
+			'/backend/js/plugins/datatables/jquery.dataTables.min',
+			'/backend/js/plugins/noty/jquery.noty',
 			'/backend/js/custom',
 			/*
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
