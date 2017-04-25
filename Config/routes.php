@@ -1,5 +1,6 @@
 <?php
-Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+
+Router::connect('/', array('controller' => 'pages', 'action' => 'inicio'));
 
 # Administración
 Router::connect('/admin', array('controller' => 'tareas', 'action' => 'index', 'admin' => true));

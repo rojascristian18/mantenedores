@@ -28,6 +28,19 @@ Class ImpuestoReglaGrupo extends AppModel {
 			'exclusive'				=> '',
 			'finderQuery'			=> '',
 			'counterQuery'			=> ''
+		),
+		'Tarea' => array(
+			'className'				=> 'Tarea',
+			'foreignKey'			=> 'impuesto_default_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
 		)
 	);
 }

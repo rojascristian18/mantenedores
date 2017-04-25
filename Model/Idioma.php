@@ -73,4 +73,20 @@ Class Idioma extends AppModel {
 			'insertQuery'			=> ''
 		)
 	);
+
+	public $hasMany = array(
+		'Tarea' => array(
+			'className'				=> 'Tarea',
+			'foreignKey'			=> 'idioma_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
+		)
+	);
 }

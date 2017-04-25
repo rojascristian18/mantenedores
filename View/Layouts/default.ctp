@@ -2,13 +2,13 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Proyecto</title>
+		<title>Plataforma de trabajo</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<?= $this->Html->meta('favicon.ico', '/favicon.ico', array('type' => 'icon')); ?>
 		<?= $this->Html->css(array(
-			'bootstrap.min', 'font-awesome.min'
+			'bootstrap.min', 'font-awesome.min', 'custom'
 		)); ?>
 		<?= $this->Html->scriptBlock(sprintf("var webroot = '%s';", $this->webroot)); ?>
 		<?= $this->Html->scriptBlock(sprintf("var fullwebroot = '%s';", $this->Html->url('/', true))); ?>

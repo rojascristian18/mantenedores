@@ -14,22 +14,12 @@ class Adjunto extends AppModel
 		/**
 		 * IMAGE UPLOAD
 		 */
-		/*
 		'Image'		=> array(
 			'fields'	=> array(
-				'imagen'	=> array(
-					'versions'	=> array(
-						array(
-							'prefix'	=> 'mini',
-							'width'		=> 100,
-							'height'	=> 100,
-							'crop'		=> true
-						)
-					)
+				'url_archivo'	=> array(
 				)
 			)
 		)
-		*/
 	);
 
 	/**
@@ -82,4 +72,13 @@ class Adjunto extends AppModel
 			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
 		)
 	);
+
+	// Validaciones
+	public function beforeSave ($options = array()) {
+		
+		if ( ! empty($this->data[$this->alias])) {
+			$this->data[$this->alias]['administrador'] = CakeSession::read('Auth.Administrador.id');
+		}
+		
+	}
 }

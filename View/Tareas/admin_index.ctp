@@ -9,8 +9,12 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">Listado de Tareas</h3>
 					<div class="btn-group pull-right">
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Tarea', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? if ($permisos['agregar']) : ?>
+						<?= $this->Html->link('<i class="fa fa-plus"></i> Nueva Tarea', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? endif; ?>
+					<? if ($permisos['exportar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+					<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -18,25 +22,46 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
-									<th><?= $this->Paginator->sort('usuario_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('nombre', 'Tarea', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('usuario_id', 'Mantenedor', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('administrador_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-									<th><?= $this->Paginator->sort('parent_id', 'Tarea padre', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-									<th><?= $this->Paginator->sort('categoriatarea_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-									<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('iniciado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('fecha_entrega', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('porcentaje_realizado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th>Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( $tareas as $tarea ) : ?>
 								<tr>
-									<td><?= $this->Html->link($tarea['Usuario']['nombre'], array('controller' => 'usuarios', 'action' => 'edit', $tarea['Usuario']['id'])); ?></td>
-									<td><?= $this->Html->link($tarea['Administrador']['nombre'], array('controller' => 'administradores', 'action' => 'edit', $tarea['Administrador']['id'])); ?></td>
-									<td><?= $this->Html->link($tarea['ParentTarea']['nombre'], array('controller' => 'tareas', 'action' => 'edit', $tarea['ParentTarea']['id'])); ?></td>
-									<td><?= $this->Html->link($tarea['Categoriatarea']['nombre'], array('controller' => 'categoriatareas', 'action' => 'edit', $tarea['Categoriatarea']['id'])); ?></td>
-									<td><?= $this->Html->link($tarea['Tienda']['nombre'], array('controller' => 'tiendas', 'action' => 'edit', $tarea['Tienda']['id'])); ?></td>
+									<td><?= $tarea['Tarea']['nombre']; ?></td>
+									<td><?= $this->Html->link($tarea['Usuario']['nombre'], array('controller' => 'usuarios', 'action' => 'view', $tarea['Usuario']['id'])); ?></td>
+									<td><?= $tarea['Administrador']['nombre']; ?></td>
+									<td><?= ($tarea['Tarea']['iniciado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
+									<td><?= $tarea['Tarea']['fecha_entrega']; ?></td>
+									<td><?= $tarea['Tarea']['porcentaje_realizado']; ?>%</td>
 									<td>
-								<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
-								<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $tarea['Tarea']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<div class="btn-group">
+                                        <a href="#" data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true"><span class="fa fa-cog"></span> Acciones</a>
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <li role="presentation" class="dropdown-header">Seleccione</li>
+											<? if ($permisos['editar']) : ?>
+												<li><?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?></li>
+											<? endif; ?>
+											<? if ($permisos['eliminar']) : ?>
+												<li><?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?></li>
+											<? endif; ?>
+											<? if ($permisos['activar']) : ?>
+												<? if ($tarea['Tarea']['activo']) : ?>
+													<li><?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?></li>
+												<? else : ?>
+													<li><?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?></li>
+												<? endif; ?>
+											<? endif; ?>
+											</ul>
+										</li>                                                    
+                                        </ul>
+                                    </div>
 									</td>
 								</tr>
 								<?php endforeach; ?>

@@ -1,0 +1,50 @@
+/* Public css */
+
+html, body {
+	background-color: #D59CC4;
+	color: #fff;
+}
+
+h1 {
+	text-shadow: 1px 1px 1px #000;
+}
+
+.btn-primary {
+	background-color: #000;
+	border-color: #000;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+	background-color: #5d5b5b;
+	border-color: #5d5b5b;
+}
+
+.btn-success {
+	background-color: #771D97;
+	border-color: #771D97;
+}
+
+.btn-success:hover, .btn-success:focus {
+	background-color:#87519E;
+	border-color:#87519E;
+}
+
+img.logo {
+	max-width: 200px; 
+	margin: 180px auto 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+	img.logo{
+		margin-top: 160px;
+	}
+
+	h1 {
+		font-size: 22px;
+	}
+
+	.btn {
+		width: 100%;
+		margin-bottom: 5px;
+	}
+}

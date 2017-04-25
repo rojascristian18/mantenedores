@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Palabraclaves</h2>
+	<h2><span class="fa fa-key"></span> Palabras claves</h2>
 </div>
 <?= $this->Form->create('Palabraclave', array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?= $this->Form->input('id');?>

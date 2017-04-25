@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Codigopaises</h2>
+	<h2><span class="fa fa-book"></span> Códigos paises</h2>
 </div>
 
 <div class="page-content-wrap">
@@ -7,10 +7,14 @@
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Listado de Codigopaises</h3>
+					<h3 class="panel-title">Listado de Código paises</h3>
 					<div class="btn-group pull-right">
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Codigopaise', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? if ($permisos['agregar']) : ?>
+						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Codigo país', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? endif; ?>
+					<? if ($permisos['exportar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+					<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -18,23 +22,34 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
-													<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('pais', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('created', 'Fecha de creación', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-													<th>Acciones</th>
+									<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('pais', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('created', 'Fecha de creación', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th>Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( $codigopaises as $codigopaise ) : ?>
 								<tr>
-													<td><?= h($codigopaise['Codigopaise']['nombre']); ?>&nbsp;</td>
-													<td><?= h($codigopaise['Codigopaise']['pais']); ?>&nbsp;</td>
-													<td><?= ($codigopaise['Codigopaise']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
-													<td><?= h($codigopaise['Codigopaise']['created']); ?>&nbsp;</td>
-											<td>
+									<td><?= h($codigopaise['Codigopaise']['nombre']); ?>&nbsp;</td>
+									<td><?= h($codigopaise['Codigopaise']['pais']); ?>&nbsp;</td>
+									<td><?= ($codigopaise['Codigopaise']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
+									<td><?= h($codigopaise['Codigopaise']['created']); ?>&nbsp;</td>
+									<td>
+									<? if ($permisos['editar']) : ?>
 										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $codigopaise['Codigopaise']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['eliminar']) : ?>
 										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $codigopaise['Codigopaise']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['activar']) : ?>
+										<? if ($codigopaise['Codigopaise']['activo']) : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $codigopaise['Codigopaise']['id']), array('class' => 'btn btn-xs btn-primary confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?>
+										<? else : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $codigopaise['Codigopaise']['id']), array('class' => 'btn btn-xs btn-success confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?>
+										<? endif; ?>
+									<? endif; ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>

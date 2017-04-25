@@ -88,6 +88,7 @@ class Palabraclave extends AppModel
 			'order'					=> '',
 			'limit'					=> '',
 			'offset'				=> '',
+			'with'					=> 'PalabraclaveTarea',
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''

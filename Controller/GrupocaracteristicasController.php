@@ -256,7 +256,7 @@ class GrupocaracteristicasController extends AppController
 					'EspecificacionIdioma.id_feature LIKE "%' . $palabra . '%"' 
 					),
 				'AND' => array(
-					'EspecificacionIdioma.id_feature NOT IN' => Hash::extract($caracteristicasDelGrupo, '{n}.GrupocaracteristicaEspecificacion.id_feature')
+					'EspecificacionIdioma.id_feature !=' => Hash::extract($caracteristicasDelGrupo, '{n}.GrupocaracteristicaEspecificacion.id_feature')
 					)
 				));
 		}

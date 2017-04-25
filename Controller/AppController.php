@@ -42,6 +42,16 @@ class AppController extends Controller
 
 	public function beforeFilter()
 	{	
+
+		/**
+		 * Layout y permisos públicos
+		 */
+		if ( ! isset($this->request->params['prefix']) ) {
+			//prx($this->request->params);
+			$this->Auth->allow();
+		}
+
+
 		/**
 		 * Layout administracion
 		 */
@@ -155,44 +165,47 @@ class AppController extends Controller
 
 	public function beforeRender() {
 
-		// Capturar permisos de usuario
-		try {
-			$permisos = $this->hasPermission();
-		} catch (Exception $e) {
-			$permisos = $e;
+		if ( ! empty($this->request->params['admin']) ) {
+			// Capturar permisos de usuario
+			try {
+				$permisos = $this->hasPermission();
+			} catch (Exception $e) {
+				$permisos = $e;
+			}
+			
+			// Permisos públicos
+			if ( is_object($permisos) && $permisos->getCode() != 66 ) {
+				$this->Session->setFlash($permisos->getMessage(), null, array(), 'danger');
+				$this->redirect(sprintf('/%s', $this->request->params['prefix']));
+			}
+
+			// Modulos activos y disponibles para este Rol
+			$modulosDisponibles = $this->modulosDisponibles( $this->Auth->user('rol_id') );
+			
+			// Tiendas
+			$tiendasList = $this->obtenerTiendas();
+
+			// Tareas
+			$tareasNotificacion =  $this->tareasRevision();
+
+			// Comentarios
+			$comentariosNotificacion =  $this->tareasComentarios();
+
+			/**
+			 * Camino de migas automático
+			 */
+			$this->caminoAutomatico();
+
+			// Camino de migas
+			$breadcrumbs	= BreadcrumbComponent::get();
+			if ( ! empty($breadcrumbs) ) {
+				$this->set(compact('breadcrumbs'));
+			}
+
+
+			$this->set(compact('permisos', 'modulosDisponibles', 'tiendasList', 'tareasNotificacion', 'comentariosNotificacion'));
 		}
-		
-		// Permisos públicos
-		if ( is_object($permisos) && $permisos->getCode() != 66 ) {
-			$this->Session->setFlash($permisos->getMessage(), null, array(), 'danger');
-			$this->redirect('/');
-		}
 
-		// Modulos activos y disponibles para este Rol
-		$modulosDisponibles = $this->modulosDisponibles( $this->Auth->user('rol_id') );
-		
-		// Tiendas
-		$tiendasList = $this->obtenerTiendas();
-
-		// Tareas
-		$tareasNotificacion =  $this->tareasRevision();
-
-		// Comentarios
-		$comentariosNotificacion =  $this->tareasComentarios();
-
-		/**
-		 * Camino de migas automático
-		 */
-		$this->caminoAutomatico();
-
-		// Camino de migas
-		$breadcrumbs	= BreadcrumbComponent::get();
-		if ( ! empty($breadcrumbs) ) {
-			$this->set(compact('breadcrumbs'));
-		}
-
-
-		$this->set(compact('permisos', 'modulosDisponibles', 'tiendasList', 'tareasNotificacion', 'comentariosNotificacion'));
 
 	}
 
@@ -226,11 +239,11 @@ class AppController extends Controller
 		}
 
 		if (empty($jsonPermisos['Rol']['permisos']) && $this->request->params['action'] != 'admin_login' && $this->request->params['action'] != 'admin_logout') {
-		 	//throw new Exception('Falta Json con información de permisos.', 11);
+		 	throw new Exception('Falta Json con información de permisos.', 11);
 		}
 
 		if ( $this->request->params['action'] == 'admin_login' || $this->request->params['action'] == 'admin_logout' ) {
-			//throw new Exception('Acceso público.', 66);
+			throw new Exception('Acceso público.', 66);
 		}
 
 		$json = json_decode( $jsonPermisos['Rol']['permisos'], true );
@@ -241,13 +254,13 @@ class AppController extends Controller
 		
 
 		if( ! array_key_exists($controladorActual, $json) ){
-			//throw new Exception('No existe el controlador en el json.', 12);
+			throw new Exception('Imposible acceder a ese módulo.', 12);
 		}
 
 		$permisosControladorActual = $json[$controladorActual];
 	
 		if( empty($permisosControladorActual) ) {
-			//throw new Exception('No existe información de permisos del controlador.', 13);
+			throw new Exception('No tiene permiso de acceder a ese módulo.', 13);
 		}else {
 			return $permisosControladorActual;
 		}	
@@ -333,6 +346,7 @@ class AppController extends Controller
 				'Usuario.nombre',
 				'Usuario.email',
 				'Tienda.nombre',
+				'Tarea.id'
 				),
 			'limit' => 50,
 			'order' => array(
@@ -485,5 +499,16 @@ class AppController extends Controller
 				BreadcrumbComponent::add('Ver ');
 				break;
 		}
+	}
+
+	public function quitarAdjuntos( $ids = '' ) {
+		if ( ! empty($ids) ) {
+			# Adjuntos eliminados
+			$arrayEliminadas = explode(",", $ids);
+			
+			ClassRegistry::init('Adjunto')->deleteAll(array('Adjunto.id' => $arrayEliminadas));	
+		}
+
+		return true;
 	}
 }

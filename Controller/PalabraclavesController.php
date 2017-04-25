@@ -167,4 +167,43 @@ class PalabraclavesController extends AppController
 		$this->Session->setFlash('Error al desactivar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
 		$this->redirect(array('action' => 'index'));
 	}
+
+	public function admin_obtenerPalabraclave ($palabra = '') {
+		if (empty($palabra)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+				'Palabraclave.nombre LIKE "%' . $palabra . '%"'
+			);
+
+		# Buscamos las palabras claves
+		$palabraclaves  = $this->Palabraclave->find('all', $options);
+		
+		$arrayPalabrasClaves = array();
+		
+		# Creamos la lista de palabras claves
+		foreach ($palabraclaves as $indice => $valor) {
+
+			$arrayPalabrasClaves[$indice]['id'] = $valor['Palabraclave']['id'];
+			$arrayPalabrasClaves[$indice]['value'] = $valor['Palabraclave']['nombre'];
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Palabraclave][Palabraclave][]" value="[*ID*]" class="js-input-id_plabraclave">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Palabraclave']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Palabraclave']['nombre'] , $tabla);
+
+			$arrayPalabrasClaves[$indice]['todo'] = $tabla;
+		}
+
+		echo json_encode($arrayPalabrasClaves);
+		exit;
+	}
 }

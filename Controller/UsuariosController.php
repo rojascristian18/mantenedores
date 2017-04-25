@@ -153,6 +153,70 @@ class UsuariosController extends AppController
 		$this->redirect(array('action' => 'index'));
 	}
 
+	/**
+	 * Muestra una tabla con el avatar del mantenedor
+	 * @param  	string 		$id 	Identificador de mantenedor
+	 * @return  string 				Tabla con información  
+	 */				
+	public function admin_obtenerAvatar($id = '') {
+
+		if ( ! empty($id) ) {
+
+			$this->Usuario->id = $id;
+			if ( ! $this->Usuario->exists() ) {
+				echo "";
+				exit;
+			}
+
+			$mantenedor = $this->Usuario->find('first', array(
+				'conditions'	=> array('Usuario.id' => $id),
+				'fields' => array('imagen', 'rut', 'email', 'fono', 'calificacion_media', 'nombre', 'apellidos')
+			));
+
+			# Cargamos las librerias helpers para utilizar alguno de sus métodos
+			App::uses('AppHelper', 'View/Helper');
+			App::uses('HtmlHelper', 'View/Helper');
+
+			# instanciamos los Helpers
+			$appHelper = new AppHelper(new View());
+			$htmlHelper = new HtmlHelper(new View());
+
+			# Armamos la tabla con la data
+			$tabla = '<tr>';
+			$tabla .= '<td colspan="2" align="center" class="mantenedor-avatar">';
+			$tabla .= $imagenPerfil = (!empty($mantenedor['Usuario']['imagen'])) ? $htmlHelper->image($mantenedor['Usuario']['imagen']['mini'], array('class' => 'img-responsive img-circle', 'alt' => $mantenedor['Usuario']['nombre'])) : $htmlHelper->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $mantenedor['Usuario']['nombre'])) ;
+			$tabla .= '<span class="mantenedor-avatar-nombre">';
+			$tabla .= $mantenedor['Usuario']['nombre'] . ' ' . $mantenedor['Usuario']['apellidos'];
+			$tabla .= '</span>';
+			$tabla .= '</td>';
+			$tabla .= '</tr>';
+			$tabla .= '<tr>';
+			$tabla .= '<th><label>' . __('Rut') . '</label></th>';
+			$tabla .= '<td>' . $mantenedor['Usuario']['rut'] . '</td>';
+			$tabla .= '</tr>';
+			$tabla .= '<tr>';
+			$tabla .= '<th><label>' . __('Email') . '</label></th>';
+			$tabla .= '<td>' . $mantenedor['Usuario']['email'] . '</td>';
+			$tabla .= '</tr>';
+			$tabla .= '<tr>';
+			$tabla .= '<th><label>' . __('Fono') . '</label></th>';
+			$tabla .= '<td>' . $mantenedor['Usuario']['fono'] . '</td>';
+			$tabla .= '</tr>';
+			$tabla .= '<tr>';
+			$tabla .= '<th><label>' . __('Calificación') . '</label></th>';
+			$tabla .= '<td>' . $appHelper->estrellas($mantenedor['Usuario']['calificacion_media']) . '</td>';
+			$tabla .= '</tr>';
+
+			echo $tabla;
+			exit;
+
+		}else{
+			echo "";
+			exit;
+		}
+	}
+
+
 
 	/**
 	 * Métodos para Mantenedores

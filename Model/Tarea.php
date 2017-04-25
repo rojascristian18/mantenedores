@@ -7,6 +7,8 @@ class Tarea extends AppModel
 	 */
 	public $displayField	= 'nombre';
 
+	public $todo = array();
+
 	/**
 	 * BEHAVIORS
 	 */
@@ -76,7 +78,7 @@ class Tarea extends AppModel
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 		),
-		'descripcion' => array(
+		/*'descripcion' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
@@ -85,20 +87,10 @@ class Tarea extends AppModel
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
-		),
+		),*/
 		'precio' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
-				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
-				//'allowEmpty'	=> true,
-				//'required'		=> false,
-				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
-			),
-		),
-		'fecha_entrega' => array(
-			'datetime' => array(
-				'rule'			=> array('datetime'),
 				'last'			=> true,
 				//'message'		=> 'Mensaje de validación personalizado',
 				//'allowEmpty'	=> true,
@@ -216,7 +208,34 @@ class Tarea extends AppModel
 			'order'					=> '',
 			'counterCache'			=> true,
 			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
-		)
+		),
+		'ImpuestoReglaGrupo' => array(
+			'className'				=> 'ImpuestoReglaGrupo',
+			'foreignKey'			=> 'impuesto_default_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
+		),
+		'Idioma' => array(
+			'className'				=> 'Idioma',
+			'foreignKey'			=> 'idioma_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
+		),
+		'Shop' => array(
+			'className'				=> 'Shop',
+			'foreignKey'			=> 'shop_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
+		),
 	);
 	public $hasMany = array(
 		'Adjunto' => array(
@@ -297,6 +316,7 @@ class Tarea extends AppModel
 			'order'					=> '',
 			'limit'					=> '',
 			'offset'				=> '',
+			'with'					=> 'PalabraclaveTarea',
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
@@ -304,10 +324,55 @@ class Tarea extends AppModel
 	);
 
 	public function beforeSave($options = array()) {
-
+		
 		if ( ! isset($this->data['Tarea']['tienda_id'])) {
 			$this->data['Tarea']['tienda_id'] = CakeSession::read('Tienda.id');
 		}
+
+		$this->todo = $this->data;
+	}
+
+	public function afterSave($created, $options = array() ) {
 		
+		/*# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasourceModelo(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+		
+		$revision = $this->find('first', array(
+			'conditions' => array(
+				'Tarea.id' => $this->data['Tarea']['id']
+				),
+			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'ParentTarea', 'Palabraclave', 'Adjunto')
+			));
+
+		$revision['Tarea']['parent_id'] = $revision['Tarea']['id'];
+		unset($revision['Tarea']['id']);
+		$revision = array_replace_recursive($revision, $this->todo);
+		prx($revision);
+		$adjunto = array();
+		$palabrasClaves = array();
+
+		if ( ! empty($revision['Adjunto'])) {
+			foreach ($revision['Adjunto'] as $key => $value) {
+				$adjunto = $revision['Adjunto'][$key];
+				unset($revision['Adjunto'][$key]);
+				$revision['Adjunto'][$key]['Adjunto'] = $adjunto;
+
+				if (array_key_exists('tarea_id', $revision['Adjunto'][$key]['Adjunto'])) {
+					unset($revision['Adjunto'][$key]['Adjunto']['tarea_id']);
+					unset($revision['Adjunto'][$key]['Adjunto']['id']);
+				}
+			}	
+		}
+		
+		if ( ! empty($revision['Palabraclave']) ) {
+
+			foreach ($revision['Palabraclave'] as $key => $value) {
+				unset($revision['Palabraclave'][$key]['PalabraclaveTarea']);
+			}
+		}
+		prx($revision);
+		$this->create();
+		$this->saveAll($revision, array('callbacks' => false));
+		return;*/
 	}
 }
