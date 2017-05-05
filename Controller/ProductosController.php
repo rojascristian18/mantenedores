@@ -3,7 +3,10 @@ App::uses('AppController', 'Controller');
 class ProductosController extends AppController
 {
 	public function admin_index()
-	{
+	{	
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Fabricante', 'Proveedor'));
+
 		$this->paginate		= array(
 			'recursive'			=> 0
 		);
@@ -12,9 +15,12 @@ class ProductosController extends AppController
 	}
 
 	public function admin_add()
-	{
+	{	
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Fabricante', 'Proveedor'));
+
 		if ( $this->request->is('post') )
-		{
+		{	
 			$this->Producto->create();
 			if ( $this->Producto->save($this->request->data) )
 			{
@@ -26,15 +32,21 @@ class ProductosController extends AppController
 				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
 			}
 		}
+
 		$tareas	= $this->Producto->Tarea->find('list');
 		$grupocaracteristicas	= $this->Producto->Grupocaracteristica->find('list');
 		$parentProductos	= $this->Producto->ParentProducto->find('list');
 		$palabraclaves	= $this->Producto->Palabraclave->find('list');
-		$this->set(compact('tareas', 'grupocaracteristicas', 'parentProductos', 'palabraclaves'));
+		$proveedores = $this->Producto->Proveedor->find('list');
+		$fabricantes = $this->Producto->Fabricante->find('list');
+		$this->set(compact('tareas', 'grupocaracteristicas', 'parentProductos', 'proveedores', 'fabricantes'));
 	}
 
 	public function admin_edit($id = null)
-	{
+	{	
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Fabricante', 'Proveedor'));
+
 		if ( ! $this->Producto->exists($id) )
 		{
 			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
@@ -63,7 +75,9 @@ class ProductosController extends AppController
 		$grupocaracteristicas	= $this->Producto->Grupocaracteristica->find('list');
 		$parentProductos	= $this->Producto->ParentProducto->find('list');
 		$palabraclaves	= $this->Producto->Palabraclave->find('list');
-		$this->set(compact('tareas', 'grupocaracteristicas', 'parentProductos', 'palabraclaves'));
+		$proveedores = $this->Producto->Proveedor->find('list');
+		$fabricantes = $this->Producto->Fabricante->find('list');
+		$this->set(compact('tareas', 'grupocaracteristicas', 'parentProductos', 'proveedores', 'fabricantes'));
 	}
 
 	public function admin_delete($id = null)

@@ -7,8 +7,6 @@ class Tarea extends AppModel
 	 */
 	public $displayField	= 'nombre';
 
-	public $todo = array();
-
 	/**
 	 * BEHAVIORS
 	 */
@@ -109,6 +107,16 @@ class Tarea extends AppModel
 			),
 		),
 		'iniciado' => array(
+			'boolean' => array(
+				'rule'			=> array('boolean'),
+				'last'			=> true,
+				//'message'		=> 'Mensaje de validación personalizado',
+				//'allowEmpty'	=> true,
+				//'required'		=> false,
+				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
+			),
+		),
+		'fecha_iniciado' => array(
 			'datetime' => array(
 				'rule'			=> array('datetime'),
 				'last'			=> true,
@@ -305,18 +313,18 @@ class Tarea extends AppModel
 		)
 	);
 	public $hasAndBelongsToMany = array(
-		'Palabraclave' => array(
-			'className'				=> 'Palabraclave',
-			'joinTable'				=> 'palabraclaves_tareas',
+		'Grupocaracteristica' => array(
+			'className'				=> 'Grupocaracteristica',
+			'joinTable'				=> 'grupocaracteristicas_tareas',
 			'foreignKey'			=> 'tarea_id',
-			'associationForeignKey'	=> 'palabraclave_id',
+			'associationForeignKey'	=> 'grupocaracteristica_id',
 			'unique'				=> true,
 			'conditions'			=> '',
 			'fields'				=> '',
 			'order'					=> '',
 			'limit'					=> '',
 			'offset'				=> '',
-			'with'					=> 'PalabraclaveTarea',
+			'with'					=> 'GrupocaracteristicaTarea',
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
@@ -329,50 +337,59 @@ class Tarea extends AppModel
 			$this->data['Tarea']['tienda_id'] = CakeSession::read('Tienda.id');
 		}
 
-		$this->todo = $this->data;
+		# Verificamos si cambió el usuario asignado
+		$usuarioActual = $this->find('first', array('conditions' => array('Tarea.id' => $this->data['Tarea']['id']), 'fields' => array('usuario_id')));
+
+		if ( ! empty($usuarioActual['Tarea']['usuario_id']) && isset($this->data['Tarea']['usuario_id']) && $this->data['Tarea']['usuario_id'] != $usuarioActual['Tarea']['usuario_id'] && !isset($this->data['Comentario'])) {
+			$this->data['Tarea']['asignada'] = true;
+			$this->data['Tarea']['desasignar_a'] = $usuarioActual['Tarea']['usuario_id'];
+			
+			#  Se reinicia la tarea
+			#  
+			#  Recordar que tambien se debe calcular el monto de la tarea e ingresarlo en la cuenta del usuario que se le quitó la tarea
+			$this->data['Tarea']['iniciado'] = 0;
+			$this->data['Tarea']['en_progreso'] = 0;
+			$this->data['Tarea']['en_revision'] = 0;
+			$this->data['Tarea']['rechazado'] = 0;
+			$this->data['Tarea']['finalizado'] = 0;
+
+		}
+
+		if ( isset($this->data['Tarea']['usuario_id']) && !empty($this->data['Tarea']['usuario_id']) && !isset($this->data['Comentario']) ) {
+			$this->data['Tarea']['asignada'] = true;
+		}
+
+		# notificar comentario al mantenedor
+		if ( isset($this->data['Comentario']) && ! empty($this->data['Comentario']) && isset($this->data['Tarea']['usuario_id']) && !empty($this->data['Tarea']['usuario_id']) ) {
+			$this->data['Tarea']['notificar_comentario_mantenedor'] = true;
+		}
+
+		# notificar comentario al administrador
+		if ( isset($this->data['Comentario']) && ! empty($this->data['Comentario']) && isset($this->data['Tarea']['administrador_id']) && !empty($this->data['Tarea']['administrador_id']) ) {
+			$this->data['Tarea']['notificar_comentario_administrador'] = true;
+		}
+
+		# notificar comentario al administrador
+		if ( isset($this->data['Tarea']['iniciado']) && isset($this->data['Tarea']['administrador_id']) && !empty($this->data['Tarea']['administrador_id']) ) {
+			$this->data['Tarea']['notificar_inicio_tarea_administrador'] = true;
+		}
+		
+		return true;
+
 	}
 
 	public function afterSave($created, $options = array() ) {
 		
-		/*# Cambiamos el datasource de los modelos que necesitamos externos
-		$this->cambiarDatasourceModelo(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
-		
-		$revision = $this->find('first', array(
-			'conditions' => array(
-				'Tarea.id' => $this->data['Tarea']['id']
-				),
-			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'ParentTarea', 'Palabraclave', 'Adjunto')
-			));
+		parent::afterSave($created, $options);
 
-		$revision['Tarea']['parent_id'] = $revision['Tarea']['id'];
-		unset($revision['Tarea']['id']);
-		$revision = array_replace_recursive($revision, $this->todo);
-		prx($revision);
-		$adjunto = array();
-		$palabrasClaves = array();
+		/**
+		 * Dispara eventos al guardar la tarea (envio correos)
+		 */
+		if ( ! empty($this->data[$this->alias])) {
 
-		if ( ! empty($revision['Adjunto'])) {
-			foreach ($revision['Adjunto'] as $key => $value) {
-				$adjunto = $revision['Adjunto'][$key];
-				unset($revision['Adjunto'][$key]);
-				$revision['Adjunto'][$key]['Adjunto'] = $adjunto;
+			$evento			= new CakeEvent('Model.Tarea.afterSave', $this, $this->data);
+			$this->getEventManager()->dispatch($evento);
 
-				if (array_key_exists('tarea_id', $revision['Adjunto'][$key]['Adjunto'])) {
-					unset($revision['Adjunto'][$key]['Adjunto']['tarea_id']);
-					unset($revision['Adjunto'][$key]['Adjunto']['id']);
-				}
-			}	
 		}
-		
-		if ( ! empty($revision['Palabraclave']) ) {
-
-			foreach ($revision['Palabraclave'] as $key => $value) {
-				unset($revision['Palabraclave'][$key]['PalabraclaveTarea']);
-			}
-		}
-		prx($revision);
-		$this->create();
-		$this->saveAll($revision, array('callbacks' => false));
-		return;*/
 	}
 }

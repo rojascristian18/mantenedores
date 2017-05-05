@@ -76,5 +76,84 @@
 			</div>
 		</div> <!-- end col -->
 	</div> <!-- end row -->
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Agregar Categorías al Grupo</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-xs-12">
+						<div class="form-inline form-categoria">
+							<div class="form-group">
+								<label>Ingrese el ID o nombre de la categoria</label>
+							</div>
+							<div class="form-group">
+								<input class="form-control input-categoria-buscar" placeholder="Taladros, Accesorios, etc." type="text"  style="min-width: 350px;">
+							</div>
+							<div class="form-group">
+								<button class="btn btn-primary button-categoria-buscar"><span class="fa fa-plus"></span> Agregar</button>
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-stripped" id="tablaCategoria">
+							<thead>
+								<th>Id</th>
+								<th>Categoría</th>
+								<th>Acción</th>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="pull-right">
+						<input type="submit" class="btn btn-primary esperar-carga" autocomplete="off" data-loading-text="Espera un momento..." value="Guardar cambios">
+						<?= $this->Html->link('Cancelar', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
+					</div>
+				</div>
+			</div>
+		</div> <!-- end col -->
+		<div class="col-xs-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Agregar Palabras Claves al Grupo</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-xs-12">
+						<div class="form-inline form-palabraclave">
+							<div class="form-group">
+								<label>Ingrese el ID o nombre de la palabra clave</label>
+							</div>
+							<div class="form-group">
+								<input class="form-control input-palabraclave-buscar" placeholder="Taladros, Accesorios, etc." type="text"  style="min-width: 350px;">
+							</div>
+							<div class="form-group">
+								<button class="btn btn-primary button-palabraclave-buscar"><span class="fa fa-plus"></span> Agregar</button>
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-stripped" id="tablaPalabraclave">
+							<thead>
+								<th>Palabra Clave</th>
+								<th style="max-width: 60px">Acción</th>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="pull-right">
+						<input type="submit" class="btn btn-primary esperar-carga" autocomplete="off" data-loading-text="Espera un momento..." value="Guardar cambios">
+						<?= $this->Html->link('Cancelar', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
+					</div>
+				</div>
+			</div>
+		</div> <!-- end col -->
+	</div>
 </div>
 <?= $this->Form->end(); ?>

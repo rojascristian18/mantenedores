@@ -15,440 +15,310 @@
  */
 jQuery(document).ready(function($)
 {
-	$('.js-query-ver-query').on('click', function(evento)
-	{
-		evento.preventDefault();
-		var $this			= $(this),
-			$tr				= $this.parents('tr').first(),
-			$extracto		= $tr.find('.extracto'),
-			$query			= $tr.find('.query');
-
-		$extracto.hide();
-		$query.show();
-	});
-
-	/* LOCK SCREEN */
-    $('.lockscreen-box .lsb-access').on('click',function()
-	{
-		$(this).parent('.lockscreen-box').addClass('active').find('input').focus();
-		return false;
-	});
-
-    $('.lockscreen-box .user_signin').on('click',function()
-	{
-		$('.sign-in').show();
-		$(this).remove();
-		$('.user').hide().find('img').attr('src', webroot + 'backend/assets/images/users/no-image.jpg');
-		$('.user').show();
-		return false;
-	});
-    /* END LOCK SCREEN */
-
-	/**
-	 * Ordenamiento de tablas generico
-	 */
-	$('.js-generico-contenedor-sort').sortable(
-	{
-		axis			: 'y',
-		cursor			: 'move',
-		helper			: function(e, tr)
-		{
-			var $originals	= tr.children(),
-				$helper		= tr.clone();
-
-			$helper.children().each(function(index)
-			{
-				$(this).width($originals.eq(index).width());
-			});
-			return $helper;
-		},
-		stop			: function(e, ui)
-		{
-			$('td.js-generico-orden', ui.item.parent()).each(function(i)
-			{
-				var $this		= $(this);
-				$this.find('input').val(i + 1);
-				$this.find('span').text(i + 1);
-			});
-
-			var $form		= ui.item.parents('form').first();
-			$.post($form.attr('action'), $form.serialize());
-		}
-	}).disableSelection();
-
-	$('.js-generico-handle-sort').on('click', function(evento)
-	{
-		evento.preventDefault();
-	});
-
-
-
-	/**
-	 * Editor de ayudas
-	 */
-	if ( $('.js-summernote').length )
-	{
-		$('.js-summernote').summernote(
-		{
-			height		: 300,
-			focus		: true,
-			toolbar		: [
-				['style', ['bold', 'italic', 'underline', 'clear']],
-				['insert', ['link', 'picture']]
-			]
-		});
-	}
-
-	/**
-	 * Funcion que permite obtener en formato YYYY-MM-DD una fecha determinada
-	 * @param			{Object}			fecha			Fecha que se desea obtener
-	 * @returns			{Object}			fecha			Fecha en formato YYYY-MM-DD
-	 */
-	function obtenerFecha(fecha)
-	{
-		return fecha.getFullYear() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getDate();
-	}
-
 	/**
 	 * Idioma español datepicker
 	 */
-	!function(a)
-	{
-		a.fn.datepicker.dates.es = {
-			days			: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-			daysShort		: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-			daysMin			: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
-			months			: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-			monthsShort		: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-			today			: 'Hoy',
-			clear			: 'Borrar',
-			weekStart		: 1,
-			format			: 'dd/mm/yyyy'
-		}
-	}(jQuery);
+	if ( $('.datepicker').length > 0 ) {
+		!function(a)
+		{
+			a.fn.datepicker.dates.es = {
+				days			: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				daysShort		: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+				daysMin			: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+				months			: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthsShort		: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				today			: 'Hoy',
+				clear			: 'Borrar',
+				weekStart		: 1,
+				defaultDate 	: '2017-01-01',
+				format			: 'yyyy-mm-dd'
+			}
+		}(jQuery);
+	}
 
 	/**
-	 * Buscador de OC - Datepicker rango fechas
+	 * Datepicker
 	 */
-	var $buscador_fecha_inicio		= $('#CompraFechaInicio'),
-		$buscador_fecha_fin			= $('#CompraFechaFin');
-
-	if ( $buscador_fecha_inicio.length )
-	{
-		$buscador_fecha_inicio.datepicker(
-		{
+	if ($('.datepicker').length > 0) {
+		$('.datepicker').datepicker({
 			language	: 'es',
 			format		: 'yyyy-mm-dd'
-		}).on('changeDate', function(data)
-		{
-			$buscador_fecha_fin.datepicker('setStartDate', data.date);
-		});
-
-		$buscador_fecha_fin.datepicker(
-		{
-			language	: 'es',
-			format		: 'yyyy-mm-dd'
-		}).on('changeDate', function(data)
-		{
-			$buscador_fecha_inicio.datepicker('setEndDate', data.date);
 		});
 	}
 
 	/**
-	 * Buscador de OC - Rango de fecha predeterminada
+	 * Masked
 	 */
-	$('.js-data-search').on('click', function(evento)
+	
+	if($("input[class^='mask_']").length > 0){
+        $("input.mask_fono").mask('9 9999 9999');
+        $("input.mask_ssn").mask('999-99-9999');
+        $("input.mask_date").mask('9999-99-99');
+        $("input.mask_product").mask('a*-999-a999');
+        $("input.mask_phone").mask('99 (999) 999-99-99');
+        $("input.mask_phone_ext").mask('99 (999) 999-9999? x99999');
+        $("input.mask_credit").mask('9999-9999-9999-9999');
+        $("input.mask_percent").mask('99%');
+    }
+
+
+    ;(function($){
+		$.fn.rut = function(opt){
+			var defaults = $.extend({
+				error_html: '<span class="rut-error">Rut incorrecto</span>',
+				formatear : true,
+				on : 'blur',
+				required : true,
+				placeholder : true,
+				fn_error : function(input){
+					mostrar_error(input, defaults.error_html);
+				},
+				fn_validado: function(input){}
+			}, opt);
+			return this.each(function(){
+				var $t = $(this);
+				$t.wrap('<div class="rut-container"></div>');
+				$t.attr('pattern', '[0-9]{7,8}-[0-9k]{1}');
+				if(defaults.required) $t.attr('required', 'required');
+				if(defaults.placeholder) $t.attr('placeholder', '12345678-5');
+				if(defaults.formatear){
+					$t.on('blur', function(){
+						$t.val($.rut.formatear($t.val()));
+					});
+				}
+				$t.on(defaults.on, function(){
+					$('.rut-error').remove();
+					if($.rut.validar($t.val()) && $.trim($t.val()) != '')
+						defaults.fn_validado($t);
+					else
+						defaults.fn_error($t);
+				});
+			});
+		}
+		function mostrar_error(input, error){
+			input.closest('.rut-container').append(error);
+		}
+	})(jQuery);
+	jQuery.rut = {
+		validar : function(rut){
+			if (!/^[0-9]+-[0-9kK]{1}$/.test(rut))
+				return false;
+			var tmp = rut.split('-');
+			var dv = tmp[1], rut 	= tmp[0];
+			if(dv == 'K') dv = 'k';
+			return ($.rut.dv(rut) == dv);
+		},
+		dv : function(rut){
+			var M=0,S=1;
+			for(;rut;rut=Math.floor(rut/10))
+				S=(S+rut%10*(9-M++%6))%11;
+			return S ? S-1 : 'k';
+		},
+		formatear : function(rut){
+			return rut.replace(/^(\d{7,8})(\w{1})$/, '$1-$2');
+		},
+		quitar_formato : function(rut){
+			rut = rut.split('-').join('').split('.').join('');
+			return rut;
+		}
+	};
+
+	/**
+	 * MAsked Rut
+	 * @param  {[type]} $('.masked_rut') [description]
+	 * @return {[type]}                  [description]
+	 */
+	if ( $('.masked_rut').length ) {
+		$('.masked_rut').rut();
+	}
+
+
+	/**
+	 * Validaciones
+	 */
+	// Validation Engine init
+	if ($('.validate').length) {
+		$('.validate').validate({
+            rules: {                                            
+                'data[Usuario][email]': {
+                        required: true,
+                        email: true
+                },
+                'data[Usuario][clave]': {
+                        required: false,
+                        minlength: 4,
+                        maxlength: 15
+                },
+                'data[Usuario][clave_nueva]': {
+                        required: false,
+                        minlength: 4,
+                        maxlength: 15,
+                },
+                'data[Usuario][rep_clave_nueva]': {
+                        required: false,
+                        minlength: 4,
+                        maxlength: 15,
+                        equalTo: '#UsuarioClaveNueva'
+                },
+                'data[Usuario][nombre]': {
+                        required: true,
+                        maxlength: 30,
+                },
+                'data[Usuario][apellidos]': {
+                        required: true,
+                        maxlength: 70,
+                },
+                'data[Usuario][fono]': {
+                        required: true,
+                        maxlength: 11,
+                }
+            },
+            messages: {                                            
+                'data[Usuario][email]': {
+                        required: 'Requerido',
+                        email: 'Ingrese un email válido'
+                },
+                'data[Usuario][clave]': {
+                        minlength: 'Largo mínimo: 5',
+                        maxlength: 'Largo máxmimo: 5'
+                },
+                'data[Usuario][clave_nueva]': {
+                        minlength: 'Largo mínimo: 5',
+                        maxlength: 'Largo máxmimo: 5'
+                },
+                'data[Usuario][rep_clave_nueva]': {
+                        minlength: 'Largo mínimo: 5',
+                        maxlength: 'Largo máxmimo: 5',
+                        equalTo: 'Las contraseñas no coinciden'
+                },
+                'data[Usuario][nombre]': {
+                        required: 'Requerido',
+                        maxlength: 'Largo permitido 30'
+                },
+                'data[Usuario][apellidos]': {
+                        required: 'Requerido',
+                        maxlength: 'Largo permitido: 70'
+                },
+                'data[Usuario][fono]': {
+                        required: 'requerido',
+                        maxlength: '',
+                },
+                'data[Usuario][rut]': {
+                        required: 'requerido'
+                }
+            }                                       
+        });
+	}
+
+
+	/**
+	 * Agregar un nuevo clon
+	 */
+	$('.js-clon-agregar').on('click', function(evento, data)
 	{
 		evento.preventDefault();
 
 		var $this			= $(this),
-			tipo			= $this.data('tipo'),
-			rango			= $this.data('rango'),
-			fecha_inicio	= new Date();
+			$scope			= $this.parents('.js-clon-scope').first(),
+			$base			= $('.js-clon-base', $scope),
+			$contenedor		= $('.js-clon-contenedor', $scope),
+			$clon			= $base.clone(),
+			$tr;
 
 		/**
-		 * Limpia las fechas
+		 * Hace visible al elemento clonado y quita los atributos de deshabilitado
 		 */
-		if ( tipo == 'todo' )
+		$clon.removeClass('hidden js-clon-base');
+		$clon.find('input, select, textarea').each(function()
 		{
-			$buscador_fecha_inicio.datepicker('update', '');
-			$buscador_fecha_fin.datepicker('update', '');
+			$(this).removeAttr('disabled');
+		});
+
+		/**
+		 * Si es accion clonar, copia los datos y escribe la fila bajo la seleccionada
+		 */
+		if ( typeof(data) === 'object' && typeof(data.clone) !== 'undefined' )
+		{
+			$tr			= $(data.element).parents('tr').first();
+			$tr.find('input, select, textarea').each(function(index)
+			{
+				$clon.find('input, select, textarea').eq(index).val($(this).val());
+			});
+			$tr.after($clon.show());
 		}
+
+		/**
+		 * Si es accion agregar, agrega la fila al final de la tabla
+		 */
 		else
 		{
-			var method = {
-				dia		: ['setDate', 'getDate'],
-				mes		: ['setMonth', 'getMonth'],
-				ano		: ['setYear', 'getFullYear']
-			};
-
-			/**
-			* Calcula la fecha
-			*/
-			fecha_inicio[method[tipo][0]](fecha_inicio[method[tipo][1]]() - rango);
-			$buscador_fecha_inicio.datepicker('setDate', obtenerFecha(fecha_inicio));
-			$buscador_fecha_fin.datepicker('setDate', obtenerFecha(new Date));
+			$contenedor.append($clon.show());
 		}
+
+		/**
+		 * Reindexa
+		 */
+		clonReindexar();
+
+		/**
+		 * Actualiza el alto del contenido
+		 */
+		page_content_onresize();
 	});
 
 	/**
-	 * Buscador de OC - Rango OC
+	 * Eliminar clon
 	 */
-	var $slider_oc		= $('#CompraRangoOc');
-	if ( $slider_oc.length )
-	{
-		var minOC		= $slider_oc.data('min-oc'),
-			maxOC		= $slider_oc.data('max-oc');
-
-		$slider_oc.ionRangeSlider(
-		{
-			type				: 'double',
-			grid				: true,
-			min					: minOC,
-			max					: maxOC,
-			//from				: minOC,
-			//to				: maxOC,
-			prettify_separator	: '.',
-			force_edges: false,
-			prefix				: 'OT ',
-			onChange			: function(data)
-			{
-				$(data.input).attr('disabled', false);
-			}
-		});
-
-		if ( typeof(filtros) === 'object' && typeof(filtros.filtro) === 'object' && typeof(filtros.filtro.oc_min) !== 'undefined' )
-		{
-			$slider_oc.data('ionRangeSlider').update(
-			{
-				from		: parseInt(filtros.filtro.oc_min, 10),
-				to			: parseInt(filtros.filtro.oc_max, 10)
-			});
-			$slider_oc.attr('disabled', false);
-		}
-	}
-
-	/**
-	 * Buscador de OC - Rango Monto
-	 */
-	var $slider_monto		= $('#CompraRangoMonto');
-	if ( $slider_monto.length )
-	{
-		var minMonto		= $slider_monto.data('min-monto'),
-			maxMonto		= $slider_monto.data('max-monto');
-
-		$slider_monto.ionRangeSlider(
-		{
-			type				: 'double',
-			grid				: true,
-			min					: minMonto,
-			max					: maxMonto,
-			//from				: minMonto,
-			//to					: maxMonto,
-			prettify_separator	: '.',
-			prefix				: '$',
-			onChange			: function(data)
-			{
-				$(data.input).attr('disabled', false);
-			}
-		});
-
-		if ( typeof(filtros) === 'object' && typeof(filtros.filtro) === 'object' && typeof(filtros.filtro.monto_min) !== 'undefined' )
-		{
-			$slider_monto.data('ionRangeSlider').update(
-			{
-				from		: parseInt(filtros.filtro.monto_min, 10),
-				to			: parseInt(filtros.filtro.monto_max, 10)
-			});
-			$slider_monto.attr('disabled', false);
-		}
-	}
-
-	/**
-	 * Select estados
-	 */
-	if ( $('.selectpicker').length )
-	{
-		$('.selectpicker').selectpicker();
-	}
-
-
-	/**
-	 * Limpia filtros
-	 */
-	$('.js-limpiar-busqueda').on('click', function(evento)
+	$('.js-clon-contenedor').on('click', '.js-clon-eliminar', function(evento)
 	{
 		evento.preventDefault();
-		var $this			= $(this),
-			tipo			= $this.data('tipo'),
-			$input			= $('[data-tipo="' + tipo + '"]').not(this);
 
-		if ( tipo === 'libre' )
-		{
-			$input.val('');
-		}
-		if ( tipo === 'fecha' )
-		{
-			$input.datepicker('update', '').datepicker('clearDates');
-		}
-		if ( tipo === 'estado' )
-		{
-			$input.selectpicker('deselectAll');
-		}
-		if ( tipo === 'oc' || tipo === 'monto' )
-		{
-			$input.data('ionRangeSlider').reset();
-			$input.prop('disabled', true);
-		}
+		var $this			= $(this),
+			$tr				= $this.parents('tr').first();
+
+		$tr.remove();
+
+		/**
+		 * Reindexa
+		 */
+		clonReindexar();
 	});
 
+	/**
+	 * Clonar
+	 */
+	$('.js-clon-contenedor').on('click', '.js-clon-clonar', function(evento)
+	{
+		evento.preventDefault();
+		var $scope			= $(this).parents('.js-clon-scope').first();
+		$('.js-clon-agregar', $scope).trigger('click', { clone: true, element: this });
+	});
 
 	/**
-	 * Input autocomplete y codigo usuario
+	 * Agrega un clon en blanco si es necesario
 	 */
-	var $autocomplete		= $('[name="data[GrupoTarifario][usuario]"]');
-
-	if ( $autocomplete.length )
+	if ( $('.js-clon-blank').length )
 	{
-		/**
-		* Limpieza inicial
-		*/
-		$autocomplete.val('');
-	   /**
-		* Autocomplete del nombre del usuario
-		* Muestra
-		* 			nombre
-		* 			apellido materno
-		* 			apellido paterno
-		* 			email
-		* 			telefono
-		*/
-		$autocomplete.typeahead(
-		{
-			/**
-			 * Se obtiene el listado de los usuarios, filtrados el parametro enviado al controlador
-			 */
-			source					: function(query, process)
-			{
-				$.ajax(
-				{
-					type			: 'POST',
-					url				: webroot + 'admin/grupo_tarifarios/ajax_usuariosTarifarios',
-					dataType		: 'json',
-					data			: { query: query },
-					success			: process
-				});
-			},
-			minLength				: 1,
-			delay					: 200,
-			autoSelect				: false,
-			showHintOnFocus			: true,
-			displayText				: function(item)
-			{
-				return item.Usuario.nombre_completo;
-			}
-		});
-
-		/**
-		 * Actualiza el codigo del usuario o elimina el usuario
-		 * si no corresponde a una opcion del autoselector
-		 */
-		$autocomplete.on('change blur', function()
-		{
-			var $this			= $(this),
-				current			= $this.typeahead('getActive');
-
-			if ( typeof(current) !== 'undefined' )
-			{
-				if ( current.Usuario.nombre_completo === $this.val() )
-				{
-					// Se verifica que el id del usuario que se ingresa, no exita o este ingresado
-					if ( ! $('.tabla-usuarios tbody tr[data-usuario_id="' + current.Usuario.id + '"]').length )
-					{
-						/**
-						 * Se arma el arreglo que contiene los datos que se ingresan a la tabla
-						 * de usuarios seleccionados
-						 */
-						var datos		= [
-							current.TipoUsuario.nombre,
-							current.Usuario.nombre,
-							current.Usuario.email,
-							current.Usuario.celular,
-						];
-						var html		= $.map(datos, function(texto)
-						{
-							return $('<td />', { text: texto });
-						});
-
-						/**
-						 * Agregamos al primer td, un input type: hidde, el cual
-						 * contendra el id del usuario que se selecciona
-						 */
-						html[0].append($('<input />',
-						{
-							type	: 'hidden',
-							name	: 'data[Usuario][][usuario_id]',
-							value	: current.Usuario.id
-						}));
-
-						/**
-						 * Se agrega como ultimo td, el boton de accion, que permite eliminar el usuarios
-						 * selecionado
-						 */
-						html.push('<td><a href="#" class="btn btn-danger js-elimina-usuario"><span class="fa fa-times"></span></td>');
-
-						/**
-						 * Se ingresan los datos del usuario en la tabla de usuarios seleccionados
-						 */
-						$('.tabla-usuarios tbody').append(
-							$('<tr />', { 'data-usuario_id' :  current.Usuario.id }).append(html)
-						);
-					}
-				}
-				$this.val('').focus();
-			}
-		});
-
-		/**
-		 * Escucha que permite eliminar un item (usuario seleccionado) de la tabla de usuarios
-		 */
-		$('.tabla-usuarios tbody').on('click', '.js-elimina-usuario', function(evento)
-		{
-			evento.preventDefault();
-			$(this).parents('tr').first().remove();
-		});
+		$('.js-clon-blank').parents('.js-clon-scope').find('.js-clon-agregar').trigger('click');
 	}
 
-   if ( typeof(valores_oc) !== 'undefined' )
-   {
-        Morris.Line({
-         element: 'dashboard-line-2',
-         data: valores_oc,
-         xkey: 'y',
-         ykeys: ['total_compra', 'total_lista', 'total_reserva'],
-         labels: ['Compra','Lista', 'Reserva'],
-         resize: false,
-         lineColors: ['#848484','#FF8000', 'blue'],
-		 parseTime: true,
-		 preUnits: '$'
-       });
-   }
+	/**
+	 * Reindexa los input clonados, agregados o eliminados
+	 */
+	function clonReindexar()
+	{
+		var $contenedor			= $('.js-clon-contenedor');
 
-	if ( typeof(cantidad_estados) !== 'undefined' )
-    {
-        Morris.Line({
-        element: 'dashboard-line-1',
-        data: cantidad_estados,
-        xkey: 'y',
-        ykeys: ['1', '2', '3', '4', '5'],
-        labels: $.map(estados.estados, function(el) { return el }),
-        resize: true,
-        hideHover: false,
-        gridTextSize: '10px',
-        lineColors: ['#FF8000', '#B64645', '#8A0808', '#95B75D', '#848484'],
-        gridLineColor: '#E5E5E5',
-		 parseTime: true
-        });
-    }
+		$contenedor.find('tr:visible').each(function(index)
+		{
+			$(this).find('input, select, textarea').each(function()
+			{
+				var $that		= $(this),
+					nombre		= $that.attr('name').replace(/[(\d)]/g, (index + 1));
+
+				$that.attr('name', nombre);
+			});
+		});
+	}
 });
 //]]>

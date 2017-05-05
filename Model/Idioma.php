@@ -71,6 +71,22 @@ Class Idioma extends AppModel {
 			'finderQuery'			=> 'EspecificacionValorIdioma',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Categoria' => array(
+			'className'				=> 'Categoria',
+			'joinTable'				=> 'category_lang',
+			'foreignKey'			=> 'id_lang',
+			'associationForeignKey'	=> 'id_category',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> '',
+			'finderQuery'			=> 'CategoriaIdioma',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 

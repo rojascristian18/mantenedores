@@ -26,30 +26,18 @@
 												<td><?= $this->Form->input('importancia_id'); ?></td>
 											</tr>
 																				<tr>
-												<th><?= $this->Form->label('usuario', 'Usuario'); ?></th>
-												<td><?= $this->Form->input('usuario', array('class' => 'form-control select')); ?></td>
+												<th><?= $this->Form->label('usuario_id', 'Usuario'); ?></th>
+												<td><?= $this->Form->input('usuario_id', array('class' => 'form-control select')); ?></td>
 											</tr>
 																				<tr>
-												<th><?= $this->Form->label('administrador', 'Administrador'); ?></th>
-												<td><?= $this->Form->input('administrador'); ?></td>
+												<th><?= $this->Form->label('administrador_id', 'Administrador'); ?></th>
+												<td><?= $this->Form->input('administrador_id'); ?></td>
 											</tr>
 																				<tr>
 												<th><?= $this->Form->label('comentario', 'Comentario'); ?></th>
 												<td><?= $this->Form->input('comentario'); ?></td>
 											</tr>
-																				<tr>
-												<th><?= $this->Form->label('visualizado', 'Visualizado'); ?></th>
-												<td><?= $this->Form->input('visualizado', array('class' => 'icheckbox')); ?></td>
-											</tr>
-																				<tr>
-												<th><?= $this->Form->label('fecha_visualizado', 'Fecha visualizado'); ?></th>
-												<td><?= $this->Form->input('fecha_visualizado'); ?></td>
-											</tr>
-																				<tr>
-												<th><?= $this->Form->label('activo', 'Activo'); ?></th>
-												<td><?= $this->Form->input('activo', array('class' => 'icheckbox')); ?></td>
-											</tr>
-																				<tr>
+											<tr>
 												<th><?= $this->Form->label('adjunto', 'Adjunto'); ?></th>
 												<td><?= $this->Form->input('adjunto'); ?></td>
 											</tr>

@@ -10,10 +10,6 @@ Class Impuesto extends AppModel {
 	public $useTable = 'tax';
 	public $primaryKey = 'id_tax';
 
-	/**
-	 * Use Toolmania Connect
-	 */
-	public $useDbConfig = 'toolmania';
 
 	public $hasMany = array(
 		'ImpuestoRegla' => array(

@@ -119,24 +119,158 @@ jQuery(document).ready(function($)
 		});
 	}
 
+	if ($('.input-categoria-buscar').length > 0) {
+    	
+    	// Se limpia el campo
+    	$('.input-categoria-buscar').val('');
+
+    	$('.input-categoria-buscar').each(function(){
+			var $esto 	= $(this),
+				grupoId = 0;
+
+			if ( $('#GrupocaracteristicaId').length > 0 ) {
+				grupoId = $('#GrupocaracteristicaId').val();
+			}
+			
+			// Se buscan las características
+			$esto.autocomplete({
+			   	source: function(request, response) {
+			      	$.get( webroot + 'admin/grupocaracteristicas/buscarCategorias/' + request.term + '/' + grupoId, function(respuesta){
+						response( $.parseJSON(respuesta) );
+			      	})
+			      	.fail(function(){
+
+						noty({text: 'Ocurrió un error al obtener la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
+
+						setTimeout(function(){
+							$.noty.closeAll();
+						}, 10000);
+					});
+			    },
+			    select: function( event, ui ) {
+			        console.log("Seleccionado: " + ui.item.value + " id " + ui.item.id);
+			        todo = ui.item.todo;
+			    },
+			    open: function(event, ui) {
+	                var autocomplete = $(".ui-autocomplete:visible");
+	                var oldTop = autocomplete.offset().top;
+	                var width  = $esto.width();
+	                var newTop = oldTop - $esto.height() + 25;
+
+	                autocomplete.css("top", newTop);
+	                autocomplete.css("width", width);
+	                autocomplete.css("position", 'absolute');
+	            }
+			});
+	    });
+
+	    // Botón agregar característica a la lista
+		$('.button-categoria-buscar').on('click', function(event) {
+			event.preventDefault();
+
+			$('#tablaCategoria tbody').append(todo);
+			$('.input-categoria-buscar').val('');
+		});
+
+		// Botón quitar característica de la lista
+		$(document).on('click', '.quitar', function(event){
+			event.preventDefault();
+			$(this).parents('tr').eq(0).remove();
+		});
+	}
+
+
+	if ($('.input-palabraclave-buscar').length > 0) {
+		var crear = true;
+    	
+    	// Se limpia el campo
+    	$('.input-palabraclave-buscar').val('');
+
+    	$('.input-palabraclave-buscar').each(function(){
+			var $esto 	= $(this),
+				grupoId = 0;
+
+			if ( $('#GrupocaracteristicaId').length > 0 ) {
+				grupoId = $('#GrupocaracteristicaId').val();
+			}
+			
+			// Se buscan las características
+			$esto.autocomplete({
+			   	source: function(request, response) {
+			      	$.get( webroot + 'admin/grupocaracteristicas/buscarPalabraclaves/' + request.term + '/' + grupoId, function(respuesta){
+						response( $.parseJSON(respuesta) );
+						crear = true;
+			      	})
+			      	.fail(function(){
+
+						noty({text: 'Ocurrió un error al obtener la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
+
+						setTimeout(function(){
+							$.noty.closeAll();
+						}, 10000);
+					});
+			    },
+			    select: function( event, ui ) {
+			        console.log("Seleccionado: " + ui.item.value + " id " + ui.item.id);
+			        todo = ui.item.todo;
+			        crear = false;
+			    }
+			   
+			});
+	    });
+
+	    // Botón agregar característica a la lista
+		$('.button-palabraclave-buscar').on('click', function(event) {
+			event.preventDefault();
+
+			$('#tablaPalabraclave tbody').append(todo);
+			$('.input-palabraclave-buscar').val('');
+		});
+
+		// Botón quitar característica de la lista
+		$(document).on('click', '.quitar', function(event){
+			event.preventDefault();
+			$(this).parents('tr').eq(0).remove();
+		});
+
+		// Botón crear y agregar al listado
+		/*$('.button-palabraclave-crear').on('click', function(event){
+			event.preventDefault();
+			if ( crear ) {
+				var $tabla = '<tr>';
+				$tabla += '<td>';
+				$tabla += '<label class="label label-info">Crear</label>';
+				$tabla += '</td>';
+				$tabla += '<td><input type="hidden" name="data[Palabraclave][][nombre]" value="'+$('.input-palabraclave-buscar').val()+'">';
+				$tabla += $('.input-palabraclave-buscar').val();
+				$tabla += '</td>';
+				$tabla += '<td>';
+				$tabla += '<button class="quitar btn btn-danger">Quitar</button>';
+				$tabla += '</td>';
+				$tabla += '</tr>';
+				$('#tablaPalabraclave tbody').append($tabla);
+			}
+		});*/
+	}
+
 	/**
      * Buscardo de palabras claves
      * @param  {[type]} $('.input-caracteristica-buscar').lenght [description]
      * @return {[type]}                                          [description]
      */
     
-    if ($('.input-palabraclave-buscar').length > 0) {
+    if ($('.input-grupocaracteristica-buscar').length > 0) {
     	
     	// Se limpia el campo
-    	$('.input-palabraclave-buscar').val('');
+    	$('.input-grupocaracteristica-buscar').val('');
 
-    	$('.input-palabraclave-buscar').each(function(){
+    	$('.input-grupocaracteristica-buscar').each(function(){
 			var $esto 	= $(this);
 
 			// Se buscan las palabras claves
 			$esto.autocomplete({
 			   	source: function(request, response) {
-			      	$.get( webroot + 'admin/palabraclaves/obtenerPalabraClave/' + request.term, function(respuesta){
+			      	$.get( webroot + 'admin/grupocaracteristicas/obtenerGrupo/' + request.term, function(respuesta){
 						response( $.parseJSON(respuesta) );
 			      	})
 			      	.fail(function(){
@@ -156,11 +290,11 @@ jQuery(document).ready(function($)
 	    });
 
 	    // Botón agregar palabra clave a la lista
-		$('.button-palabraclave-buscar').on('click', function(event) {
+		$('.button-grupocaracteristica-buscar').on('click', function(event) {
 			event.preventDefault();
 
-			$('#tablaPalabrasClaves tbody').append(todo);
-			$('.input-palabraclave-buscar').val('');
+			$('#tablaGrupocaracteristica tbody').append(todo);
+			$('.input-grupocaracteristica-buscar').val('');
 		});
 
 		// Botón quitar palabra clave de la lista
@@ -354,6 +488,38 @@ jQuery(document).ready(function($)
 					noty({text: 'Ocurrió un error al obtener el historial de compra del cliente. Intente nuevamente.', layout: 'topRight', type: 'error'});
 				});
 			}
+		});
+	}
+
+
+	/**
+	 * Idioma español datepicker
+	 */
+	if ( $('.datepicker').length > 0 ) {
+		!function(a)
+		{
+			a.fn.datepicker.dates.es = {
+				days			: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				daysShort		: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+				daysMin			: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+				months			: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthsShort		: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				today			: 'Hoy',
+				clear			: 'Borrar',
+				weekStart		: 1,
+				defaultDate 	: '2017-01-01',
+				format			: 'yyyy-mm-dd'
+			}
+		}(jQuery);
+	}
+
+	/**
+	 * Datepicker
+	 */
+	if ($('.datepicker').length > 0) {
+		$('.datepicker').datepicker({
+			language	: 'es',
+			format		: 'yyyy-mm-dd'
 		});
 	}
 

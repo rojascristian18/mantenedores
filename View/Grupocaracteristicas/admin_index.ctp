@@ -26,6 +26,7 @@
 									<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('desripcion', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('count_caracteristicas', 'Cant. características', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('count_categorias', 'Cant. categorias', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th>Acciones</th>
 								</tr>
@@ -37,6 +38,7 @@
 									<td><?= h($grupocaracteristica['Grupocaracteristica']['nombre']); ?>&nbsp;</td>
 									<td><?= h($grupocaracteristica['Grupocaracteristica']['desripcion']); ?>&nbsp;</td>
 									<td><?= h($grupocaracteristica['Grupocaracteristica']['count_caracteristicas']); ?>&nbsp;</td>
+									<td><?= h($grupocaracteristica['Grupocaracteristica']['count_categorias']); ?>&nbsp;</td>
 									<td><?= ($grupocaracteristica['Grupocaracteristica']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td>
 									<? if ($permisos['editar']) : ?>

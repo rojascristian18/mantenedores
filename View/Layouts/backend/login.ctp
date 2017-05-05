@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<?= $this->Html->meta('icon'); ?>
 		<?= $this->Html->css(array(
-			'/backend/css/theme-default',
+			'/backend/css/theme-dark',
 			'/backend/css/custom'
 		)); ?>
 		<?= $this->Html->scriptBlock("var webroot = '{$this->webroot}';"); ?>

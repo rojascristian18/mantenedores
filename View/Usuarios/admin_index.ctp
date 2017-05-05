@@ -34,7 +34,7 @@
 							<tbody>
 								<?php foreach ( $usuarios as $usuario ) : ?>
 								<tr>
-									<td><?= $imagenPerfil = (!empty($usuario['Usuario']['imagen'])) ? $this->Html->image($usuario['Usuario']['imagen']['mini'], array('class' => 'img-responsive img-circle', 'alt' => $usuario['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $usuario['Usuario']['nombre'])) ; ?></td>
+									<td><?= $imagenPerfil = (!empty($usuario['Usuario']['imagen'])) ? $this->Html->image($usuario['Usuario']['imagen']['mini'], array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $usuario['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $usuario['Usuario']['nombre'])) ; ?></td>
 									<td valign="center"><?= h($usuario['Usuario']['rut']); ?>&nbsp;</td>
 									<td valign="center"><?= h($usuario['Usuario']['nombre']); ?>&nbsp;</td>
 									<td valign="center"><?= h($usuario['Usuario']['apellidos']); ?>&nbsp;</td>

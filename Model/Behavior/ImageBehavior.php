@@ -112,7 +112,7 @@ class ImageBehavior extends ModelBehavior
 	{
 		$tempData	= array();
 		extract($this->settings[$model->name]);
-
+		
 		foreach ( $fields as $key => $value )
 		{
 			$field		= (is_numeric($key) ? $value : $key);

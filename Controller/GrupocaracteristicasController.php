@@ -16,13 +16,17 @@ class GrupocaracteristicasController extends AppController
 	{
 		if ( $this->request->is('post') )
 		{	
-			# Limpiamos las especificaciones
-			$this->request->data['Especificacion'] = $this->limpiarEspecificaciones($this->request->data['Especificacion']);
-
-			if (empty($this->request->data['Especificacion'])) {
+			if ( empty($this->request->data['Especificacion']) ) {
 				$this->request->data['Grupocaracteristica']['count_caracteristicas'] = 0;
 			}
+			
+			if ( empty($this->request->data['Categoria']) ) {
+				$this->request->data['Grupocaracteristica']['count_categorias'] = 0;
+			}
 
+			if ( empty($this->request->data['Palabraclave'])) {
+				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
+			}
 
 			$this->Grupocaracteristica->create();
 			if ( $this->Grupocaracteristica->save($this->request->data) )
@@ -63,7 +67,7 @@ class GrupocaracteristicasController extends AppController
 	public function admin_edit($id = null)
 	{	
 		# Cambiamos el datasource de los modelos que necesitamos externos
-		$this->cambiarDatasource(array('Especificacion', 'EspecificacionIdioma', 'Idioma'));
+		$this->cambiarDatasource(array('Especificacion', 'EspecificacionIdioma', 'Idioma', 'Categoria', 'CategoriaIdioma'));
 
 		if ( ! $this->Grupocaracteristica->exists($id) )
 		{
@@ -73,17 +77,35 @@ class GrupocaracteristicasController extends AppController
 
 		if ( $this->request->is('post') || $this->request->is('put') )
 		{	
-
-			# Limpiamos las especificaciones
-			$this->request->data['Especificacion'] = $this->limpiarEspecificaciones($this->request->data['Especificacion']);
-
-			if (empty($this->request->data['Especificacion'])) {
+			if ( ! empty($this->request->data['Especificacion']) ) {
+				# Limpiamos las especificaciones
+				$this->request->data['Especificacion'] = $this->limpiarEspecificaciones($this->request->data['Especificacion']);
+			}else {
 				$this->request->data['Grupocaracteristica']['count_caracteristicas'] = 0;
+			}
+			
+			if ( ! empty($this->request->data['Categoria']) ) {
+				# Limpiamos las categorias
+				$this->request->data['Categoria'] = $this->limpiarCategorias($this->request->data['Categoria']);
+			}else{
+				$this->request->data['Grupocaracteristica']['count_categorias'] = 0;
+			}
+
+			if ( ! empty($this->request->data['Palabraclave'])) {
+				# Limpiamos las categorias
+				$this->request->data['Palabraclave'] = $this->limpiarPalabraclaves($this->request->data['Palabraclave']);
+			}else{
+				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
 			}
 
 			# Eliminar caracteristicas anteriores Con callbacks
 			$this->Grupocaracteristica->GrupocaracteristicaEspecificacion->deleteAll(array('GrupocaracteristicaEspecificacion.grupocaracteristica_id' => $id));
+			# Eliminar categorias anteriores Con callbacks
+			$this->Grupocaracteristica->GrupocaracteristicaCategoria->deleteAll(array('GrupocaracteristicaCategoria.grupocaracteristica_id' => $id));
+			# Eliminar categorias anteriores Con callbacks
+			$this->Grupocaracteristica->GrupocaracteristicaPalabraclave->deleteAll(array('GrupocaracteristicaPalabraclave.grupocaracteristica_id' => $id));
 
+			#prx($this->request->data);			
 			if ( $this->Grupocaracteristica->save($this->request->data) )
 			{
 				$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
@@ -97,7 +119,8 @@ class GrupocaracteristicasController extends AppController
 		else
 		{
 			$this->request->data	= $this->Grupocaracteristica->find('first', array(
-				'conditions'	=> array('Grupocaracteristica.id' => $id)
+				'conditions'	=> array('Grupocaracteristica.id' => $id),
+				'contain' => array('Palabraclave')
 			));
 
 			# Se obtiene el listado de caracteristicas que tiene este registro
@@ -137,8 +160,48 @@ class GrupocaracteristicasController extends AppController
 				$this->request->data['Especificacion'] = $caracteristicasGrupo;
 
 			}
+
+
+			# Buscamos las categorias del grupo
+			# Se obtiene el listado de categorias que tiene este registro
+			$categorias = $this->Grupocaracteristica->GrupocaracteristicaCategoria->find('all', array(
+				'conditions' => array(
+					'GrupocaracteristicaCategoria.grupocaracteristica_id' => $id
+					),
+				'fields' => array('id_category')
+				));
+
+			# Declaramos el indice Categoria como un arreglo vacio
+			$this->request->data['Categoria'] = array();
+			$categoriasGrupo = array();
+
+			# Sí no viene vacia buscamos
+			if ( ! empty($categorias) ) {
+
+				$listaIdCategorias = Hash::extract($categorias, '{n}.GrupocaracteristicaCategoria.id_category');
+
+				$optionsCat['conditions'] = array(
+					'Categoria.id_category' => $listaIdCategorias
+				);
+
+				$optionsCat['contain'] = array(
+					'Idioma'
+				);
+
+				if ( count($listaIdCategorias) == 1 ) {
+					$optionsCat['conditions'] = array(
+						'Categoria.id_category' => $listaIdCategorias
+						);
+				}
+
+
+				$categoriasGrupo = $this->Grupocaracteristica->Categoria->find('all', $optionsCat);
+				
+				$this->request->data['Categoria'] = $categoriasGrupo;
+
+			}
 		}
-		
+	
 		# Total de atributos disponibles
 		$totalAtributos = $this->Grupocaracteristica->Especificacion->find('count');
 		
@@ -221,6 +284,31 @@ class GrupocaracteristicasController extends AppController
 		return $especificaciones;
 	}
 
+	private function limpiarCategorias ($categorias =  array()) {
+		if ( !empty($categorias) ) {
+			foreach ($categorias as $indice => $categoria) {
+				if ($categoria['id_category'] == 0) {
+					unset($categorias[$indice]);
+				}
+			}
+		}
+
+		return $categorias;
+	}
+
+
+	private function limpiarPalabraclaves ($palabraclaves =  array()) {
+		if ( !empty($palabraclaves) ) {
+			foreach ($palabraclaves as $indice => $palabraclave) {
+				if ($palabraclave['id'] == 0) {
+					unset($palabraclaves[$indice]);
+				}
+			}
+		}
+
+		return $palabraclaves;
+	}
+
 	public function admin_buscarCaracteristicas($palabra = '', $idGrupo = '') {
 		if (empty($palabra)) {
 			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
@@ -287,6 +375,198 @@ class GrupocaracteristicasController extends AppController
 		}
 
 		echo json_encode($arrayAtributos);
+		exit;
+
+	}
+
+
+	public function admin_buscarCategorias($palabra = '', $idGrupo = '') {
+		if (empty($palabra)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Categoria', 'CategoriaIdioma', 'Idioma'));
+
+		# Se obtiene el listado de categorias que tiene este grupo
+		$categoriasDelGrupo = $this->Grupocaracteristica->GrupocaracteristicaCategoria->find('all', array(
+			'conditions' => array(
+				'GrupocaracteristicaCategoria.grupocaracteristica_id' => $idGrupo
+				),
+			'fields' => array(
+				'GrupocaracteristicaCategoria.id_category'
+				)
+			));
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'CategoriaIdioma.name LIKE "%' . $palabra . '%"',
+				'CategoriaIdioma.id_category LIKE "%' . $palabra . '%"' 
+				)
+			);
+
+		# Consulta con grupo de categoria definido
+		if ( ! empty($categoriasDelGrupo) ) {
+			$options['conditions'] = array_replace_recursive($options['conditions'], array(
+				'OR' => array(
+					'CategoriaIdioma.name LIKE "%' . $palabra . '%"',
+					'CategoriaIdioma.id_category LIKE "%' . $palabra . '%"' 
+					),
+				'AND' => array(
+					'CategoriaIdioma.id_category !=' => Hash::extract($categoriasDelGrupo, '{n}.GrupocaracteristicaCategoria.id_category')
+					)
+				));
+		}
+
+		# Buscamos las categorias que no este asociados a este grupo
+		$categorias  = $this->Grupocaracteristica->Categoria->CategoriaIdioma->find('all', $options);
+		
+		$arrayCategorias = array();
+		
+		# Creamos la lista de atributos
+		foreach ($categorias as $indice => $valor) {
+
+			$arrayCategorias[$indice]['id'] = $valor['CategoriaIdioma']['id_category'];
+			$arrayCategorias[$indice]['value'] = sprintf('%s - %s', $valor['CategoriaIdioma']['id_category'], $valor['CategoriaIdioma']['name']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Categoria][[*ID*]][id_category]" value="[*ID*]" class="js-input-id_category">[*ID*]</td>';
+	    	$tabla .= '<td>[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['CategoriaIdioma']['id_category'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['CategoriaIdioma']['name'] , $tabla);
+
+			$arrayCategorias[$indice]['todo'] = $tabla;
+		}
+
+		echo json_encode($arrayCategorias);
+		exit;
+
+	}
+
+	public function admin_buscarPalabraclaves($palabra = '', $idGrupo = '') {
+		if (empty($palabra)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+
+		# Se obtiene el listado de categorias que tiene este grupo
+		$palabraclavesDelGrupo = $this->Grupocaracteristica->GrupocaracteristicaPalabraclave->find('all', array(
+			'conditions' => array(
+				'GrupocaracteristicaPalabraclave.grupocaracteristica_id' => $idGrupo
+				),
+			'fields' => array(
+				'GrupocaracteristicaPalabraclave.palabraclave_id'
+				)
+			));
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'Palabraclave.nombre LIKE "%' . $palabra . '%"',
+				'Palabraclave.id LIKE "%' . $palabra . '%"' 
+				)
+			);
+
+		# Consulta con grupo de categoria definido
+		if ( ! empty($palabraclavesDelGrupo) ) {
+			$options['conditions'] = array_replace_recursive($options['conditions'], array(
+				'OR' => array(
+					'Palabraclave.nombre LIKE "%' . $palabra . '%"',
+					'Palabraclave.id LIKE "%' . $palabra . '%"' 
+					),
+				'AND' => array(
+					'Palabraclave.id !=' => Hash::extract($palabraclavesDelGrupo, '{n}.GrupocaracteristicaPalabraclave.palabraclave_id')
+					)
+				));
+		}
+
+		# Buscamos las categorias que no este asociados a este grupo
+		$palabraclaves  = $this->Grupocaracteristica->Palabraclave->find('all', $options);
+
+		if (empty($palabraclaves)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+		
+		$arrayPalabraclaves = array();
+		
+		# Creamos la lista de atributos
+		foreach ($palabraclaves as $indice => $valor) {
+
+			$arrayPalabraclaves[$indice]['id'] = $valor['Palabraclave']['id'];
+			$arrayPalabraclaves[$indice]['value'] = sprintf('%s - %s', $valor['Palabraclave']['id'], $valor['Palabraclave']['nombre']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Palabraclave][Palabraclave][[*ID*]]" value="[*ID*]" class="js-input-id_palabraclave">[*ID*]</td>';
+	    	$tabla .= '<td>[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Palabraclave']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Palabraclave']['nombre'] , $tabla);
+
+			$arrayPalabraclaves[$indice]['todo'] = $tabla;
+		}
+
+		echo json_encode($arrayPalabraclaves);
+		exit;
+
+	}
+
+
+	public function admin_obtenerGrupo($palabra = '', $idGrupo = '') {
+		if (empty($palabra)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'Grupocaracteristica.nombre LIKE "%' . $palabra . '%"',
+				'Grupocaracteristica.id LIKE "%' . $palabra . '%"' 
+				)
+			);
+
+		# Buscamos las categorias que no este asociados a este grupo
+		$grupos  = $this->Grupocaracteristica->find('all', $options);
+
+		if (empty($grupos)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+		
+		$arrayGrupos = array();
+		
+		# Creamos la lista de atributos
+		foreach ($grupos as $indice => $valor) {
+
+			$arrayGrupos[$indice]['id'] = $valor['Grupocaracteristica']['id'];
+			$arrayGrupos[$indice]['value'] = sprintf('%s - %s', $valor['Grupocaracteristica']['id'], $valor['Grupocaracteristica']['nombre']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Grupocaracteristica][Grupocaracteristica][[*ID*]]" value="[*ID*]" class="js-input-id_palabraclave">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-xs btn-danger">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Grupocaracteristica']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Grupocaracteristica']['nombre'] , $tabla);
+
+			$arrayGrupos[$indice]['todo'] = $tabla;
+		}
+
+		echo json_encode($arrayGrupos);
 		exit;
 
 	}

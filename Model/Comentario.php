@@ -13,22 +13,12 @@ class Comentario extends AppModel
 		/**
 		 * IMAGE UPLOAD
 		 */
-		/*
 		'Image'		=> array(
 			'fields'	=> array(
-				'imagen'	=> array(
-					'versions'	=> array(
-						array(
-							'prefix'	=> 'mini',
-							'width'		=> 100,
-							'height'	=> 100,
-							'crop'		=> true
-						)
-					)
+				'adjunto'	=> array(
 				)
 			)
 		)
-		*/
 	);
 
 	/**
@@ -97,6 +87,24 @@ class Comentario extends AppModel
 			'order'					=> '',
 			'counterCache'			=> true,
 			//'counterScope'			=> array('Asociado.modelo' => 'Importancia')
+		),
+		'Administrador' => array(
+			'className'				=> 'Administrador',
+			'foreignKey'			=> 'administrador_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
+		),
+		'Usuario' => array(
+			'className'				=> 'Usuario',
+			'foreignKey'			=> 'usuario_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
 		)
 	);
 	public $hasMany = array(
@@ -114,4 +122,8 @@ class Comentario extends AppModel
 			'counterQuery'			=> ''
 		)
 	);
+
+	public function beforeSave($options = array()) {
+		#prx($this->data);
+	}
 }

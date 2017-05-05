@@ -41,7 +41,14 @@ class UsuariosController extends AppController
 	public function admin_add()
 	{
 		if ( $this->request->is('post') )
-		{
+		{	
+			# Bit que habilita la notificacion al usuario
+			$this->request->data['Usuario']['creado'] = true;
+			
+			# creamos la clave nueva de 10 dígitos random
+			$this->request->data['Usuario']['clave'] = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(10/strlen($x)) )),1,10);
+			$this->request->data['Usuario']['clave_normal'] = $this->request->data['Usuario']['clave'];
+
 			$this->Usuario->create();
 			if ( $this->Usuario->save($this->request->data) )
 			{
@@ -85,7 +92,9 @@ class UsuariosController extends AppController
 			));
 		}
 		$tareas	= $this->Usuario->Tarea->find('list');
-		$this->set(compact('tareas'));
+		$codigopaises	= $this->Usuario->Codigopaise->find('list', array('conditions' => array('activo' => 1)));
+
+		$this->set(compact('tareas', 'codigopaises'));
 	}
 
 	public function admin_delete($id = null)
@@ -170,9 +179,9 @@ class UsuariosController extends AppController
 
 			$mantenedor = $this->Usuario->find('first', array(
 				'conditions'	=> array('Usuario.id' => $id),
-				'fields' => array('imagen', 'rut', 'email', 'fono', 'calificacion_media', 'nombre', 'apellidos')
+				'fields' => array('id', 'imagen', 'rut', 'email', 'fono', 'calificacion_media', 'nombre', 'apellidos')
 			));
-
+			
 			# Cargamos las librerias helpers para utilizar alguno de sus métodos
 			App::uses('AppHelper', 'View/Helper');
 			App::uses('HtmlHelper', 'View/Helper');
@@ -222,12 +231,52 @@ class UsuariosController extends AppController
 	 * Métodos para Mantenedores
 	 */
 
-	public function maintainers_login()
-	{
+	public function maintainers_login() {
+		/**
+		 * Login normal
+		 */
 		if ( $this->request->is('post') )
-		{
+		{	
 			if ( $this->Auth->login() )
-			{
+			{	
+				# Obtenemos la tienda principal
+				$tiendaPrincipal = ClassRegistry::init('Tienda')->find('first', array(
+					'conditions' => array('Tienda.principal' => 1),
+					'order' => array('Tienda.modified' => 'DESC')
+					));
+
+				if ( empty($tiendaPrincipal) ) {
+					
+					# Enviamos mensaje de porque la redirección
+					$this->Session->setFlash('No existe una tienda principal, porfavor contácte al encargado.', null, array(), 'danger');
+
+					# Eliminamos la sesión tienda
+					$this->Session->delete('Tienda');
+					# Deslogeamos
+					$this->maintainers_logout();
+				}else {
+					$this->Session->setFlash('Su tienda principal es ' . $tiendaPrincipal['Tienda']['nombre'], null, array(), 'success');
+					$this->Session->write('Tienda', $tiendaPrincipal['Tienda']);
+				}
+
+
+				/**
+				 * Verificamos que exista el usuario en la DB y esté activo
+				 */
+				$usuario			= $this->Usuario->find('first', array(
+					'conditions'			=> array('Usuario.email' => $this->request->data['Usuario']['email'], 'Usuario.activo' => 1)
+				));
+
+				if (empty($usuario)) {
+
+					$this->Session->setFlash('Su cuenta ha sido desactivada.', null, array(), 'danger');
+
+					# Deslogeamos
+					$this->maintainers_logout();
+				}
+
+				$this->Usuario->id = $usuario['Usuario']['id'];
+				$this->Usuario->saveField('ultimo_acceso', date('Y-m-d H:i:s'));
 				$this->redirect($this->Auth->redirectUrl());
 			}
 			else
@@ -235,44 +284,21 @@ class UsuariosController extends AppController
 				$this->Session->setFlash('Nombre de usuario y/o clave incorrectos.', null, array(), 'danger');
 			}
 		}
+
+
 		$this->layout	= 'login';
 	}
 
 	public function maintainers_logout()
-	{
+	{	
+		$this->Session->delete('Tienda');
 		$this->redirect($this->Auth->logout());
 	}
 
-	public function maintainers_index()
-	{
-		$this->paginate		= array(
-			'recursive'			=> 0
-		);
-		$usuarios	= $this->paginate();
-		$this->set(compact('usuarios'));
-	}
-
-	public function maintainers_add()
-	{
-		if ( $this->request->is('post') )
-		{
-			$this->Usuario->create();
-			if ( $this->Usuario->save($this->request->data) )
-			{
-				$this->Session->setFlash('Registro agregado correctamente.', null, array(), 'success');
-				$this->redirect(array('action' => 'index'));
-			}
-			else
-			{
-				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
-			}
-		}
-		$tareas	= $this->Usuario->Tarea->find('list');
-		$this->set(compact('tareas'));
-	}
-
 	public function maintainers_edit($id = null)
-	{
+	{	if ( $id != $this->Auth->user('id') ) {
+			$this->redirect(array('action' => 'profile'));
+		}
 		if ( ! $this->Usuario->exists($id) )
 		{
 			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
@@ -301,33 +327,115 @@ class UsuariosController extends AppController
 		$this->set(compact('tareas'));
 	}
 
-	public function maintainers_delete($id = null)
-	{
-		$this->Usuario->id = $id;
-		if ( ! $this->Usuario->exists() )
+
+	public function maintainers_profile()
+	{	#Id de sesión
+		$id = $this->Auth->user('id');
+		
+		if ( ! $this->Usuario->exists($id) )
 		{
 			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
 			$this->redirect(array('action' => 'index'));
 		}
 
-		$this->request->onlyAllow('post', 'delete');
-		if ( $this->Usuario->delete() )
-		{
-			$this->Session->setFlash('Registro eliminado correctamente.', null, array(), 'success');
-			$this->redirect(array('action' => 'index'));
+		if ( $this->request->is('post') || $this->request->is('put') )
+		{	
+			# Normalizamos la clave
+			if ( ! $this->validarClave() ) {
+				$this->Session->setFlash('Las contraseñas no estan correctas. Verifiqualas y vuelva a intentar.', null, array(), 'danger');
+				$this->redirect(array('action' => 'profile'));
+			}
+
+			# Verificamos el tamaño de la imagen si es que existe
+			if ( !empty($this->request->data) ) {
+				
+			}
+			
+			if ( $this->Usuario->saveAll($this->request->data) )
+			{	
+				# Actualizamos el valor de la sesión
+				
+				$this->actualizarAuth($id);
+
+				$this->Session->setFlash('Información guardada con éxito.', null, array(), 'success');
+				$this->redirect(array('action' => 'profile'));
+			}
+			else
+			{	
+				$this->Session->setFlash('Error al guardar la información. Por favor intenta nuevamente.', null, array(), 'danger');
+			}
 		}
-		$this->Session->setFlash('Error al eliminar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
-		$this->redirect(array('action' => 'index'));
+		else
+		{
+			$this->request->data	= $this->Usuario->find('first', array(
+				'conditions'	=> array('Usuario.id' => $id),
+				'contain' => array('Cuenta')
+			));
+		}
+		
+		$bancos = $this->Usuario->Cuenta->Banco->find('list', array('conditions' => array('Banco.activo' => 1)));
+		$tipoCuentas = $this->Usuario->Cuenta->TipoCuenta->find('list', array('conditions' => array('TipoCuenta.activo' => 1)));
+		$codigopaises	= $this->Usuario->Codigopaise->find('list', array('conditions' => array('activo' => 1)));
+		$tareas = $this->Usuario->Tarea->find('all', array(
+			'conditions' => array('Tarea.usuario_id' => $id, 'Tarea.finalizado' => 1), 
+			'limit' => 5, 
+			'contain' => array('Tienda')
+			));
+
+		# Montos
+		$acumuladoNoPagado 		= 0;
+		$acumuladoPagado 		= 0;
+		$totalMontoTareas 		= 0;
+		foreach ( $tareas as $ix => $tarea) {
+			$acumuladoNoPagado = 0;
+		}
+
+		BreadcrumbComponent::add('Mis Perfil ');
+
+		$this->set(compact('bancos', 'tipoCuentas', 'codigopaises', 'tareas'));
 	}
 
-	public function maintainers_exportar()
-	{
-		$datos			= $this->Usuario->find('all', array(
-			'recursive'				=> -1
-		));
-		$campos			= array_keys($this->Usuario->_schema);
-		$modelo			= $this->Usuario->alias;
 
-		$this->set(compact('datos', 'campos', 'modelo'));
+	public function actualizarAuth ($id = null) {
+
+		if ( ! $this->Usuario->exists($id) )
+		{
+			$this->Session->setFlash('Ocurrió un error al actualizar la sesión, por favor ingrese nuevamente.', null, array(), 'danger');
+			# Deslogeamos
+			$this->maintainers_logout();
+		}
+		
+		$usuario = $this->Usuario->find('first', array('conditions' => array('Usuario.id' => $id)));
+	
+		$this->Session->write('Auth.Mantenedor', $usuario['Usuario']);
+
+	}
+
+	public function validarClave() {
+		# Verificamos que este vacia para quitarla del arreglo
+		if (empty($this->request->data['Usuario']['clave'])) {
+			unset($this->request->data['Usuario']['clave'], $this->request->data['Usuario']['clave_nueva'], $this->request->data['Usuario']['rep_clave_nueva']);
+			return true;
+		}
+
+		# Validamos la nueva contraseña
+		if ( ! empty($this->request->data['Usuario']['clave']) && ! empty($this->request->data['Usuario']['clave_nueva']) && ! empty($this->request->data['Usuario']['rep_clave_nueva']) ) {
+			
+			# Verificamos que la clave se la misma registrada en la BD
+			if (AuthComponent::password($this->data['Usuario']['clave']) == $this->Auth->user('clave')) {
+				# Verificamos que las nuevas claves sean iguales
+				if ( $this->request->data['Usuario']['clave_nueva'] == $this->request->data['Usuario']['rep_clave_nueva'] ) {
+					$this->request->data['Usuario']['clave'] = $this->request->data['Usuario']['clave_nueva'];
+					unset($this->request->data['Usuario']['clave_nueva'], $this->request->data['Usuario']['rep_clave_nueva']);
+					return true;
+				}else{
+					return false;
+				}	
+			}else{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

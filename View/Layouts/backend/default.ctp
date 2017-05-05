@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 	<head>
-		<title>Proyecto | Administración</title>
+		<title>Trabajo | Administración</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,6 +31,7 @@
 			'/backend/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min',
 			'/backend/js/plugins/summernote/summernote',
 			'/backend/js/plugins/summernote/summernote_espanol',
+			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
 			//'/backend/js/plugins',
 			'/backend/js/custom',
 			/*

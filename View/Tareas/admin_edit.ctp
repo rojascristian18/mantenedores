@@ -83,7 +83,7 @@
 							<? if ( !empty($this->request->data['Usuario']['id']) ) : ?>
 								<tr>
 									<td colspan="2" align="center" class="mantenedor-avatar">
-										<?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image($this->request->data['Usuario']['imagen']['mini'], array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>
+										<?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image(sprintf('Usuario/%d/mini_%s', $this->request->data['Usuario']['id'] , $this->request->data['Usuario']['imagen']), array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>
 										<span class="mantenedor-avatar-nombre">
 											<?= $this->request->data['Usuario']['nombre']; ?> <?= $this->request->data['Usuario']['apellidos']; ?>
 										</span>
@@ -122,34 +122,34 @@
 			<div class="col-xs-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Agregar palabras claves</h3>
+						<h3 class="panel-title">Agregar grupos</h3>
 					</div>
 					<div class="panel-body">
 						<div class="col-xs-12">
-							<div class="form-inline form-palabraclave">
+							<div class="form-inline form-grupocaracteristica">
 								<div class="form-group">
-									<label>Ingrese el nombre de la palabra clave <label class="label label-form label-success">(<?=count($palabraclaves)?>) disponibles</label></label>
+									<label>Ingrese el nombre del grupo <label class="label label-form label-success">(<?=count($grupocaracteristicas)?>) disponibles</label></label>
 								</div>
 								<div class="form-group">
-									<input class="form-control input-palabraclave-buscar" placeholder="Herramientas eléctricas, Carro de compras, etc" type="text"  style="min-width: 350px;">
+									<input class="form-control input-grupocaracteristica-buscar" placeholder="Herramientas eléctricas, Carro de compras, etc" type="text"  style="min-width: 350px;">
 								</div>
 								<div class="form-group">
-									<button class="btn btn-primary button-palabraclave-buscar"><span class="fa fa-plus"></span> Agregar</button>
+									<button class="btn btn-primary button-grupocaracteristica-buscar"><span class="fa fa-plus"></span> Agregar</button>
 								</div>
 							</div>
 						</div>
 						<div class="table-responsive">
-							<table class="table table-stripped" id="tablaPalabrasClaves">
+							<table class="table table-stripped" id="tablaGrupocaracteristica">
 								<thead>
-									<th>Palabra Clave</th>
+									<th>Grupo</th>
 									<th style="max-width: 60px">Acción</th>
 								</thead>
 								<tbody>
-								<? if (!empty($this->request->data['Palabraclave'])) : ?>
+								<? if (!empty($this->request->data['Grupocaracteristica'])) : ?>
 								
-									<? foreach ($this->request->data['Palabraclave'] as $indice => $palabraclave) : ?>
+									<? foreach ($this->request->data['Grupocaracteristica'] as $indice => $grupo) : ?>
 									<tr>
-		    							<td><?= $this->Form->input('Palabraclave.Palabraclave.' . $palabraclave['id'], array('value' => $palabraclave['id'], 'type' => 'hidden')); ?><?=$palabraclave['nombre'];?></td>
+		    							<td><?= $this->Form->input('Grupocaracteristica.Grupocaracteristica.' . $grupo['id'], array('value' => $grupo['id'], 'type' => 'hidden')); ?><?=$grupo['nombre'];?></td>
 		    							<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>
 		    						</tr>
 									<? endforeach; ?>

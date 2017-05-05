@@ -77,18 +77,18 @@ class Palabraclave extends AppModel
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
 		),
-		'Tarea' => array(
-			'className'				=> 'Tarea',
-			'joinTable'				=> 'palabraclaves_tareas',
+		'Grupocaracteristica' => array(
+			'className'				=> 'Grupocaracteristica',
+			'joinTable'				=> 'grupocaracteristicas_palabraclaves',
 			'foreignKey'			=> 'palabraclave_id',
-			'associationForeignKey'	=> 'tarea_id',
+			'associationForeignKey'	=> 'grupocaracteristica_id',
 			'unique'				=> true,
 			'conditions'			=> '',
 			'fields'				=> '',
 			'order'					=> '',
 			'limit'					=> '',
 			'offset'				=> '',
-			'with'					=> 'PalabraclaveTarea',
+			'with'					=> 'GrupocaracteristicaPalabraclave',
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''

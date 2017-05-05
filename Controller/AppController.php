@@ -32,8 +32,7 @@ class AppController extends Controller
 		'DebugKit.Toolbar',
 		'Breadcrumb' => array(
 			'crumbs'		=> array(
-				array('', null),
-				array('Inicio', '/'),
+				array('Inicio', ''),
 			)
 		)
 		//'Facebook.Connect'	=> array('model' => 'Usuario'),
@@ -72,7 +71,7 @@ class AppController extends Controller
 			// Login Form config
 			$this->Auth->authenticate['Form']['userModel']		= 'Administrador';
 			$this->Auth->authenticate['Form']['fields']['username'] = 'email';
-			$this->Auth->authenticate['Form']['fields']['password'] = 'clave';			
+			$this->Auth->authenticate['Form']['fields']['password'] = 'clave';
 		}
 
 		/**
@@ -89,8 +88,8 @@ class AppController extends Controller
 			$this->Auth->loginAction['maintainers'] 		= true;
 
 			// Login redirect and logout redirect
-			$this->Auth->loginRedirect = '/maintainers';
-			$this->Auth->logoutRedirect = '/maintainers';
+			$this->Auth->loginRedirect = '/maintainers/mis-tareas';
+			$this->Auth->logoutRedirect = '/maintainers/login';
 
 			// Permitir a usuario no logeado ingresar a los métodos
 			// $this->Auth->allow('maintainers_registro', 'maintainers_recuperarclave');
@@ -99,7 +98,6 @@ class AppController extends Controller
 			$this->Auth->authenticate['Form']['userModel']		= 'Usuario';
 			$this->Auth->authenticate['Form']['fields']['username'] = 'email';
 			$this->Auth->authenticate['Form']['fields']['password'] = 'clave';
-
 		}
 
 		/**
@@ -204,6 +202,19 @@ class AppController extends Controller
 
 
 			$this->set(compact('permisos', 'modulosDisponibles', 'tiendasList', 'tareasNotificacion', 'comentariosNotificacion'));
+		}
+
+		if ( ! empty($this->request->params['maintainers']) ) {
+			// Tiendas
+			$tiendasList = $this->obtenerTiendas();
+
+			// Camino de migas
+			$breadcrumbs	= BreadcrumbComponent::get();
+			if ( ! empty($breadcrumbs) ) {
+				$this->set(compact('breadcrumbs'));
+			}
+
+			$this->set(compact('tiendasList'));
 		}
 
 
@@ -362,31 +373,66 @@ class AppController extends Controller
 	**/
 	public function	tareasComentarios() {
 
-		$comentarios = ClassRegistry::init('Comentario')->find('all', array(
-			'conditions' => array(
+		if ( isset($this->request->params['admin']) ) {
+			$options['conditions'] = array(
 				'Comentario.visualizado' => 0,
-				'Comentario.administrador' => ''
-				),
-			'contain' => array(
-				'Tarea' => array(
-					'Usuario',
-					'conditions' => array(
-						'Tarea.administrador_id' => $this->Auth->user('id')
-						)
-					)
-				),
-			'fields' => array(
-				'Comentario.comentario'
-				),
-			'limit' => 50,
-			'order' => array(
-				'Tarea.modified' => 'DESC'
-				)
-			));
+				'Comentario.administrador_id' => '',
+			);
 
+			$options['contain'] = array('Tarea' => array('Tienda'), 'Usuario');
+		}
+
+
+		if ( isset($this->request->params['maintainers']) ) {
+			$options['conditions'] = array(
+				'Comentario.visualizado' => 0,
+				'Comentario.usuario_id' => '',
+			);
+
+			$options['contain'] = array('Tarea' => array('Tienda'), 'Administrador');
+		}
+
+		$options['limit'] = 50;
+		$options['order'] = array('Comentario.created' => 'DESC');
+
+		
+		$comentarios = ClassRegistry::init('Comentario')->find('all', $options);
+		
 		return $comentarios;
 	}
 
+	public function visualizarComentarios($id = null) {
+
+		if ( isset($this->request->params['admin']) ) {
+			$options['conditions'] = array(
+				'Comentario.visualizado' => 0,
+				'Comentario.administrador_id' => '',
+				'Comentario.tarea_id' => $id
+			);
+		}
+
+
+		if ( isset($this->request->params['maintainers']) ) {
+			$options['conditions'] = array(
+				'Comentario.visualizado' => 0,
+				'Comentario.usuario_id' => '',
+				'Comentario.tarea_id' => $id
+			);
+		}
+
+		$options['fields'] = array('Comentario.id');
+
+		$comentarios = ClassRegistry::init('Comentario')->find('all', $options);
+			
+		foreach ($comentarios as $indice=> $comentario) {
+			$comentarios[$indice]['Comentario']['visualizado'] = 1;
+			$comentarios[$indice]['Comentario']['fecha_visualizado'] = date('Y-m-d H:i:s');
+		}
+		
+		if ( !empty($comentarios) ) {
+			ClassRegistry::init('Comentario')->saveMany($comentarios);
+		}
+	}
 
 
 	private function cambioTienda() {
@@ -478,7 +524,7 @@ class AppController extends Controller
 	}
 
 	/**
-	 * Función que 
+	 * Función que crea un camino de migas según el controllador y la acción que se está ejecutando.
 	 * @return [type] [description]
 	 */
 	public function caminoAutomatico() {
@@ -487,7 +533,7 @@ class AppController extends Controller
 	
 		switch ($this->request->params['action']) {
 			case sprintf('%s_index', $this->request->params['prefix']):
-				BreadcrumbComponent::add('Listado ');
+				 // Do nothing
 				break;
 			case sprintf('%s_add', $this->request->params['prefix']):
 				BreadcrumbComponent::add('Agregar ');
@@ -498,9 +544,20 @@ class AppController extends Controller
 			case sprintf('%s_view', $this->request->params['prefix']):
 				BreadcrumbComponent::add('Ver ');
 				break;
+			case sprintf('%s_review', $this->request->params['prefix']):
+				BreadcrumbComponent::add('Revisar ');
+				break;
+			case sprintf('%s_work', $this->request->params['prefix']):
+				BreadcrumbComponent::add('Trabajar ');
+				break;
 		}
 	}
 
+	/**
+	 * Función que elimna lós elementos adjuntos por id
+	 * @param  string 	$ids 	String de IDs separados por coma  
+	 * @return void
+	 */
 	public function quitarAdjuntos( $ids = '' ) {
 		if ( ! empty($ids) ) {
 			# Adjuntos eliminados
@@ -508,7 +565,103 @@ class AppController extends Controller
 			
 			ClassRegistry::init('Adjunto')->deleteAll(array('Adjunto.id' => $arrayEliminadas));	
 		}
+	}
 
-		return true;
+
+	/**
+	 * Función que permite cambiar el estado de una tarea.
+	 * 
+	 * Los posibles estados son:
+	 * 		en_progreso  	El mantenedor está trabajando actualemnte en la tarea.
+	 * 		en_revision  	El administrador está revisando la tarea.
+	 * 		rechazado 		El administrador rechaó la tarea y vuelve al mantenedor.
+	 * 		finalizado   	El mantenedor y el administrador dieron por finalizada la tarea.
+	 * 		
+	 * @param  		int 		$id     	Identofocador de la tarea
+	 * @param  		string 		$estado 	Uno de los estados descritos arriba
+	 * @return 		void 					si se actualiza con exito, de los contrario redirecciona al index mostrando un mensaje de error.
+	 */
+	public function cambiarEstadoTarea($idTarea = null, $estado = '' ) {
+		if (is_null($idTarea) || empty($estado)) {
+			return false;
+		}
+
+		$tarea = array(
+			'Tarea' => array(
+				'id' => $idTarea,
+				'en_progreso' 	=> 0,
+				'en_revision' 	=> 0,
+				'rechazado'		=> 0,
+				'finalizado' 	=> 0
+			)
+		);
+
+		if ($estado == 'finalizado') {
+			$tarea['Tarea']['fecha_finalizado'] = date('Y-m-d H:i:s');
+		}
+
+		if (array_key_exists($estado, $tarea['Tarea'])) {
+			$tarea['Tarea'][$estado] = 1;
+			if ( ClassRegistry::init('Tarea')->save($tarea) ) {
+				return true;
+			}else{
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+
+
+	public function calcularMontoTarea ($id = '') {
+		if (empty($id)) {
+			return false;
+		}
+
+		$tarea = ClassRegistry::init('Tarea')->find('first', array(
+			'Tarea.id' => $id
+			));
+
+		if (empty($tarea)) {
+			return false;
+		}
+
+	}
+
+	/**
+	 * Funcíon que permite identificar si la tarea a la que se está visualizando está asignada al visitante.
+	 * @param  int 		$id 	Identificador de la tarea
+	 * @return bool
+	 */
+	public function esMiTarea( $id = null ) {
+
+		if ( empty($id) ) {
+			return false;
+		}
+
+		if ( isset($this->request->params['admin']) ) {
+			$options['conditions'] = array(
+				'Tarea.id' => $id,
+				'Tarea.administrador_id' => $this->Auth->user('id')
+			);
+		}
+
+		if ( isset($this->request->params['maintainers']) ) {
+			$options['conditions'] = array(
+				'Tarea.id' => $id,
+				'Tarea.usuario_id' => $this->Auth->user('id')
+			);
+		}
+
+		$options['fields'] = array('id', 'administrador_id', 'nombre');
+
+		$miTarea = ClassRegistry::init('Tarea')->find('first', $options);
+
+		if (!empty($miTarea)) {
+			return $miTarea;
+		}
+		
+		return false;
 	}
 }

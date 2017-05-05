@@ -115,6 +115,54 @@ class Grupocaracteristica extends AppModel
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Categoria' => array(
+			'className'				=> 'Categoria',
+			'joinTable'				=> 'grupocaracteristicas_categorias',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'id_category',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaCategoria',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
+		),
+		'Palabraclave' => array(
+			'className'				=> 'Palabraclave',
+			'joinTable'				=> 'grupocaracteristicas_palabraclaves',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'palabraclave_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaPalabraclave',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
+		),
+		'Tarea' => array(
+			'className'				=> 'Tarea',
+			'joinTable'				=> 'grupocaracteristicas_tareas',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'tarea_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaTarea',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 

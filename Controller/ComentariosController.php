@@ -7,7 +7,9 @@ class ComentariosController extends AppController
 		$this->paginate		= array(
 			'recursive'			=> 0
 		);
+
 		$comentarios	= $this->paginate();
+		
 		$this->set(compact('comentarios'));
 	}
 
@@ -26,10 +28,14 @@ class ComentariosController extends AppController
 				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
 			}
 		}
+
 		$parentComentarios	= $this->Comentario->ParentComentario->find('list');
 		$tareas	= $this->Comentario->Tarea->find('list');
 		$importancias	= $this->Comentario->Importancia->find('list');
-		$this->set(compact('parentComentarios', 'tareas', 'importancias'));
+		$usuarios = $this->Comentario->Usuario->find('list');
+		$administradores = $this->Comentario->Administrador->find('list');
+
+		$this->set(compact('parentComentarios', 'tareas', 'importancias', 'usuarios', 'administradores'));
 	}
 
 	public function admin_edit($id = null)
@@ -61,7 +67,10 @@ class ComentariosController extends AppController
 		$parentComentarios	= $this->Comentario->ParentComentario->find('list');
 		$tareas	= $this->Comentario->Tarea->find('list');
 		$importancias	= $this->Comentario->Importancia->find('list');
-		$this->set(compact('parentComentarios', 'tareas', 'importancias'));
+		$usuarios = $this->Comentario->Usuario->find('list');
+		$administradores = $this->Comentario->Administrador->find('list');
+
+		$this->set(compact('parentComentarios', 'tareas', 'importancias', 'usuarios', 'administradores'));
 	}
 
 	public function admin_delete($id = null)

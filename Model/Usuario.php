@@ -1,11 +1,12 @@
 <?php
 App::uses('AppModel', 'Model');
+
 class Usuario extends AppModel
 {
 	/**
 	 * CONFIGURACION DB
 	 */
-	public $displayField	= 'nombre';
+	public $displayField	= 'email';
 
 	/**
 	 * BEHAVIORS
@@ -22,6 +23,12 @@ class Usuario extends AppModel
 							'prefix'	=> 'mini',
 							'width'		=> 100,
 							'height'	=> 100,
+							'crop'		=> true
+						),
+						array(
+							'prefix'	=> 'square',
+							'width'		=> 300,
+							'height'	=> 300,
 							'crop'		=> true
 						)
 					)
@@ -168,6 +175,32 @@ class Usuario extends AppModel
 			'exclusive'				=> '',
 			'finderQuery'			=> '',
 			'counterQuery'			=> ''
+		),
+		'Cuenta' => array(
+			'className'				=> 'Cuenta',
+			'foreignKey'			=> 'usuario_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
+		),
+		'Comentario' => array(
+			'className'				=> 'Comentario',
+			'foreignKey'			=> 'usuario_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
 		)
 	);
 
@@ -199,6 +232,27 @@ class Usuario extends AppModel
 				$this->data[$this->alias]['clave']	= AuthComponent::password($this->data[$this->alias]['clave']);
 			}
 		}
+
+		// Quitamos espacios del fono
+		if (isset($this->data[$this->alias]['fono'])) {
+			$this->data[$this->alias]['fono'] = trim(str_replace(' ', '', $this->data[$this->alias]['fono'])) ;
+		}
+		
 		return true;
 	}
+
+	public function afterSave($created = true, $options = array()) {
+		parent::afterSave($created, $options);
+
+		/**
+		 * Dispara eventos al guardar usuario (envio correos)
+		 */
+		if ( ! empty($this->data[$this->alias]) && isset($this->data[$this->alias]['creado']) && $this->data[$this->alias]['creado'] == true) {
+
+			$evento			= new CakeEvent('Model.Usuario.afterSave', $this, $this->data);
+			$this->getEventManager()->dispatch($evento);
+
+		}
+	}
+
 }

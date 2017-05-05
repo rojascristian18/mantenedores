@@ -21,8 +21,8 @@
 													<th><?= $this->Paginator->sort('parent_id', 'Comentario padre', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 															<th><?= $this->Paginator->sort('tarea_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 															<th><?= $this->Paginator->sort('importancia_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('usuario', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('administrador', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+															<th><?= $this->Paginator->sort('usuario_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+															<th><?= $this->Paginator->sort('administrador_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 													<th>Acciones</th>
 								</tr>
 							</thead>
@@ -32,8 +32,8 @@
 											<td><?= $this->Html->link($comentario['ParentComentario']['id'], array('controller' => 'comentarios', 'action' => 'edit', $comentario['ParentComentario']['id'])); ?></td>
 											<td><?= $this->Html->link($comentario['Tarea']['nombre'], array('controller' => 'tareas', 'action' => 'edit', $comentario['Tarea']['id'])); ?></td>
 											<td><?= $this->Html->link($comentario['Importancia']['nombre'], array('controller' => 'importancias', 'action' => 'edit', $comentario['Importancia']['id'])); ?></td>
-													<td><?= h($comentario['Comentario']['usuario']); ?>&nbsp;</td>
-													<td><?= h($comentario['Comentario']['administrador']); ?>&nbsp;</td>
+													<td><?= h($comentario['Comentario']['usuario_id']); ?>&nbsp;</td>
+													<td><?= h($comentario['Comentario']['administrador_id']); ?>&nbsp;</td>
 											<td>
 										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $comentario['Comentario']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
 										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $comentario['Comentario']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>

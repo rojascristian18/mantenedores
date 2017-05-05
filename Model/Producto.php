@@ -198,6 +198,24 @@ class Producto extends AppModel
 			'order'					=> '',
 			'counterCache'			=> true,
 			//'counterScope'			=> array('Asociado.modelo' => 'Producto')
+		),
+		'Proveedor' => array(
+			'className'				=> 'Proveedor',
+			'foreignKey'			=> 'proveedor_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Grupocaracteristica')
+		),
+		'Fabricante' => array(
+			'className'				=> 'Fabricante',
+			'foreignKey'			=> 'fabricante_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Grupocaracteristica')
 		)
 	);
 	public $hasMany = array(
@@ -245,4 +263,29 @@ class Producto extends AppModel
 			'insertQuery'			=> ''
 		)
 	);
+
+	public function beforeSave($options = array()) {
+		# Se agrega el nombre final y el slug
+		if ( ! empty($this->data[$this->alias]['nombre']) && ! empty($this->data[$this->alias]['grupocaracteristica_id']) && ! empty($this->data[$this->alias]['fabricante_id']) ) {
+
+			$grupo = ClassRegistry::init('Grupocaracteristica')->find('first', array(
+				'conditions' => array('Grupocaracteristica.id' => $this->data[$this->alias]['grupocaracteristica_id']),
+				'fields' => array('Grupocaracteristica.nombre')
+				)
+			);
+
+		
+			$fabricante = ClassRegistry::init('Fabricante')->find('first', array(
+				'conditions' => array('Fabricante.id_manufacturer' => $this->data[$this->alias]['fabricante_id'] ),
+				'fields' => array('Fabricante.name')
+				));
+
+			# Formato del nombre final = Grupo en singular + nombre + marca
+			$this->data[$this->alias]['nombre_final'] = sprintf('%s %s %s', Inflector::singularize($grupo['Grupocaracteristica']['nombre']), $this->data[$this->alias]['nombre'], $fabricante['Fabricante']['name']);
+
+			# Slug
+			$this->data[$this->alias]['slug'] = Inflector::slug(strtolower($this->data[$this->alias]['nombre_final']));
+		}
+		
+	}
 }
