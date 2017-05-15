@@ -10,8 +10,8 @@ class AppController extends Controller
 	);
 	public $components	= array(
 		'Session',
+		'Cookie',
 		'Auth'		=> array(
-			'authError'			=> 'No tienes permisos para entrar a esta sección.',
 			'Form'				=> array(
 				'fields' => array(
 					'username'	=> 'email',
@@ -214,7 +214,29 @@ class AppController extends Controller
 				$this->set(compact('breadcrumbs'));
 			}
 
-			$this->set(compact('tiendasList'));
+			$miAcumulado = $this->miAcumulado();
+
+			$miAcumuladoMesActual = 0;
+			$miAcumuladoTotal = 0;
+
+			foreach ($miAcumulado['Actual'] as $ix => $valor) {
+				$miAcumuladoMesActual = $miAcumuladoMesActual + $valor['Pago']['monto_a_pagar'];
+			}
+
+			foreach ($miAcumulado['Total'] as $ix => $valor) {
+				$miAcumuladoTotal = $miAcumuladoTotal + $valor['Pago']['monto_a_pagar'];
+			}
+			
+			if ( $this->Cookie->check('CUENTA') ) {
+				
+			}
+
+			$cuenta = ClassRegistry::init('Cuenta')->find('first', array(
+				'conditions' => array('usuario_id' => $this->Auth->user('id')),
+				'contain' => array('Banco', 'TipoCuenta')
+				));
+			
+			$this->set(compact('tiendasList', 'miAcumuladoMesActual', 'miAcumuladoTotal', 'cuenta'));
 		}
 
 
@@ -558,12 +580,12 @@ class AppController extends Controller
 	 * @param  string 	$ids 	String de IDs separados por coma  
 	 * @return void
 	 */
-	public function quitarAdjuntos( $ids = '' ) {
+	public function quitarElementos( $ids = '', $clase = '' ) {
 		if ( ! empty($ids) ) {
 			# Adjuntos eliminados
 			$arrayEliminadas = explode(",", $ids);
 			
-			ClassRegistry::init('Adjunto')->deleteAll(array('Adjunto.id' => $arrayEliminadas));	
+			ClassRegistry::init($clase)->deleteAll(array(sprintf('%s.id', $clase) => $arrayEliminadas));	
 		}
 	}
 
@@ -663,5 +685,33 @@ class AppController extends Controller
 		}
 		
 		return false;
+	}
+
+
+	public function miAcumulado() {
+
+		# Acumulados no pagados mes actual
+		$rangoFechas = array(
+			date('Y-m-01 00:00:00'),
+			date('Y-m-t 23:59:59')	
+			);
+		
+		$pagos['Actual'] = ClassRegistry::init('Pago')->find('all', array(
+			'conditions' => array(
+				'Pago.usuario_id' => $this->Auth->user('id'),
+				'Pago.created BETWEEN ? AND ? ' => $rangoFechas,   
+				'Pago.pagado' => 0
+				)
+			));
+
+		$pagos['Total'] = ClassRegistry::init('Pago')->find('all', array(
+			'conditions' => array(
+				'Pago.usuario_id' => $this->Auth->user('id'),   
+				'Pago.pagado' => 0
+				)
+			));
+
+
+		return $pagos;
 	}
 }

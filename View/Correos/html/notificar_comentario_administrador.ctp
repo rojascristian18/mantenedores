@@ -42,7 +42,7 @@
                   </p>
                   <?=$this->html->link('Ingresar a la tarea', array(
                       'controller' => 'tareas', 
-                      'action' => 'review', 
+                      'action' => 'edit', 
                       $alerta['Tarea']['id'],
                       'admin' => true,
                       'full_base' => true), 

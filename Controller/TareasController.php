@@ -252,7 +252,7 @@ class TareasController extends AppController
 			}
 			else
 			{
-				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+				$this->Session->setFlash('Error al guardar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
 			}
 		}
 
@@ -268,7 +268,7 @@ class TareasController extends AppController
 	public function admin_edit($id = null)
 	{	
 		# Cambiamos el datasource de los modelos que necesitamos externos
-		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
 		
 
 		if ( ! $this->Tarea->exists($id) )
@@ -279,28 +279,52 @@ class TareasController extends AppController
 
 		if ( $this->request->is('post') || $this->request->is('put') )
 		{	
-			# Se eliminan los adjuntos
-			$this->quitarAdjuntos($this->request->data['Tarea']['ElementosEliminados']);
+			// Si no es una comentario se procede con la eliminación de archivos y datos
+			if ( ! isset($this->request->data['Comentario']) ) {
+				# Se eliminan los adjuntos
+				$this->quitarElementos($this->request->data['Tarea']['ElementosEliminados'], 'Adjunto');
 			
-			# Eliminar rel palabras claves
-			$this->Tarea->GrupocaracteristicaTarea->deleteAll(array('GrupocaracteristicaTarea.tarea_id' => $id));
-			#$this->Tarea->PalabraclaveTarea->deleteAll(array('PalabraclaveTarea.tarea_id' => $id));
-			
+				# Eliminar rel palabras claves
+				$this->Tarea->GrupocaracteristicaTarea->deleteAll(array('GrupocaracteristicaTarea.tarea_id' => $id));
+				#$this->Tarea->PalabraclaveTarea->deleteAll(array('PalabraclaveTarea.tarea_id' => $id));
+			}
+
 			if ( $this->Tarea->saveAll($this->request->data) )
 			{	
-				$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
-				$this->redirect(array('action' => 'index'));
+				if ( isset($this->request->data['Comentario']) ) {
+					$this->Session->setFlash('Comentario agregado.', null, array(), 'success');
+					$this->redirect(array('action' => 'edit', $id));
+				}else{
+					$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
+					$this->redirect(array('action' => 'index'));
+				}
 			}
 			else
-			{
-				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+			{	
+				if ( isset($this->request->data['Comentario']) ) {
+					$this->Session->setFlash('Error al guardar el comentario. Por favor intenta nuevamente.', null, array(), 'danger');
+				}else{
+					$this->Session->setFlash('Error al guardar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
+				}
+				
 			}
 		}
 		else
 		{	
+			# Actualizamos los comentarios no visualizados a visualizado
+			$this->visualizarComentarios($id);
+			
 			$this->request->data	= $this->Tarea->find('first', array(
 				'conditions'	=> array('Tarea.id' => $id),
-				'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'ParentTarea', 'Grupocaracteristica', 'Adjunto', 'Comentario')
+				'contain' => array(
+					'Usuario', 
+					'ImpuestoReglaGrupo', 
+					'Idioma', 
+					'Shop', 
+					'Grupocaracteristica', 
+					'Adjunto', 
+					'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'conditions' => array('Producto.activo' => 1)), 
+					'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 			));
 			
 		}
@@ -374,11 +398,13 @@ class TareasController extends AppController
 			$this->Session->setFlash('Registro eliminado correctamente.', null, array(), 'success');
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->Session->setFlash('Error al eliminar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->Session->setFlash('Error al eliminar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
 		$this->redirect(array('action' => 'index'));
 	}
 
 	public function admin_activar( $id = null ) {
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
 		$this->Tarea->id = $id;
 		if ( ! $this->Tarea->exists() )
 		{
@@ -391,11 +417,13 @@ class TareasController extends AppController
 			$this->Session->setFlash('Registro activado correctamente.', null, array(), 'success');
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->Session->setFlash('Error al activar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->Session->setFlash('Error al activar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
 		$this->redirect(array('action' => 'index'));
 	}
 
 	public function admin_desactivar( $id = null ) {
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
 		$this->Tarea->id = $id;
 		if ( ! $this->Tarea->exists() )
 		{
@@ -408,7 +436,69 @@ class TareasController extends AppController
 			$this->Session->setFlash('Registro desactivado correctamente.', null, array(), 'success');
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->Session->setFlash('Error al desactivar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->Session->setFlash('Error al desactivar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
+
+
+	public function admin_accept( $id = null ) {
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+
+		$this->Tarea->id = $id;
+		if ( ! $this->Tarea->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$estados = array(
+			'Tarea' => array(
+				'id' => $id,
+				'en_revision' => 0,
+				'en_progreso' => 0,
+				'rechazado' => 0,
+				'finalizado' => 1,
+				'fecha_finalizado' => date('Y-m-d H:i:s')
+				)
+			);
+
+		if ( $this->Tarea->save($estados) )
+		{
+			$this->Session->setFlash('Tarea aceptada y finalizada.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al aceptar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
+
+
+	public function admin_refuse( $id = null ) {
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+		$this->Tarea->id = $id;
+		if ( ! $this->Tarea->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$estados = array(
+			'Tarea' => array(
+				'id' => $id,
+				'en_revision' => 0,
+				'en_progreso' => 0,
+				'rechazado' => 1,
+				'finalizado' => 0
+				)
+			);
+
+		if ( $this->Tarea->save($estados) )
+		{
+			$this->Session->setFlash('Tarea rechazada con éxito.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al rechazar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
 		$this->redirect(array('action' => 'index'));
 	}
 
@@ -440,7 +530,7 @@ class TareasController extends AppController
 	public function admin_cambiarEstado($id = null, $estado = '') {
 		# Cambiar estado de una tarea
 		if ( ! $this->cambiarEstadoTarea($id, $estado)) {
-			$this->Session->setFlash('No se puedo cambiar el estado del registro. Intente nuevamente', null, array(), 'danger');
+			$this->Session->setFlash('No se puedo cambiar el estado dla tarea. Intente nuevamente', null, array(), 'danger');
 			$this->redirect(array('action' => 'index'));
 		}else{
 			$this->Session->setFlash('Estado cambiado con éxito', null, array(), 'success');
@@ -690,5 +780,49 @@ class TareasController extends AppController
 	 		$this->Session->setFlash('Error al iniciar la tarea, intente nuevamente.', null, array(), 'danger');
 	 		$this->redirect(array('action' => 'index'));
 	 	}
+	}
+
+	/**
+	 * Función que permite cambiar el estado de una tarea.
+	 * 
+	 * Los posibles estados son:
+	 * 		en_progreso  	El mantenedor está trabajando actualemnte en la tarea.
+	 * 		en_revision  	El administrador está revisando la tarea.
+	 * 		rechazado 		El administrador rechaó la tarea y vuelve al mantenedor.
+	 * 		finalizado   	El mantenedor y el administrador dieron por finalizada la tarea.
+	 * 		
+	 * @param  		int 		$id     	Identofocador de la tarea
+	 * @param  		string 		$estado 	Uno de los estados descritos arriba
+	 * @return 		void 					si se actualiza con exito, de los contrario redirecciona al index mostrando un mensaje de error.
+	 */
+	public function maintainers_enviar_a_revision($id = null) {
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		if ( ! $this->Tarea->exists($id) )
+		{
+			$this->Session->setFlash('No existe la tarea.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$tarea = $this->esMiTarea($id);
+
+		if ( ! $tarea ) {
+			$this->Session->setFlash('Esta tarea ya no se encuentra disponible.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->request->is('post') || $this->request->is('put') )
+		{
+			# Cambiar estado de una tarea
+			if ( ! $this->cambiarEstadoTarea($id, 'en_revision')) {
+				$this->Session->setFlash('No se puedo enviar a revisión la tarea. Intente nuevamente', null, array(), 'danger');
+				$this->redirect(array('action' => 'index'));
+			}else{
+				$this->Session->setFlash('La tarea fue enviada al administrador con éxito.', null, array(), 'success');
+				$this->redirect(array('action' => 'index'));
+			}
+		}
 	}
 }

@@ -23,10 +23,16 @@
 			'/maintainers-backend/js/plugins/jquery/jquery.min',
 			'/maintainers-backend/js/plugins/jquery/jquery-ui.min',
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap.min',
+			'/maintainers-backend/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min',
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-select',
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-datepicker',
-			'/maintainers-backend/js/plugins/maskedinput/jquery.maskedinput.min',
+			'/maintainers-backend/js/plugins/smartwizard/jquery.smartWizard-2.0.min',
+			
 			'/maintainers-backend/js/plugins/jquery-validation/jquery.validate',
+			'/maintainers-backend/js/plugins/summernote/summernote',
+			'/maintainers-backend/js/plugins/summernote/summernote_espanol',
+			'/maintainers-backend/js/plugins/bootstrap/bootstrap-file-input',
+			'/maintainers-backend/js/plugins/owl/owl.carousel.min',
 			'/maintainers-backend/js/custom'
 			/*
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-datepicker',

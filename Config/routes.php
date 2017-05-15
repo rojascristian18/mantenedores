@@ -10,7 +10,7 @@ Router::connect('/admin/mantenedores/crear', array('controller' => 'usuarios', '
 Router::connect('/admin/mantenedores/modificar', array('controller' => 'usuarios', 'action' => 'edit', 'admin' => true));
 
 # Mantenedores
-#Router::connect('/maintainers', array('controller' => 'tareas', 'action' => 'index', 'maintainers' => true));
+Router::redirect('/maintainers', array('controller' => 'tareas', 'action' => 'index', 'maintainers' => true));
 Router::connect('/maintainers/login', array('controller' => 'usuarios', 'action' => 'login', 'maintainers' => true));
 Router::connect('/maintainers/mi-perfil', array('controller' => 'usuarios', 'action' => 'profile', 'maintainers' => true));
 Router::connect('/maintainers/mis-tareas', array('controller' => 'tareas', 'action' => 'index', 'maintainers' => true));

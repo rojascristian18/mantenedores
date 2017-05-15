@@ -2,6 +2,16 @@
 <div class="page-title">                    
     <h2><span class="fa fa-cogs"></span> Mi Perfil</h2>
 </div>
+<? if ( empty($cuenta) ) : ?>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;&nbsp;Para recibir pagos usted debe agregar una cuenta bancaria en su perfil. 
+            </div>
+        </div>
+    </div>
+    <? endif; ?>
 <!-- END PAGE TITLE -->                     
 <?= $this->Form->create('Usuario', array('class' => 'form-horizontal validate', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?= $this->Form->input('id');?>
@@ -88,12 +98,12 @@
             
             <div class="panel panel-default tabs">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#tareas" data-toggle="tab">Últimas Tareas Finalizadas</a></li>
-                    <li><a href="#cuentas" data-toggle="tab">Datos bancarios</a></li>   
+                    <li><a href="#tareas" data-toggle="tab">Últimas Tareas Finalizadas</a></li>
+                    <li class="active"><a href="#cuentas" data-toggle="tab">Datos bancarios</a></li>   
                     <li><a href="#pagos" data-toggle="tab">Pagos</a></li>                                    
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane panel-body active" id="tareas">
+                    <div class="tab-pane panel-body" id="tareas">
                     <? foreach ($tareas as $indice => $tarea) : ?>                                                                      
                         <div class="list-group list-group-contacts border-bottom">
                             <?= $this->Html->link(
@@ -109,7 +119,7 @@
                         </div>
                     <? endforeach; ?>
                     </div>
-                    <div class="tab-pane panel-body" id="cuentas">                                        
+                    <div class="tab-pane panel-body active" id="cuentas">                                        
                         <p>Agregue su cuenta bancaria principal. En esta cuenta se haran los pagos de las tareas finalizadas.</p>
                         <div class="table table-stripped">
                             <table class="table">

@@ -264,6 +264,7 @@ textarea {
 
 .comentario-pie .btn {
 	float: left;
+	margin-right: 10px;
 }
 
 .comentario-pie span.visto {
@@ -287,4 +288,50 @@ textarea {
 .comentar {
     float: left;
     width: 100%;
+}
+
+form .input-grupo {
+    float: left;
+    width: 50%;
+    padding-right: 5px;
+}
+
+form .input-nombre {
+    float: left;
+    width: 100%;
+    margin: 10px 0 0 0;
+}
+
+form .input-marca {
+    float: left;
+    width: 50%;
+    padding-left: 5px;
+}
+
+@media screen and (max-width: 768px) {
+	.input-grupo, .input-nombre, .input-marca {
+		padding: 0;
+	}
+}
+
+.aceptado {
+	background-color: 
+}
+
+td {
+	position: relative;
+}
+
+
+
+td.aceptado {
+    background: #89AD4D !important;
+	color: #fff !important;
+	text-align: center;
+}
+
+td.rechazado{
+    background: #B64645 !important;
+    color: #fff !important;
+    text-align: center;
 }

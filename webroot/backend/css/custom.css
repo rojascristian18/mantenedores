@@ -283,6 +283,7 @@ textarea {
 
 .comentario-pie .btn {
 	float: left;
+	margin-right: 10px;
 }
 
 .comentario-pie .fecha {
@@ -306,4 +307,27 @@ textarea {
 .comentar {
     float: left;
     width: 100%;
+}
+
+form .input-grupo {
+    float: left;
+    width: 25%;
+    padding-right: 5px;
+}
+
+form .input-nombre {
+    float: left;
+    width: 50%;
+}
+
+form .input-marca {
+    float: left;
+    width: 25%;
+    padding-left: 5px;
+}
+
+@media screen and (max-width: 768px) {
+	.input-grupo, .input-nombre, .input-marca {
+		padding: 0;
+	}
 }

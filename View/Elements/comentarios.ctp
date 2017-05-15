@@ -16,7 +16,7 @@
             '<span class="contacts-title">'. $comentario['Usuario']['email'] . ' a comentado una tarea</span>'.
             '<p>' . $this->Text->truncate($comentario['Comentario']['comentario'], 15) .
             ' <small class="text-muted">Creado el '.$this->Time->format($comentario['Comentario']['created'], '%e de %m, %Y') . '</small></p>', 
-            array('controller' => 'tareas', 'action' => 'review', $comentario['Tarea']['id']), array('escape' => false, 'class' => 'list-group-item')); ?>
+            array('controller' => 'tareas', 'action' => 'edit', $comentario['Tarea']['id']), array('escape' => false, 'class' => 'list-group-item')); ?>
     <? endforeach; ?>
     </div>
 </div>

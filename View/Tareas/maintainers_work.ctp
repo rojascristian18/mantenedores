@@ -115,7 +115,7 @@
 			<div class="col-xs-12 col-sm-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Grupos</h3>
+						<h3 class="panel-title">Grupos disponibles</h3>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
@@ -198,39 +198,48 @@
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<h3 class="panel-title">Productos agregados</h3>
-					<p class="parrafo-panel">Revise uno a uno los productos de la tarea antes de darla por finalizada para garantizar una correcta subida.</p>
+					<h3 class="panel-title">Productos de la tarea</h3>
+					<p class="parrafo-panel">Los productos que no estan activados no se contemplan para el progreso y monetización de la tarea. Tampoco se muestran en la revisión de la tarea.</p>
+					<? if ( count($this->request->data['Producto']) < $this->request->data['Tarea']['cantidad_productos'] ) : ?>
+					<?=$this->Html->link('<i class="fa fa-plus"></i> Agregar producto', array('controller' => 'productos', 'action' => 'add', $this->request->data['Tarea']['id']), array('class' => 'btn btn-success btn-xs pull-right', 'escape' => false)); ?>
+					<? endif; ?>
 				</div>
 				<div class="panel-body">
 					<div class="table-responsive">
-						<table class="table table-stripped">
+						<table class="table table-striped">
 							<thead>
+								<th>Aceptado</th>
 								<th>Referecia</th>
 								<th>Nombre final</th>
 								<th>Precio</th>
 								<th>Grupo</th>
 								<th>Proveedor</th>
 								<th>Fabricante</th>
+								<th>Activado</th>
 								<th>Acción</th>
 							</thead>
 							<tbody>
 							<? foreach ($this->request->data['Producto'] as $indice => $producto) : ?>
 								<tr>
+									<td class="<?= $aceptado = ($producto['aceptado']) ? 'aceptado' : 'rechazado' ; ?>"><?= $estado = ($producto['aceptado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td><?= $referencia = (!empty($producto['referencia'])) ? $producto['referencia'] : 'No agregado' ; ?></td>
 									<td><?= $nombre = (!empty($producto['nombre_final'])) ? $producto['nombre_final'] : 'No agregado' ; ?></td>
 									<td><?= $precio = (!empty($producto['precio'])) ? CakeNumber::currency($producto['precio'], 'CLP') : 'No agregado' ; ?></td>
 									<td><?= $grupo = (!empty($producto['grupocaracteristica_id'])) ? $producto['Grupocaracteristica']['nombre'] : 'No agregado' ; ?></td>
 									<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>
 									<td><?= $fabricante = (!empty($producto['fabricante_id'])) ? $producto['Fabricante']['name'] : 'No agregado' ; ?></td>
+									<td><?= $activo = ($producto['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td>
 									<div class="btn-group">
                                         <a href="#" data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true"><span class="fa fa-cog"></span> Acciones</a>
                                         <ul class="dropdown-menu dropdown-menu-left" role="menu">
                                             <li role="presentation" class="dropdown-header">Seleccione</li>
-											<li><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'review', $producto['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Revisar este registro', 'escape' => false)); ?>
+											<li><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'edit', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
 											</li>
-											<? if( $producto['rechazado'] || ! $producto['aceptado'] ) : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-ban"></i> Rechazar', array('controller' => 'productos', 'action' => 'edit', $producto['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este producto', 'escape' => false)); ?></li>
+											<? if( $producto['activo'] ) : ?>
+												<li><?= $this->Form->postLink('<i class="fa fa-ban"></i> Quitar de la tarea', array('controller' => 'productos', 'action' => 'desactivar', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Desactivar este producto', 'escape' => false)); ?></li>
+											<? else : ?>
+												<li><?= $this->Form->postLink('<i class="fa fa-check"></i> Activar', array('controller' => 'productos', 'action' => 'activar', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Activar este producto', 'escape' => false)); ?></li>
 											<? endif; ?>
 										</ul>
                                     </div>
@@ -335,8 +344,27 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="pull-right guardar-botones">
-				<input type="submit" class="btn btn-primary esperar-carga" autocomplete="off" data-loading-text="Espera un momento..." value="Guardar cambios">
+				<a href="#" class="mb-control btn btn-primary" data-box="#mb-review"><i class="fa fa-eye"></i> Enviar a revisión</a>
 				<?= $this->Html->link('Cancelar', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="message-box message-box-warning animated fadeIn" data-sound="alert" id="mb-review">
+	<div class="mb-container">
+		<div class="mb-middle">
+			<div class="mb-title"><span class="fa fa-sign-out"></span>¿Enviar a <strong>revisión</strong>?</div>
+			<div class="mb-content">
+				<p>¿Seguro que desea enviar a revisión la tarea?</p>
+				<p>Recuerde que mientras la tarea se encuentra en revisión usted no podrá hacer cambios de ningun tipo.</p>
+				<p>Presiona NO para continuar trabajando y SI para enviar a revisión.</p>
+			</div>
+			<div class="mb-footer">
+				<div class="pull-right">
+					<?= $this->Form->postLink('Enviar a revisión', array('action' => 'enviar_a_revision', $this->request->data['Tarea']['id']), array('class' => 'btn btn-primary btn-lg')); ?>
+					<button class="btn btn-default btn-lg mb-control-close">No</button>
+				</div>
 			</div>
 		</div>
 	</div>

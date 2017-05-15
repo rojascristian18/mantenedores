@@ -23,7 +23,159 @@ class TareaListener implements CakeEventListener
 		# 	- Tarea en revisión		en_revision		Notificar a Administrador, no al mantenedor
 		# 	- Tarea finalizada 	 	finalizada		Notificar a Mantenedor, no al administrador
 		# 	- Tarea rechazada 		rechazada		Notificar a Mantenedor, no al administrador
+		# 
 		
+		if ( isset($evento->data['Tarea']['notificar_tarea_rechazada_matenedor']) ) {
+			# Buscamos la información y relaciones de la tarea
+			$tarea = ClassRegistry::init('Tarea')->find('first', array(
+				'conditions' => array(
+					'Tarea.id' => $evento->data['Tarea']['id']
+					),
+				'contain' => array(
+					'Administrador', 'Usuario'
+					)
+				)
+			);
+
+			/**
+			 * Clases requeridas
+			 */
+			$alerta						= $tarea;
+			$this->View					= new View();
+			$this->View->viewPath		= 'Correos' . DS . 'html';
+			$this->View->layoutPath		= 'Emails' . DS . 'html';
+			$this->View->set(compact('alerta'));
+			$this->Correo				= ClassRegistry::init('Correo');
+			
+			/**
+			 * Correos a mantenedor rechazo de la tarea
+			 */
+			$html						= $this->View->render('notificar_tarea_rechazada_matenedor');
+	
+			/**
+			 * Guarda el email a enviar
+			 */
+			$this->Correo->create();
+			$this->Correo->save(array(
+				'estado'					=> 'Notificación de rechazo tarea a mantenedor',
+				'html'						=> $html,
+				'asunto'					=> '[NDRZA] Su tarea fue revisada',
+				'destinatario_email'		=> $alerta['Usuario']['email'],
+				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
+				'remitente_email'			=> 'no-reply@nodriza.cl',
+				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
+				'cc_email'					=> '',
+				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'traza'						=> null,
+				'proceso_origen'			=> null,
+				'procesado'					=> 0,
+				'enviado'					=> 0,
+				'reintentos'				=> 0,
+				'atachado'					=> null
+			));
+		}
+
+
+		if ( isset($evento->data['Tarea']['notificar_tarea_aceptada_matenedor']) ) {
+			# Buscamos la información y relaciones de la tarea
+			$tarea = ClassRegistry::init('Tarea')->find('first', array(
+				'conditions' => array(
+					'Tarea.id' => $evento->data['Tarea']['id']
+					),
+				'contain' => array(
+					'Administrador', 'Usuario'
+					)
+				)
+			);
+
+			/**
+			 * Clases requeridas
+			 */
+			$alerta						= $tarea;
+			$this->View					= new View();
+			$this->View->viewPath		= 'Correos' . DS . 'html';
+			$this->View->layoutPath		= 'Emails' . DS . 'html';
+			$this->View->set(compact('alerta'));
+			$this->Correo				= ClassRegistry::init('Correo');
+			
+			/**
+			 * Correos a mantenedor rechazo de la tarea
+			 */
+			$html						= $this->View->render('notificar_tarea_aceptada_matenedor');
+	
+			/**
+			 * Guarda el email a enviar
+			 */
+			$this->Correo->create();
+			$this->Correo->save(array(
+				'estado'					=> 'Notificación de tarea aceptada a mantenedor',
+				'html'						=> $html,
+				'asunto'					=> '[NDRZA] ¡Hurra! su tarea fue aceptada',
+				'destinatario_email'		=> $alerta['Usuario']['email'],
+				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
+				'remitente_email'			=> 'no-reply@nodriza.cl',
+				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
+				'cc_email'					=> '',
+				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'traza'						=> null,
+				'proceso_origen'			=> null,
+				'procesado'					=> 0,
+				'enviado'					=> 0,
+				'reintentos'				=> 0,
+				'atachado'					=> null
+			));
+		}
+		
+		if ( isset($evento->data['Tarea']['notificar_tarea_revision_administrador']) ) {
+			# Buscamos la información y relaciones de la tarea
+			$tarea = ClassRegistry::init('Tarea')->find('first', array(
+				'conditions' => array(
+					'Tarea.id' => $evento->data['Tarea']['id']
+					),
+				'contain' => array(
+					'Administrador', 'Usuario'
+					)
+				)
+			);
+
+			/**
+			 * Clases requeridas
+			 */
+			$alerta						= $tarea;
+			$this->View					= new View();
+			$this->View->viewPath		= 'Correos' . DS . 'html';
+			$this->View->layoutPath		= 'Emails' . DS . 'html';
+			$this->View->set(compact('alerta'));
+			$this->Correo				= ClassRegistry::init('Correo');
+			
+			/**
+			 * Correos a administrador comentario a la tarea
+			 */
+			$html						= $this->View->render('notificar_tarea_revision_administrador');
+			
+			/**
+			 * Guarda el email a enviar
+			 */
+			$this->Correo->create();
+			$this->Correo->save(array(
+				'estado'					=> 'Notificación de revision tarea a administrador',
+				'html'						=> $html,
+				'asunto'					=> '[NDRZA] Nueva tarea para revisión',
+				'destinatario_email'		=> $alerta['Administrador']['email'],
+				'destinatario_nombre'		=> $alerta['Administrador']['nombre'],
+				'remitente_email'			=> 'no-reply@nodriza.cl',
+				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
+				'cc_email'					=> '',
+				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'traza'						=> null,
+				'proceso_origen'			=> null,
+				'procesado'					=> 0,
+				'enviado'					=> 0,
+				'reintentos'				=> 0,
+				'atachado'					=> null
+			));
+		}
+	
 		if ( isset($evento->data['Tarea']['notificar_inicio_tarea_administrador']) && isset($evento->data['Tarea']['administrador_id']) ) {
 			# Buscamos la información del administrador que se debe notificar
 			$administrador = ClassRegistry::init('Administrador')->find('first', array(
@@ -33,7 +185,7 @@ class TareaListener implements CakeEventListener
 					)
 				)
 			);
-
+	
 			$administrador['Tarea'] = $evento->data['Tarea'];
 
 			/**
@@ -58,7 +210,7 @@ class TareaListener implements CakeEventListener
 			$this->Correo->save(array(
 				'estado'					=> 'Notificación de inicio tarea a administrador',
 				'html'						=> $html,
-				'asunto'					=> '[Inicio] El mantenedor ha iniciado una tarea',
+				'asunto'					=> '[NDRZA] El mantenedor ha iniciado una tarea',
 				'destinatario_email'		=> $alerta['Administrador']['email'],
 				'destinatario_nombre'		=> $alerta['Administrador']['nombre'],
 				'remitente_email'			=> 'no-reply@nodriza.cl',
@@ -108,7 +260,7 @@ class TareaListener implements CakeEventListener
 			$this->Correo->save(array(
 				'estado'					=> 'Notificación de tarea asignada',
 				'html'						=> $html,
-				'asunto'					=> '[Asignación] ¡Se le ha asignado una tarea!',
+				'asunto'					=> '[NDRZA] ¡Se le ha asignado una tarea!',
 				'destinatario_email'		=> $alerta['Usuario']['email'],
 				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
 				'remitente_email'			=> 'no-reply@nodriza.cl',
@@ -160,7 +312,7 @@ class TareaListener implements CakeEventListener
 			$this->Correo->save(array(
 				'estado'					=> 'Notificación de tarea cancelada',
 				'html'						=> $html,
-				'asunto'					=> '[Cancelada] Se ha cancelado una tarea',
+				'asunto'					=> '[NDRZA] Se ha cancelado una tarea',
 				'destinatario_email'		=> $alerta['Usuario']['email'],
 				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
 				'remitente_email'			=> 'no-reply@nodriza.cl',
@@ -174,6 +326,58 @@ class TareaListener implements CakeEventListener
 				'reintentos'				=> 0,
 				'atachado'					=> null
 			));
+		}
+
+
+		if ( isset($evento->data['Tarea']['modificada']) ) {
+			# Buscamos la información del mantenedor que se debe notificar
+			$mantenedor = ClassRegistry::init('Usuario')->find('first', array(
+				'conditions' => array(
+					'Usuario.id' => $evento->data['Tarea']['usuario_id'],
+					'Usuario.activo' => 1
+					)
+				)
+			);
+
+			$mantenedor['Tarea'] = $evento->data['Tarea'];
+
+			/**
+			 * Clases requeridas
+			 */
+			$alerta						= $mantenedor;
+			$this->View					= new View();
+			$this->View->viewPath		= 'Correos' . DS . 'html';
+			$this->View->layoutPath		= 'Emails' . DS . 'html';
+			$this->View->set(compact('alerta'));
+			$this->Correo				= ClassRegistry::init('Correo');
+			
+			/**
+			 * Correos a mantenedor asignación de tarea
+			 */
+			$html						= $this->View->render('notificar_tarea_modificada');
+			
+			/**
+			 * Guarda el email a enviar
+			 */
+			$this->Correo->create();
+			$this->Correo->save(array(
+				'estado'					=> 'Notificación de tarea modificada',
+				'html'						=> $html,
+				'asunto'					=> '[NDRZA] Se ha modificado su tarea',
+				'destinatario_email'		=> $alerta['Usuario']['email'],
+				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
+				'remitente_email'			=> 'no-reply@nodriza.cl',
+				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
+				'cc_email'					=> '',
+				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'traza'						=> null,
+				'proceso_origen'			=> null,
+				'procesado'					=> 0,
+				'enviado'					=> 0,
+				'reintentos'				=> 0,
+				'atachado'					=> null
+			));
+			
 		}
 
 
@@ -213,7 +417,7 @@ class TareaListener implements CakeEventListener
 			$this->Correo->save(array(
 				'estado'					=> 'Notificación de comentario hacia mantenedor',
 				'html'						=> $html,
-				'asunto'					=> '[Comentario] El administrador ha comentado su tarea',
+				'asunto'					=> '[NDRZA] El administrador ha comentado su tarea',
 				'destinatario_email'		=> $alerta['Usuario']['email'],
 				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
 				'remitente_email'			=> 'no-reply@nodriza.cl',
@@ -231,8 +435,8 @@ class TareaListener implements CakeEventListener
 		}
 
 
-		if ( isset($evento->data['Tarea']['notificar_comentario_administrador']) && isset($evento->data['Tarea']['mantenedor_id']) ) {
-
+		if ( isset($evento->data['Tarea']['notificar_comentario_administrador']) && isset($evento->data['Tarea']['administrador_id']) ) {
+			
 			# Buscamos la información del administrador que se debe notificar
 			$administrador = ClassRegistry::init('Administrador')->find('first', array(
 				'conditions' => array(
@@ -267,7 +471,7 @@ class TareaListener implements CakeEventListener
 			$this->Correo->save(array(
 				'estado'					=> 'Notificación de comentario hacia administrador',
 				'html'						=> $html,
-				'asunto'					=> '[Comentario] El mantenedor ha comentado su tarea',
+				'asunto'					=> '[NDRZA] El mantenedor ha comentado su tarea',
 				'destinatario_email'		=> $alerta['Administrador']['email'],
 				'destinatario_nombre'		=> $alerta['Administrador']['nombre'],
 				'remitente_email'			=> 'no-reply@nodriza.cl',
@@ -283,12 +487,13 @@ class TareaListener implements CakeEventListener
 			));
 
 		}
+		
 
 		# Se ejecuta el comando para enviar los correos
-		App::uses('AppShell', 'Console/Command');
+		/*App::uses('AppShell', 'Console/Command');
 		App::uses('EnviarCorreosShell', 'Console/Command');
 		$this->EnviarEmails = new EnviarCorreosShell();
-		$this->EnviarEmails->main();
+		$this->EnviarEmails->main();*/
 
 	}
 }

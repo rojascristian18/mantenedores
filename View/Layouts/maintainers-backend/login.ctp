@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<?= $this->Html->meta('icon'); ?>
 		<?= $this->Html->css(array(
-			'/maintainers-backend/css/theme-default',
+			'/maintainers-backend/css/theme-dark',
 			'/maintainers-backend/css/custom'
 		)); ?>
 		<?= $this->Html->scriptBlock("var webroot = '{$this->webroot}';"); ?>
@@ -22,7 +22,6 @@
 	</head>
     <body>
 		<div class="login-container">
-			<?= $this->element('maintainers_alertas'); ?>
 			<?= $this->fetch('content'); ?>
         </div>
     </body>

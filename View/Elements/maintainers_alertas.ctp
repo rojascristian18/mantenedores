@@ -1,3 +1,4 @@
+
 <? if ( $flash = $this->Session->flash('flash') ) : ?>
 <div class="alert alert-info">
 	<a class="close" data-dismiss="alert">&times;</a>

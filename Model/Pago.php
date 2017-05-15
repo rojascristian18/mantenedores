@@ -35,4 +35,51 @@ class Pago extends AppModel
 	/**
 	 * VALIDACIONES
 	 */
+	public $belongsTo = array(
+		'Usuario' => array(
+			'className'				=> 'Usuario',
+			'foreignKey'			=> 'usuario_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Usuario')
+		),
+		'Administrador' => array(
+			'className'				=> 'Administrador',
+			'foreignKey'			=> 'administrador_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Importancia')
+		),
+		'Tarea' => array(
+			'className'				=> 'Tarea',
+			'foreignKey'			=> 'tarea_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
+		),
+		'Cuenta' => array(
+			'className'				=> 'Cuenta',
+			'foreignKey'			=> 'cuenta_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
+		),
+		'Tienda' => array(
+			'className'				=> 'Tienda',
+			'foreignKey'			=> 'tienda_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
+		)
+	);
 }

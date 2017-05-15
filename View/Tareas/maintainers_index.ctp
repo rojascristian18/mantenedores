@@ -3,8 +3,47 @@
 </div>
 
 <div class="page-content-wrap">
+	<? if ( empty($cuenta) ) : ?>
 	<div class="row">
-		<div class="col-xs-12 glosario">
+		<div class="col-xs-12">
+			<div class="alert alert-danger">
+				<a class="close" data-dismiss="alert">&times;</a>
+				<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;&nbsp;Para recibir pagos usted debe agregar una cuenta bancaria en su perfil. 
+			</div>
+		</div>
+	</div>
+	<? else : ?>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="alert alert-success">
+				<a class="close" data-dismiss="alert">&times;</a>
+				Los pagos de sus tareas se harán a la <?=$cuenta['TipoCuenta']['nombre']; ?> n° <b><?= $cuenta['Cuenta']['cuenta']; ?></b> del banco <?=$cuenta['Banco']['nombre']?>.
+			</div>
+		</div>
+	</div>
+	<? endif; ?>
+	<div class="row">
+		<div class="col-xs-12 col-sm-6 pull-right">
+			<div class="widget widget-primary widget-carousel">
+                <div class="owl-carousel">
+                	<? if( !empty($miAcumuladoMesActual) ) : ?>
+                    <div>                                    
+                        <div class="widget-title">Acumulado no pagado</div>                                                                        
+                        <div class="widget-subtitle">del <?=date('Y-m-01');?> a la fecha</div>
+                        <div class="widget-int"><?= CakeNumber::currency($miAcumuladoMesActual, 'CLP'); ?></div>
+                    </div>
+                	<? endif; ?>
+                    <? if( !empty($miAcumuladoTotal) ) : ?>
+                    <div>                                    
+                        <div class="widget-title">Acumulado total</div>                                                                        
+                        <div class="widget-subtitle">no pagado</div>
+                        <div class="widget-int"><?= CakeNumber::currency($miAcumuladoTotal, 'CLP'); ?></div>
+                    </div>
+                	<? endif; ?>
+                </div>                                                        
+            </div>
+		</div>
+		<div class="col-xs-12 col-sm-6 glosario">
 			<h4>Glosario</h4>
 			<div class="table-responsive">
 				<table class="table tabla-sin-bordes">
@@ -103,6 +142,7 @@
 									<th><?= $this->Paginator->sort('administrador_id', 'Admnistrador', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('iniciado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('fecha_entrega', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('cantidad_productos', 'Cant productos', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('porcentaje_realizado', 'Avanzado', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><a><?= __('Estado'); ?></a></th>
 									<th><?= $this->Paginator->sort('created', 'Creada', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
@@ -116,6 +156,7 @@
 									<td><?= $tarea['Administrador']['nombre']; ?></td>
 									<td><?= ($tarea['Tarea']['iniciado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td><?= $tarea['Tarea']['fecha_entrega']; ?></td>
+									<td><?= $tarea['Tarea']['cantidad_productos']; ?></td>
 									<td><?= $tarea['Tarea']['porcentaje_realizado']; ?>%</td>
 									<td>
 										<? if ($tarea['Tarea']['en_progreso']) : ?>
@@ -130,7 +171,7 @@
 										<? if ($tarea['Tarea']['finalizado']) : ?>
 											<label class="label label-success">Finalizado</label>
 										<? endif; ?>
-										<? if ( ! $tarea['Tarea']['en_progreso'] && ! $tarea['Tarea']['en_revision'] && ! $tarea['Tarea']['finalizado']) : ?>
+										<? if ( ! $tarea['Tarea']['en_progreso'] && ! $tarea['Tarea']['rechazado'] && ! $tarea['Tarea']['en_revision'] && ! $tarea['Tarea']['finalizado']) : ?>
 											<label class="label label-default">Sin estado</label>
 										<? endif; ?>
 									</td>

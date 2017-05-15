@@ -128,13 +128,14 @@ class EnviarCorreosShell extends AppShell
 			$enviado		= false;
 		}
 		finally
-		{
+		{	
 			$this->Correo->id		= $datos['Correo']['id'];
 			$this->Correo->save(array(
 				'procesado'			=> true,
 				'enviado'			=> $enviado,
 				'reintentos'		=> ($datos['Correo']['reintentos'] + 1)
 			));
+
 		}
 
 		return $enviado;

@@ -148,7 +148,7 @@
 										<? if ($tarea['Tarea']['finalizado']) : ?>
 											<label class="label label-success">Finalizado</label>
 										<? endif; ?>
-										<? if ( ! $tarea['Tarea']['en_progreso'] && ! $tarea['Tarea']['en_revision'] && ! $tarea['Tarea']['finalizado']) : ?>
+										<? if ( ! $tarea['Tarea']['en_progreso'] && ! $tarea['Tarea']['en_revision'] && ! $tarea['Tarea']['rechazado'] && ! $tarea['Tarea']['finalizado']) : ?>
 											<label class="label label-default">Sin estado</label>
 										<? endif; ?>
 									</td>
@@ -159,19 +159,14 @@
                                         <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                             <li role="presentation" class="dropdown-header">Seleccione</li>
                                             <? if ($permisos['ver']) :  ?>
-												<li><?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('action' => 'review', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Ver este registro', 'escape' => false)); ?></li>
+												<li><?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('action' => 'view', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Ver este registro', 'escape' => false)); ?></li>
                                         	<? endif; ?>
-											<? if ($permisos['editar'] && !$tarea['Tarea']['en_revision'] && !$tarea['Tarea']['finalizado']) : ?>
+											<? if ($permisos['editar'] && !$tarea['Tarea']['finalizado']) : ?>
 												<li><?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?></li>
 											<? else : ?>
 												<li><a>Imposible editar</a></li>
 											<? endif; ?>
-											<? if ($permisos['eliminar'] && !$tarea['Tarea']['en_revision'] && !$tarea['Tarea']['finalizado']) : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?></li>
-											<? else : ?>
-												<li><a>Imposible eliminar</a></li>
-											<? endif; ?>
-											<? if ($permisos['activar'] && !$tarea['Tarea']['en_revision'] && !$tarea['Tarea']['finalizado']) : ?>
+											<? if ($permisos['activar'] && !$tarea['Tarea']['iniciado'] && !$tarea['Tarea']['en_revision'] && !$tarea['Tarea']['en_progreso'] && !$tarea['Tarea']['finalizado']) : ?>
 												<? if ($tarea['Tarea']['activo']) : ?>
 													<li><?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?></li>
 												<? else : ?>

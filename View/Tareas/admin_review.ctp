@@ -211,6 +211,7 @@
 								<th>Grupo</th>
 								<th>Proveedor</th>
 								<th>Fabricante</th>
+								<th>Aceptado</th>
 								<th>Acción</th>
 							</thead>
 							<tbody>
@@ -222,20 +223,8 @@
 									<td><?= $grupo = (!empty($producto['grupocaracteristica_id'])) ? $producto['Grupocaracteristica']['nombre'] : 'No agregado' ; ?></td>
 									<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>
 									<td><?= $fabricante = (!empty($producto['fabricante_id'])) ? $producto['Fabricante']['name'] : 'No agregado' ; ?></td>
-									<td>
-									<div class="btn-group">
-                                        <a href="#" data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true"><span class="fa fa-cog"></span> Acciones</a>
-                                        <ul class="dropdown-menu dropdown-menu-left" role="menu">
-                                            <li role="presentation" class="dropdown-header">Seleccione</li>
-											<li><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'review', $producto['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Revisar este registro', 'escape' => false)); ?>
-											</li>
-											<? if( $producto['aceptado'] ) : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-ban"></i> Rechazar', array('controller' => 'productos', 'action' => 'refuse', $producto['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Rechazar este producto', 'escape' => false)); ?></li>
-											<? else : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-check"></i> Aceptar', array('controller' => 'productos', 'action' => 'acept', $producto['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Aceptar este producto', 'escape' => false)); ?></li>
-											<? endif; ?>
-										</ul>
-                                    </div>
+									<td><?= ($producto['aceptado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
+									<td><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'review', $producto['id']), array('class' => 'btn btn-info btn-xs', 'rel' => 'tooltip', 'title' => 'Revisar este registro', 'escape' => false)); ?></td>
 								</tr>
 							<? endforeach; ?>
 							</tbody>
@@ -337,8 +326,11 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="pull-right guardar-botones">
-				<input type="submit" class="btn btn-primary esperar-carga" autocomplete="off" data-loading-text="Espera un momento..." value="Guardar cambios">
-				<?= $this->Html->link('Cancelar', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
+				<? if ($this->request->data['Tarea']['en_revision'] && !$this->request->data['Tarea']['en_progreso'] && !$this->request->data['Tarea']['finalizado'] && !$this->request->data['Tarea']['rechazado']) : ?>
+					<?= $this->Form->postLink('<i class="fa fa-check"></i> Aceptar tarea y finalizar', array('action' => 'accept', $this->request->data['Tarea']['id']), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<?= $this->Form->postLink('<i class="fa fa-remove"></i> Rechazar tarea', array('action' => 'refuse', $this->request->data['Tarea']['id']), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+				<? endif; ?>
+				<?= $this->Html->link('Volver', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
 			</div>
 		</div>
 	</div>
