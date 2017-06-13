@@ -331,6 +331,104 @@ class Tarea extends AppModel
 		)
 	);
 
+
+	public function guardarPago() 
+	{
+		# Obtenemos Información completa de la tarea
+		$tarea = ClassRegistry::init('Tarea')->find('first',
+			array(
+				'conditions' => array(
+					'Tarea.id' => $this->data['Tarea']['id']
+					),
+				'contain' => array(
+					'Usuario' => array('Cuenta', 'Producto' => array('conditions' => array('Producto.tarea_id' => $this->data['Tarea']['id']))),
+					)	 
+			)
+		);
+
+		if (empty($tarea['Usuario']) || empty($tarea['Usuario']['Cuenta']) || empty($tarea['Usuario']['Producto']) ) {
+			return;
+		}
+
+		$porcentajeMantenedor = $this->calcularPorcentajeMantenedor($tarea['Tarea']['cantidad_productos'], count($tarea['Usuario']['Producto']));
+
+		if ($porcentajeMantenedor < 1) {
+			return;
+		}
+		
+		# Creamos el arreglo para guardar la información al pago
+		$pago = array(
+			'Pago' => array(
+				'administrador_id' => $tarea['Tarea']['administrador_id'],
+				'usuario_id' => $tarea['Tarea']['usuario_id'],
+				'tarea_id' => $tarea['Tarea']['id'],
+				'tienda_id' => $tarea['Tarea']['tienda_id'],
+				'cuenta_id' => $tarea['Usuario']['Cuenta'][0]['id'],
+				'porcentaje_realizado' => $porcentajeMantenedor,
+				'nombre_tarea' => $tarea['Tarea']['nombre'],
+				'monto_a_pagar' => $this->calcularMontoPagar($tarea['Tarea']['precio'], $porcentajeMantenedor, $tarea['Tarea']['cantidad_productos'])
+				)
+			);
+
+		## ¿Que pasa cuando se paga 2 veces una tarea ?
+
+		# Buscamos un pago que tenga la misma tarea, el mismo usuario.
+		$pagoExistentes = ClassRegistry::init('Pago')->find('all', array(
+			'conditions' => array(
+				'Pago.tarea_id' => $tarea['Tarea']['id'],
+				'Pago.usuario_id' => $tarea['Tarea']['usuario_id']
+				)
+			)
+		);
+
+		foreach ($pagoExistentes as $llave => $pagoExistente) {
+			if( $pago['Pago']['usuario_id'] == $pagoExistente['Pago']['usuario_id'] && $pago['Pago']['tarea_id'] == $pagoExistente['Pago']['tarea_id']) {
+
+				# Sí los montos son iguales, quiere decir que ya se registró el pago de esa porción de la tarea
+				if ( !$pagoExistente['Pago']['pagado'] && $pago['Pago']['monto_a_pagar'] == $pagoExistente['Pago']['monto_a_pagar'] ) {
+					return;
+				}
+
+				# Sí los montos son diferentes verificamos el estado del pago existente
+				if ( $pago['Pago']['monto_a_pagar'] != $pagoExistente['Pago']['monto_a_pagar'] ) {
+					if ( $pagoExistente['Pago']['pagado'] ) {
+						$pago['Pago']['monto_a_pagar'] = $pago['Pago']['monto_a_pagar'] - $pagoExistente['Pago']['monto_pagado'];
+						$pago['Pago']['porcentaje_realizado'] = $pago['Pago']['porcentaje_realizado'] - $pagoExistente['Pago']['porcentaje_realizado'];
+					}else{
+						$pago['Pago']['monto_a_pagar'] = $pago['Pago']['monto_a_pagar'] - $pagoExistente['Pago']['monto_a_pagar'];
+						$pago['Pago']['porcentaje_realizado'] = $pago['Pago']['porcentaje_realizado'] - $pagoExistente['Pago']['porcentaje_realizado'];
+					}
+				}
+			}
+		}
+		
+		# Guardamos el pago
+		ClassRegistry::init('Pago')->save($pago);
+		return true;
+	}
+
+
+	public function contadorTareas()
+	{
+		# Obtenemos Información completa de la tarea
+		$tarea = ClassRegistry::init('Tarea')->find('count',
+			array(
+				'conditions' => array(
+					'Tarea.usuario_id' => $this->data['Tarea']['usuario_id'],
+					'Tarea.finalizado' => 1
+				)	 
+			)
+		);
+		
+		if ( empty($tarea) ) {
+			return;
+		}
+
+		ClassRegistry::init('Usuario')->id = $this->data['Tarea']['usuario_id'];
+		ClassRegistry::init('Usuario')->saveField('count_tareas_terminadas', $tarea);
+		return;
+	}
+
 	public function beforeSave($options = array()) {
 		
 		if ( ! isset($this->data['Tarea']['tienda_id'])) {
@@ -338,6 +436,7 @@ class Tarea extends AppModel
 		}
 
 		if ( isset($this->data['Tarea']['id']) ) {
+			
 			# Verificamos si cambió el usuario asignado
 			$usuarioActual = $this->find('first', array('conditions' => array('Tarea.id' => $this->data['Tarea']['id']), 'fields' => array('usuario_id')));
 
@@ -348,6 +447,10 @@ class Tarea extends AppModel
 				#  Se reinicia la tarea
 				#  
 				#  Recordar que tambien se debe calcular el monto de la tarea e ingresarlo en la cuenta del usuario que se le quitó la tarea
+
+				$this->guardarPago();
+				
+
 				$this->data['Tarea']['iniciado'] = 0;
 				$this->data['Tarea']['en_progreso'] = 0;
 				$this->data['Tarea']['en_revision'] = 0;
@@ -356,7 +459,12 @@ class Tarea extends AppModel
 
 			}
 
-			if ( isset($this->data['Tarea']['usuario_id']) && !empty($this->data['Tarea']['usuario_id']) && !isset($this->data['Comentario']) && $usuarioActual['Tarea']['usuario_id'] == $this->data['Tarea']['usuario_id'] ) {
+			# Notificar tarea reabierta
+			if ( isset($this->data['Tarea']['reabierta']) ){
+				$this->data['Tarea']['notificar_reabrir_tarea'] = true;
+			}
+
+			if ( !isset($this->data['Tarea']['reabierta']) && isset($this->data['Tarea']['usuario_id']) && !empty($this->data['Tarea']['usuario_id']) && !isset($this->data['Comentario']) && $usuarioActual['Tarea']['usuario_id'] == $this->data['Tarea']['usuario_id'] ) {
 				$this->data['Tarea']['modificada'] = true;
 			}
 
@@ -395,12 +503,12 @@ class Tarea extends AppModel
 							'Tarea.id' => $this->data['Tarea']['id']
 							),
 						'contain' => array(
-							'Usuario' => array('Cuenta'),
+							'Usuario' => array('Cuenta', 'Producto' => array('conditions' => array('Producto.tarea_id' => $this->data['Tarea']['id']))),
 							)	 
 					)
 				);
 
-				if (empty($tarea['Usuario']) || empty($tarea['Usuario']['Cuenta']) ) {
+				if (empty($tarea['Usuario']) || empty($tarea['Usuario']['Cuenta']) || empty($tarea['Usuario']['Producto']) ) {
 					return false;
 				}
 
@@ -429,6 +537,15 @@ class Tarea extends AppModel
 		}
 	}
 
+	public function calcularPorcentajeMantenedor($total_productos = 0, $total_productos_matenedor = 0)
+	{
+		if ( $total_productos > 0 && $total_productos_matenedor > 0 ) {
+			return  round($total_productos_matenedor * 100 / $total_productos); 
+		}else{
+			return 0;
+		}
+	}
+
 	public function afterSave($created, $options = array() ) {
 		
 		parent::afterSave($created, $options);
@@ -443,41 +560,13 @@ class Tarea extends AppModel
 			 */
 
 			if ( isset($this->data['Tarea']['tarea_finalizada']) && $this->data['Tarea']['tarea_finalizada'] ) {
+				# Guardar el monto a pagar de la tarea
+				$this->guardarPago();
 
-				# Obtenemos Información completa de la tarea
-				$tarea = ClassRegistry::init('Tarea')->find('first',
-					array(
-						'conditions' => array(
-							'Tarea.id' => $this->data['Tarea']['id']
-							),
-						'contain' => array(
-							'Usuario' => array('Cuenta'),
-							)	 
-					)
-				);
-
-				if (empty($tarea['Usuario']) || empty($tarea['Usuario']['Cuenta']) ) {
-					return false;
-				}
-				
-				# Creamos el arreglo para guardar la información al pago
-				$pago = array(
-					'Pago' => array(
-						'administrador_id' => $tarea['Tarea']['administrador_id'],
-						'usuario_id' => $tarea['Tarea']['usuario_id'],
-						'tarea_id' => $tarea['Tarea']['id'],
-						'tienda_id' => $tarea['Tarea']['tienda_id'],
-						'cuenta_id' => $tarea['Usuario']['Cuenta'][0]['id'],
-						'nombre_tarea' => $tarea['Tarea']['nombre'],
-						'monto_a_pagar' => $this->calcularMontoPagar($tarea['Tarea']['precio'], $tarea['Tarea']['porcentaje_realizado'], $tarea['Tarea']['cantidad_productos'])
-						)
-					);
-
-				# Guardamos el pago
-				ClassRegistry::init('Pago')->save($pago);
+				# actualiza el campo de contador de tareas finalizadas del mantenedor
+				$this->contadorTareas();
 
 			}
-
 
 			$evento			= new CakeEvent('Model.Tarea.afterSave', $this, $this->data);
 			$this->getEventManager()->dispatch($evento);

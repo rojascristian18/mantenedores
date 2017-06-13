@@ -96,11 +96,12 @@
                 </div>
             </div>
             
-            <div class="panel panel-default tabs">
+            <div class="panel panel-default tabs" id="tabs-perfil">
                 <ul class="nav nav-tabs">
-                    <li><a href="#tareas" data-toggle="tab">Últimas Tareas Finalizadas</a></li>
+                    <li><a href="#tareas" data-toggle="tab">Tareas Finalizadas</a></li>
                     <li class="active"><a href="#cuentas" data-toggle="tab">Datos bancarios</a></li>   
-                    <li><a href="#pagos" data-toggle="tab">Pagos</a></li>                                    
+                    <li><a href="#pagos" data-toggle="tab">Pagos</a></li>
+                    <li><a href="#calificaciones" data-toggle="tab">Calificaciones</a></li>                                    
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane panel-body" id="tareas">
@@ -165,8 +166,8 @@
                     </div>
                     <div class="tab-pane panel-body" id="pagos">                                        
                         <p>Acá se listan los últimos 10 pagos realizados a su cuenta.</p>
-                        <? if ( ! empty($this->request->data['Pagos']) ) : ?>
-                        <? foreach ($this->request->data['Pagos'] as $indice => $pago) : ?>                                                                      
+                        <? if ( ! empty($this->request->data['Pago']) ) : ?>
+                        <? foreach ($this->request->data['Pago'] as $indice => $pago) : ?>                                                                      
                         <div class="list-group list-group-contacts border-bottom">
                             <?= $this->Html->link(
                                 '<span class="contacts-title">#' . $tarea['Tarea']['id'] .'</span> ' . 
@@ -185,13 +186,29 @@
                                 <label class="list-group-item">No registra pagos aún.</>
                             </div>
                         <? endif; ?>                            
-                    </div>                                                                        
+                    </div>
+                    <div class="tab-pane panel-body" id="calificaciones">
+                        <p>¿Cómo va mi trabajo?</p>
+                        <div class="table-scroll">
+                            <table class="table table-stripped">
+                                <thead>
+                                    <th>Calificación</th>
+                                    <th>Comentario</th>
+                                </thead>
+                                <tbody>
+                                    <? foreach( $this->request->data['Calificacion'] as $calificacion ) : ?>
+                                        <tr>
+                                            <td><?= $this->Html->estrellas($calificacion['calificacion']); ?></td>
+                                            <td><?= $calificacion['mensaje']; ?></td>
+                                        </tr>
+                                    <? endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                                                                  
                 </div>
-                
             </div>
-
         </div>
-        
         <div class="col-md-3">
             <div class="panel panel-default form-horizontal">
                 <div class="panel-body">

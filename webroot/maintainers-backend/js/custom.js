@@ -73,6 +73,25 @@ jQuery(document).ready(function($)
 	if($("input[class^='mask_']").length > 0){
         $("input.mask_fono").mask('9 9999 9999');
         $("input.mask_money").mask('000.000.000.000.000', {reverse: true});
+        $("input.mask_medida").mask('99999999999.000000', {
+        	onKeyPress: function(cep, event, current, options) {
+        		var partes = cep.split('.');
+        		var valor = '';
+        		if ( typeof(partes[1]) != 'undefined' && partes[1].length < 6) {
+        			var faltan = 6 - partes[1].length 
+        			console.log(faltan);
+        			for (var i = 0; i < faltan; i++) {
+        				partes[1] = partes[1] + '0';
+        			};
+        			valor = partes[0] + '.' + partes[1];
+        			current.val(valor);
+        		}
+
+        		if(typeof(partes[1]) == 'undefined') {
+        			current.val( cep + '.000000' );
+        		}
+        	}
+        });
     }
 	
 
@@ -241,7 +260,7 @@ jQuery(document).ready(function($)
 				'data[Producto][nombre]': {
 					required: true,
 					minlength: 5,
-                    maxlength: 100
+                    maxlength: 50
 				},
 				'data[Producto][referencia]': {
 					required: true,
@@ -250,7 +269,8 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][descripcion_corta]': {
 					required: true,
-					minlength: 25,
+					minlength: 50,
+					maxlength: 800
 				},
 				'data[Producto][descripcion]': {
 					required: true,
@@ -260,19 +280,15 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][largo]': {
 					required: true,
-					number: true
 				},
 				'data[Producto][alto]': {
 					required: true,
-					number: true
 				},
 				'data[Producto][profundidad]': {
 					required: true,
-					number: true
 				},
 				'data[Producto][peso]': {
 					required: true,
-					number: true
 				},
 				'.not-blank': {
 					required: true,
@@ -280,7 +296,48 @@ jQuery(document).ready(function($)
 
 			},
 			messages: {
-
+				'data[Producto][grupocaracteristica_id]': {
+					required: 'Requerido'
+				},
+				'data[Producto][fabricante_id]': {
+					required: 'Requerido'
+				},
+				'data[Producto][nombre]': {
+					required: 'Requerido',
+					minlength: '5 carácteres mínimo',
+                    maxlength: '50 carácteres máximo'
+				},
+				'data[Producto][referencia]': {
+					required: 'Requerido',
+					minlength: '5 carácteres mínimo',
+                    maxlength: '32 carácteres máximo'
+				},
+				'data[Producto][descripcion_corta]': {
+					required: 'Requerido',
+					minlength: '25 carácteres mínimo',
+					maxlength: '800 carácteres máximo'
+				},
+				'data[Producto][descripcion]': {
+					required: 'Requerido',
+				},
+				'data[Producto][precio]': {
+					required: "Requerido",
+				},
+				'data[Producto][largo]': {
+					required: 'Requerido',
+				},
+				'data[Producto][alto]': {
+					required: 'Requerido',
+				},
+				'data[Producto][profundidad]': {
+					required: 'Requerido',
+				},
+				'data[Producto][peso]': {
+					required: 'Requerido',
+				},
+				'.not-blank': {
+					required: 'Requerido',
+				}
 			}
 		});
 	}
@@ -492,7 +549,7 @@ jQuery(document).ready(function($)
     		obtenerTablaCaracteristicas($('.string_grupo').val());
     	});
 
-    	$('.string_nombre').on('keydown', function(event){
+    	$('.string_nombre').on('keyup', function(event){
     		$('.string_nombre_final .nombre_preview').html($('.string_nombre').val());
 
     		insertarNombreFinal();
@@ -533,5 +590,8 @@ jQuery(document).ready(function($)
 	if($(".owl-carousel").length > 0){
         $(".owl-carousel").owlCarousel({mouseDrag: true, touchDrag: true, slideSpeed: 300, paginationSpeed: 400, singleItem: true, navigation: false,autoPlay: true});
     }
+
+    // TOUR
+    
 });
 //]]>

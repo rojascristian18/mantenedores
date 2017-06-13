@@ -1,6 +1,7 @@
 <?= $this->Form->create('Producto', array('class' => 'form-horizontal validate-product', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?= $this->Form->input('id');?>
 <?= $this->Form->input('tarea_id', array('type' => 'hidden', 'value' => $miTarea['Tarea']['id'])); ?>
+<?= $this->Form->input('usuario_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Mantenedor.id'))); ?>
 <?= $this->Form->input('ElementosEliminados', array('type' => 'hidden', 'id' => 'ElementosEliminados')); ?>
 <div class="page-title">
 	<h2><span class="fa fa-shopping-bag"></span> Editar producto</h2>
@@ -12,7 +13,11 @@
 <div class="page-content-wrap">
 	<div class="row">
 		<div class="col-xs-12">
-			<p>Usted está actualizando un producto para la tarea <b>identificador #<?=$miTarea['Tarea']['id'];?></b>.</p>
+			<p>Usted está editando un producto de la tarea <b>identificador #<?=$miTarea['Tarea']['id'];?></b>.</p>
+			<div class="alert alert-warning" role="alert">
+	            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+	            <strong>¡Recuerde!</strong> Todos los campos con (*) son obligatorios. Sí usted no encuentra un valor comenteselo al administrador.
+	        </div>
 		</div>
 	</div>
 	<div class="row">
@@ -33,36 +38,79 @@
 						<div class="error"><span></span></div>
 						<div role="tabpanel" class="tab-pane row active" id="informacion">
 							<div class="row">
-								<div class="form-group col-xs-12 col-sm-6">
-									<?= $this->Form->label('nombre', 'Crear el nombre (obligatorio)', array('class' => 'btn-block')); ?>
-									<div class="input-grupo">
-										<?= $this->Form->input('grupocaracteristica_id', array('class' => 'form-control string_grupo', 'empty' => 'Seleccione tipo de producto')); ?>
-									</div>
-									<div class="input-marca">
-										<?= $this->Form->input('fabricante_id', array('class' => 'form-control string_marca', 'empty' => 'Seleccione marca')); ?>
-									</div>
-									<div class="input-nombre">
-										<?= $this->Form->input('nombre', array('placeholder' => 'Ingrese características importantes', 'class' => 'form-control string_nombre')); ?>
-									</div>
+								<div class="col-xs-12">
+									<h3><?= _('Creando el nombre del producto');?></h3>
 								</div>
-								<div class="form-group col-xs-12 col-sm-6">
-									<?= $this->Form->label('nombre_final', 'Nombre final del producto'); ?>
+							</div>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('grupocaracteristica_id', _('Seleccione la categoría del producto (*)'));?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<?= $this->Form->input('grupocaracteristica_id', array('class' => 'form-control string_grupo', 'empty' => 'Seleccione')); ?>
+								</div>
+							</div>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('fabricante_id', _('Seleccione la marca del producto (*)'));?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<?= $this->Form->input('fabricante_id', array('class' => 'form-control string_marca', 'empty' => 'Seleccione marca')); ?>
+								</div>
+							</div>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('nombre', _('Ingrese carácteristicas del producto como por ejemplo: <b>650W 1,7L 48"</b> (*)'));?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<?= $this->Form->input('nombre', array('placeholder' => 'Ingrese características importantes del producto', 'class' => 'form-control string_nombre')); ?>
+								</div>
+							</div>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('nombre_final', 'Nombre final del producto <br/><small><b>(categoría + carácteristicas + marca)</b></small>'); ?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
 									<span class="form-control string_nombre_final"><span class="grupo_preview"></span> <span class="nombre_preview"></span> <span class="marca_preview"></span></span>
 									<?= $this->Form->input('nombre_final', array('type' => 'hidden', 'class' => 'input_nombre_final')); ?>
 								</div>
 							</div>
-							<div class="form-group col-xs-12 col-sm-6">
-								<?= $this->Form->label('referencia', 'Referencia (obligatorio)'); ?>
-								<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto')); ?>
+							<div class="divisor-md"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('referencia', 'Referencia del producto (*)'); ?><br>
+									<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#refeenciaProducto">
+									  Ejemplo
+									</button>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto')); ?>
+								</div>
 							</div>
-							<div class="form-group col-xs-12 col-sm-6">
-								<?= $this->Form->label('descripcion_corta', 'Descripción corta (obligatorio)'); ?>
-								<?= $this->Form->input('descripcion_corta', array('placeholder' => 'Ingrese una descripción corta del producto', 'class' => 'summernote-small')); ?>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('descripcion_corta', 'Descripción corta (*)'); ?>
+									<p><small>Describa brevemente el producto, destacando sus cualidades, materiales o especificaciones.</small></p>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<p><b>Puede agregar formato al texto.</b></p>
+									<?= $this->Form->input('descripcion_corta', array('placeholder' => 'Ingrese una descripción corta del producto', 'class' => 'summernote-small')); ?>
+								</div>
 							</div>
-							<div class="form-group col-xs-12">
-								<?= $this->Form->label('descripcion', 'Descripción completa (obligatorio)'); ?>
-								<p>Ingrese una descripción completa del producto, puede agregar etiquetas HTML para ordenar el texto.</p>
-								<?= $this->Form->input('descripcion', array('class' => 'summernote')); ?>
+							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('descripcion', 'Descripción completa (*)'); ?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<p><b>Puede agregar formato al texto.</b></p>
+									<?= $this->Form->input('descripcion', array('class' => 'summernote')); ?>
+								</div>
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="precio">
@@ -79,7 +127,7 @@
 							<div class="form-group col-xs-12 col-sm-3">
 								<?= $this->Form->label('largo', 'Largo'); ?>
 								<div class="input-group">
-                                    <?= $this->Form->input('largo'); ?>
+                                    <?= $this->Form->input('largo', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
                                 </div>
 								
@@ -87,7 +135,7 @@
 							<div class="form-group col-xs-12 col-sm-3">
 								<?= $this->Form->label('alto', 'Alto'); ?>
 								<div class="input-group">
-                                    <?= $this->Form->input('alto'); ?>
+                                    <?= $this->Form->input('alto', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
                                 </div>
 								
@@ -95,14 +143,14 @@
 							<div class="form-group col-xs-12 col-sm-3">
 								<?= $this->Form->label('profundidad', 'Profundidad'); ?>
 								<div class="input-group">
-                                    <?= $this->Form->input('profundidad'); ?>
+                                    <?= $this->Form->input('profundidad', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
                                 </div>
 							</div>
 							<div class="form-group col-xs-12 col-sm-3">
 								<?= $this->Form->label('peso', 'Peso'); ?>
 								<div class="input-group">
-                                    <?= $this->Form->input('peso'); ?>
+                                    <?= $this->Form->input('peso', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">Kg</span>
                                 </div>
 								

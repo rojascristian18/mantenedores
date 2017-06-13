@@ -6,11 +6,15 @@
 </div>
 <div class="pull-right guardar-botones">
 <? if ($this->request->data['Tarea']['en_revision'] && !$this->request->data['Tarea']['en_progreso'] && !$this->request->data['Tarea']['finalizado'] && !$this->request->data['Tarea']['rechazado']) : ?>
-	<?= $this->Form->postLink('<i class="fa fa-check"></i> Aceptar tarea y finalizar', array('action' => 'accept', $this->request->data['Tarea']['id']), array('class' => 'btn btn-success', 'escape' => false)); ?>
+	<? if ($pNoAceptados == 0 ) : ?>
+		<button class="btn btn-success btn-aceptar-tarea" data-toggle="modal" data-target="#calificar"><i class="fa fa-check"></i> Aceptar tarea y finalizar</button>
+	<? else : ?>
+		<label class="label label-form label-warning">Para aprobar la tarea debe aceptar todos los productos.</label>
+	<? endif; ?>
 	<?= $this->Form->postLink('<i class="fa fa-remove"></i> Rechazar tarea', array('action' => 'refuse', $this->request->data['Tarea']['id']), array('class' => 'btn btn-primary', 'escape' => false)); ?>
 <? endif; ?>
 </div>
-<?= $this->Form->create('Tarea', array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+<?= $this->Form->create('Tarea', array('class' => 'form-horizontal tareas-form', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?=	$this->Form->input('id');?>
 <?= $this->Form->input('administrador_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Administrador.id'))); ?>
 <?= $this->Form->input('ElementosEliminados', array('type' => 'hidden', 'id' => 'ElementosEliminados')); ?>
@@ -38,7 +42,7 @@
 											</tr>
 											<tr>
 												<th><?= $this->Form->label('precio', 'Precio'); ?></th>
-												<td><?= $this->Form->input('precio'); ?></td>
+												<td><?= $this->Form->input('precio', array('class' => 'mask_money form-control')); ?></td>
 											</tr>
 											<tr>
 												<th><?= $this->Form->label('cantidad_productos', 'Cant productos'); ?></th>
@@ -316,7 +320,44 @@
 		<div class="col-xs-12">
 			<div class="pull-right guardar-botones">
 			<? if ($this->request->data['Tarea']['en_revision'] && !$this->request->data['Tarea']['en_progreso'] && !$this->request->data['Tarea']['finalizado'] && !$this->request->data['Tarea']['rechazado']) : ?>
-				<?= $this->Form->postLink('<i class="fa fa-check"></i> Aceptar tarea y finalizar', array('action' => 'accept', $this->request->data['Tarea']['id']), array('class' => 'btn btn-success', 'escape' => false)); ?>
+				<? if ($pNoAceptados == 0 ) : ?>
+
+				<button class="btn btn-success btn-aceptar-tarea" data-toggle="modal" data-target="#calificar"><i class="fa fa-check"></i> Aceptar tarea y finalizar</button>
+
+				<!-- Modal calificar -->
+				<div class="modal fade" id="calificar" tabindex="-1" role="dialog" aria-labelledby="calificarLabel">
+				  <div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      <div class="modal-header">
+				        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				        <h4 class="modal-title" id="calificarLabel"><?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image(sprintf('Usuario/%d/mini_%s', $this->request->data['Usuario']['id'] , $this->request->data['Usuario']['imagen']), array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>  Calificar a <?= h($this->request->data['Usuario']['nombre']); ?>&nbsp;<?= h($this->request->data['Usuario']['apellidos']); ?></h4>
+				      </div>
+				      <div class="modal-body">
+				        <?= $this->Form->create('Tarea', array('action' => 'accept'), array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+				        <?= $this->Form->input('id');?>
+				        <?= $this->Form->input('id_usuario', array('type' => 'hidden', 'value' => $this->request->data['Usuario']['id']));?>
+				        <?= $this->Form->input('calificacion_media', array('type' => 'hidden', 'value' => '0')); ?>
+				        <div class="form-group col-xs-12 col-sm-6">
+				        	<label>Califique en una escala de 1 a 5, donde 1 es muy malo y 5 es excelente.</label>
+				        	<div class="estrellas">
+					        	<?= $this->Html->estrellas(0); ?>
+					        </div>
+				        </div>
+				        <div class="form-group col-xs-12 col-sm-6">
+				        		<label>Agregue un comentario <small>(opcional)</small></label>
+				        	<textarea class="form-control" name="data[Tarea][mensaje]"></textarea>
+				        </div>
+				        <div class="form-group col-xs-12 col-sm-12">
+				        	<button type="submit" class="btn btn-success btn-block">Finalizar tarea</button>
+				        </div>
+				        <?= $this->Form->end(); ?>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<? else : ?>
+					<label class="label label-form label-warning">Para aprobar la tarea debe aceptar todos los productos.</label>
+				<? endif; ?>
 				<?= $this->Form->postLink('<i class="fa fa-remove"></i> Rechazar tarea', array('action' => 'refuse', $this->request->data['Tarea']['id']), array('class' => 'btn btn-primary', 'escape' => false)); ?>
 			<? endif; ?>
 			</div>

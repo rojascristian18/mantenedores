@@ -5,9 +5,6 @@
 	<li class="xn-search">
     <?= $this->Form->create('Tienda', array('class' => 'form-inline', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 	    <div class="form-group">
-	    	<?= $this->Form->label('tienda', 'Tienda', array('class' => 'txt-tienda')); ?>
-	    </div>
-	    <div class="form-group">
 	    	<?= $this->Form->select('tienda', $tiendasList, array('class' => 'form-control js-tienda', 'empty' => false)); ?>
 	    </div>
     <?= $this->Form->end(); ?>

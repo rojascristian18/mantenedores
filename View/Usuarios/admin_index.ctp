@@ -42,7 +42,7 @@
 									<td valign="center"><?= $this->Html->estrellas($usuario['Usuario']['calificacion_media']); ?>&nbsp;</td>
 									<td valign="center">
 									<? if ($permisos['editar']) : ?>
-										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+										<?= $this->Html->link('<i class="fa fa-edit"></i> Ver', array('action' => 'edit', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
 									<? endif; ?>
 									<? if ($permisos['eliminar']) : ?>
 										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $usuario['Usuario']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>

@@ -1,7 +1,7 @@
 <div class="page-title">
 	<h2><span class="fa fa-pencil-square-o"></span> Tarea</h2>
 </div>
-<?= $this->Form->create('Tarea', array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+<?= $this->Form->create('Tarea', array('class' => 'form-horizontal tareas-form', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?= $this->Form->input('administrador_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Administrador.id'))); ?>
 <div class="page-content-wrap">
 	<div class="row">
@@ -27,7 +27,7 @@
 											</tr>
 											<tr>
 												<th><?= $this->Form->label('precio', 'Precio'); ?></th>
-												<td><?= $this->Form->input('precio'); ?></td>
+												<td><?= $this->Form->input('precio', array('class' => 'mask_money form-control')); ?></td>
 											</tr>
 											<tr>
 												<th><?= $this->Form->label('cantidad_productos', 'Cant productos'); ?></th>

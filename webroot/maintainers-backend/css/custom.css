@@ -335,3 +335,43 @@ td.rechazado{
     color: #fff !important;
     text-align: center;
 }
+
+#tabs-perfil .nav-tabs, .nav-tabs.nav-justified {
+	margin-top: -37px;
+}
+
+#tabs-perfil .nav-tabs > li > a {
+	font-size: 12px;
+}
+
+#tabs-perfil .table-scroll {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: auto;  
+}
+
+.txt-tienda {
+    color: transparent;
+}
+
+.js-tienda {
+	margin-left: 40px;
+}
+
+@media screen and (max-width: 768px) {
+	.js-tienda {
+		margin-left: 30px;
+	}
+}
+
+.divisor-sm {
+	float: left;
+	width: 100%;
+	margin: 6px 0;
+}
+
+.divisor-md {
+	float: left;
+	width: 100%;
+	margin: 20px 0;
+}

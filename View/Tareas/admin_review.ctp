@@ -116,6 +116,7 @@
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Grupos</h3>
+						<p class="parrafo-panel">Grupos de atributos para los productos disponibles en esta tarea.</p>
 					</div>
 					<div class="panel-body">
 						<div class="table-responsive">
@@ -147,6 +148,7 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">Materiales de la tarea</h3>
 				</div>
+				<? if ( ! empty($this->request->data['Adjunto']) ) : ?>
 				<div class="panel-body">
 					<div class="table-responsive">
 						<table class="table js-clon-scope">
@@ -159,8 +161,6 @@
 								</tr>
 							</thead>
 							<tbody class="js-clon-contenedor">
-								
-								<? if ( ! empty($this->request->data['Adjunto']) ) : ?>
 								<? foreach ( $this->request->data['Adjunto'] as $index => $adjunto ) : ?>
 								<tr>
 									<td>
@@ -186,11 +186,15 @@
 									</td>
 								</tr>
 								<? endforeach; ?>
-								<? endif; ?>
 							</tbody>
 						</table>
 					</div>
 				</div>
+				<? else : ?>
+				<div class="panel-body">
+					<p>Esta tarea no registra materiales de apoyo.</p>
+				</div>
+				<? endif; ?>
 			</div>
 		</div>
 	</div>
@@ -240,6 +244,7 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">Comentarios de la tarea</h3>
 				</div>
+				<? if (!empty($this->request->data['Comentario']) ) : ?>
 				<div class="panel-body panel-gris">
 					<div class="comentarios">
 						<div class="comentarios-contenedor">
@@ -320,6 +325,11 @@
 						</div>
 					</div>
 				</div>
+				<? else : ?>
+				<div class="panel-body">
+					<p>No se han hecho comentarios en esta tarea.</p>
+				</div>
+			<? endif; ?>
 			</div>
 		</div>
 	</div>

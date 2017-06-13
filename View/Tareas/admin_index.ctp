@@ -117,6 +117,7 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
+									<th><?= $this->Paginator->sort('id', 'Identificador', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('nombre', 'Tarea', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('usuario_id', 'Mantenedor', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('iniciado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
@@ -130,6 +131,7 @@
 							<tbody>
 								<?php foreach ( $tareas as $tarea ) : ?>
 								<tr>
+									<td><?= sprintf('#%d', $tarea['Tarea']['id']); ?></td>
 									<td><?= $tarea['Tarea']['nombre']; ?></td>
 									<td><?= $this->Html->link($tarea['Usuario']['nombre'], array('controller' => 'usuarios', 'action' => 'view', $tarea['Usuario']['id'])); ?></td>
 									<td><?= ($tarea['Tarea']['iniciado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
@@ -160,6 +162,9 @@
                                             <li role="presentation" class="dropdown-header">Seleccione</li>
                                             <? if ($permisos['ver']) :  ?>
 												<li><?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('action' => 'view', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Ver este registro', 'escape' => false)); ?></li>
+                                        	<? endif; ?>
+                                        	<? if ($permisos['editar'] && $tarea['Tarea']['finalizado']) :  ?>
+												<li><?= $this->Form->postLink('<i class="fa fa-external-link"></i> Re abrir tarea', array('action' => 'reabrir', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?></li>
                                         	<? endif; ?>
 											<? if ($permisos['editar'] && !$tarea['Tarea']['finalizado']) : ?>
 												<li><?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $tarea['Tarea']['id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?></li>

@@ -2,24 +2,21 @@
 	<li class="xn-icon-button">
 		<a href="#" class="x-navigation-minimize"><span class="fa fa-dedent"></span></a>
 	</li>
-	<!--<li class="xn-search">
+	<li class="xn-search">
     <?= $this->Form->create('Tienda', array('class' => 'form-inline', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
-	    <div class="form-group">
-	    	<?= $this->Form->label('tienda', 'Tienda', array('class' => 'txt-tienda')); ?>
-	    </div>
 	    <div class="form-group">
 	    	<?= $this->Form->select('tienda', $tiendasList, array('class' => 'form-control js-tienda', 'empty' => false)); ?>
 	    </div>
     <?= $this->Form->end(); ?>
-    </li>-->
+    </li>
 	<li class="pull-right">
 		<a href="#" class="mb-control" data-box="#mb-signout"><i class="fa fa-sign-out"></i> Cerrar sesión</a>
 	</li>
 	<li class="xn-icon-button pull-right">
-        <?//=$this->element('tareas'); ?>
+        <?=$this->element('maintainers_tareas'); ?>
     </li>
     <li class="xn-icon-button pull-right">
-        <?//=$this->element('comentarios'); ?>
+        <?=$this->element('maintainers_comentarios'); ?>
     </li>
 </ul>
 

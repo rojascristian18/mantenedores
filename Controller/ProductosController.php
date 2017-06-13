@@ -40,6 +40,39 @@ class ProductosController extends AppController
 				)
 			)
 		);
+
+		BreadcrumbComponent::add('Producto #' . $id);
+	}
+
+
+	public function admin_view($id = null) {
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Fabricante', 'Proveedor', 'Especificacion', 'EspecificacionIdioma', 'Idioma'));
+
+		if ( ! $this->Producto->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$this->request->data = $this->Producto->find('first', array(
+			'conditions' => array(
+				'Producto.id' => $id
+				),
+			'contain' => array(
+				'Especificacion' => array(
+					'Idioma'
+					),
+				'Proveedor',
+				'Fabricante',
+				'Imagen',
+				'Tarea',
+				'Grupocaracteristica'
+				)
+			)
+		);
+
+		BreadcrumbComponent::add('Producto #' . $id);
 	}
 
 	public function admin_accept($id = null, $tarea = null)
@@ -228,6 +261,7 @@ class ProductosController extends AppController
 		}
 	}
 
+
 	public function validarImagenes() {
 		if ( !empty($this->request->data['Imagen']) ) {
 			foreach ($this->request->data['Imagen'] as $key => $imagen) {
@@ -239,6 +273,7 @@ class ProductosController extends AppController
 
 		return true;
 	}
+
 	
 	public function limpiarImagenes() {
 		if ( !empty($this->request->data['Imagen']) ) {
@@ -251,6 +286,7 @@ class ProductosController extends AppController
 
 		return $this->request->data;
 	}
+
 
 	public function maintainers_add($tarea = null) {
 
@@ -277,9 +313,15 @@ class ProductosController extends AppController
 				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
 			}
 			else
-			{
-				$this->Session->setFlash('Error al guardar el producto. Por favor intenta nuevamente.', null, array(), 'danger');
-				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
+			{	
+				$errores = '<ul>';
+				foreach ($this->Producto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+				$errores .= '</ul>';
+				
+				$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
+				$this->redirect(array('controller' => 'tareas', 'action' => 'add', $this->request->data['Producto']['tarea_id']));
 			}
 		}
 		
@@ -309,9 +351,12 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
+
+		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
 		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes'));
 	}
+
 
 	public function maintainers_edit($id = null, $tarea = null) {
 
@@ -324,21 +369,31 @@ class ProductosController extends AppController
 			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
 		}
 
+		if ( ! $this->esMiProducto($id, $tarea) ) {
+			$this->Session->setFlash('Este producto no pertenece a usted.', null, array(), 'danger');
+			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
+		}
+
 		if ( $this->request->is('post') || $this->request->is('put') )
 		{	
+
+			# Se eliminan las imagenes
+			if ( !empty($this->request->data['Producto']['ElementosEliminados']) ) {
+				$this->quitarElementos($this->request->data['Producto']['ElementosEliminados'], 'Imagen');
+			}else{
+				unset($this->request->data['Producto']['ElementosEliminados']);
+			}
+
 			if( ! $this->validarCampos()) {
 				$this->Session->setFlash('Error al guardar el producto. No completó los campos obligatorios.', null, array(), 'danger');
-				$this->redirect(array('action' => 'add', $this->request->data['Producto']['tarea_id']));
+				$this->redirect(array('action' => 'edit', $id ,$this->request->data['Producto']['tarea_id']));
 			}
-			
+		
 			// Limpiamos las especificaciones
 			$this->Producto->EspecificacionesProducto->deleteAll(array('producto_id' => $id));
 
 			# Limpiar imagenes vacias
 			$this->limpiarImagenes();
-
-			# Se eliminan las imagenes
-			$this->quitarElementos($this->request->data['Producto']['ElementosEliminados'], 'Imagen');
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
@@ -352,8 +407,14 @@ class ProductosController extends AppController
 			}
 			else
 			{	
-				$this->Session->setFlash('Error al editar el producto. Por favor intenta nuevamente.', null, array(), 'danger');
-				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
+				$errores = '<ul>';
+				foreach ($this->Producto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+				$errores .= '</ul>';
+				
+				$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
+				$this->redirect(array('action' => 'edit', $id ,$this->request->data['Producto']['tarea_id']));
 			}
 		}else{
 
@@ -402,9 +463,12 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
+
+		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
 		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes'));
 	}
+
 
 	public function maintainers_activar( $id = null, $tarea = null ) {
 		# Cambiamos el datasource de los modelos que necesitamos externos
@@ -425,6 +489,7 @@ class ProductosController extends AppController
 		$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
 	}
 
+
 	public function maintainers_desactivar( $id = null, $tarea = null ) {
 		# Cambiamos el datasource de los modelos que necesitamos externos
 		$this->cambiarDatasource(array('Fabricante', 'Proveedor', 'Especificacion', 'EspecificacionIdioma', 'Idioma'));
@@ -432,7 +497,7 @@ class ProductosController extends AppController
 		if ( ! $this->Producto->exists() )
 		{
 			$this->Session->setFlash('Producto no existe.', null, array(), 'danger');
-			$this->redirect(array('action' => 'index'));
+			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
 		}
 
 		if ( $this->Producto->saveField('activo', 0) )
@@ -441,6 +506,33 @@ class ProductosController extends AppController
 			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
 		}
 		$this->Session->setFlash('Error al desactivar el producto. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
+	}
+
+
+	public function maintainers_delete($id = null, $tarea = null)
+	{	
+		$this->cambiarDatasource(array('Fabricante', 'Proveedor', 'Especificacion', 'EspecificacionIdioma', 'Idioma'));
+		$this->Producto->id = $id;
+		if ( ! $this->Producto->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
+		}
+
+
+		if ( ! $this->esMiProducto($id, $tarea) ) {
+			$this->Session->setFlash('Este producto no pertenece a usted.', null, array(), 'danger');
+			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
+		}
+
+		$this->request->onlyAllow('post', 'delete');
+		if ( $this->Producto->delete() )
+		{
+			$this->Session->setFlash('Registro eliminado correctamente.', null, array(), 'success');
+			$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
+		}
+		$this->Session->setFlash('Error al eliminar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
 		$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
 	}
 

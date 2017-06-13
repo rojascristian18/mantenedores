@@ -331,3 +331,36 @@ form .input-marca {
 		padding: 0;
 	}
 }
+
+.modal img {
+	display: inline;
+	vertical-align: middle;
+	max-width: 35px;
+	margin-right: 15px;
+}
+
+#TareaAcceptForm .estrellas {
+	cursor: pointer;
+}
+
+#TareaAcceptForm .estrellas .fa {
+	font-size: 20px;
+}
+
+#TareaAcceptForm .estrellas .fa.error {
+	color: #B64645;
+}
+
+#TareaAcceptForm .btn-success {
+	margin-top: 15px;
+}
+
+.js-tienda {
+	margin-left: 40px;
+}
+
+@media screen and (max-width: 768px) {
+	.js-tienda {
+		margin-left: 30px;
+	}
+}

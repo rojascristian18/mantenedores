@@ -8,13 +8,13 @@ class UsuariosController extends AppController
 	public function admin_login()
 	{
 		if ( $this->request->is('post') )
-		{
+		{	
 			if ( $this->Auth->login() )
 			{
 				$this->redirect($this->Auth->redirectUrl());
 			}
 			else
-			{
+			{	
 				$this->Session->setFlash('Nombre de usuario y/o clave incorrectos.', null, array(), 'danger');
 			}
 		}
@@ -74,11 +74,67 @@ class UsuariosController extends AppController
 		}
 
 		if ( $this->request->is('post') || $this->request->is('put') )
-		{
-			if ( $this->Usuario->save($this->request->data) )
+		{	#prx($this->request->data);
+
+			if (empty($this->request->data['Usuario']['id_pago']) 
+				|| empty($this->request->data['Usuario']['monto_pagado'])
+				|| empty($this->request->data['Usuario']['codigo_pago']) 
+				|| empty($this->request->data['Usuario']['medio_de_pago']) 
+				|| empty($this->request->data['Usuario']['fecha_pagado']) 
+				|| empty($this->request->data['Usuario']['detalle'])) 
 			{
-				$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash('No se permiten campos vacios', null, array(), 'danger');
+				$this->redirect(array('action' => 'edit', $id));
+			}
+
+			# Normalizamos los datos
+			$this->request->data['Usuario']['id_pago'] = explode(',', $this->request->data['Usuario']['id_pago']);
+
+			# Pago/s
+
+			foreach ($this->request->data['Usuario']['id_pago'] as $key => $pago) {
+				if ( empty($pago) ) {
+					unset($this->request->data['Usuario']['id_pago'][$key]);
+				}
+			}
+
+			$pagos = $this->Usuario->Pago->find('all', array(
+				'conditions' => array(
+					'Pago.id' => $this->request->data['Usuario']['id_pago'],
+					'Pago.pagado' => 0
+					)
+				));
+
+			# Verificamos que el monto pagado sea igual al monto a pagar de los pagos
+			$sumaPagos = 0;
+			foreach ($pagos as $key => $value) {
+				$sumaPagos = $sumaPagos + $value['Pago']['monto_a_pagar'];
+			}
+
+			if ( $sumaPagos != intval(str_replace('.', '', $this->request->data['Usuario']['monto_pagado'])) ) {
+				$this->Session->setFlash('Error con el pago. El monto pagado no es igual al monto a pagar.', null, array(), 'danger');
+				$this->redirect(array('action' => 'edit', $id));
+			}
+
+			$this->request->data['Pago'] = array();
+
+			foreach ($pagos as $key => $pago) {
+				$this->request->data['Pago'][$key]['id'] = $pago['Pago']['id'];
+				$this->request->data['Pago'][$key]['monto_pagado'] = $pago['Pago']['monto_a_pagar'];
+				$this->request->data['Pago'][$key]['codigo_pago'] = $this->request->data['Usuario']['codigo_pago'];
+				$this->request->data['Pago'][$key]['medio_de_pago'] = $this->request->data['Usuario']['medio_de_pago'];
+				$this->request->data['Pago'][$key]['detalle'] = $this->request->data['Usuario']['detalle'];
+				$this->request->data['Pago'][$key]['fecha_pagado'] = $this->request->data['Usuario']['fecha_pagado'];
+				$this->request->data['Pago'][$key]['pagado'] = 1;
+			}
+
+			unset($this->request->data['Usuario']);
+			$this->request->data['Usuario']['id'] = $id;
+			
+			if ( $this->Usuario->saveAssociated($this->request->data) )
+			{
+				$this->Session->setFlash('Pagos actualizados correctamente.', null, array(), 'success');
+				$this->redirect(array('action' => 'edit', $id));
 			}
 			else
 			{
@@ -88,9 +144,11 @@ class UsuariosController extends AppController
 		else
 		{
 			$this->request->data	= $this->Usuario->find('first', array(
-				'conditions'	=> array('Usuario.id' => $id)
+				'conditions'	=> array('Usuario.id' => $id),
+				'contain' => array('Codigopaise', 'Cuenta' => array('Banco', 'TipoCuenta'), 'Calificacion', 'Tarea' => array('Tienda'), 'Pago' => array('Cuenta', 'Tienda'))
 			));
 		}
+
 		$tareas	= $this->Usuario->Tarea->find('list');
 		$codigopaises	= $this->Usuario->Codigopaise->find('list', array('conditions' => array('activo' => 1)));
 
@@ -277,11 +335,41 @@ class UsuariosController extends AppController
 
 				$this->Usuario->id = $usuario['Usuario']['id'];
 				$this->Usuario->saveField('ultimo_acceso', date('Y-m-d H:i:s'));
+				$this->Session->write('Auth.Mantenedor.clave', $usuario['Usuario']['clave']);
 				$this->redirect($this->Auth->redirectUrl());
 			}
 			else
-			{
-				$this->Session->setFlash('Nombre de usuario y/o clave incorrectos.', null, array(), 'danger');
+			{	
+				// Recuperar clave
+				if (isset($this->request->data['Usuario']['email_recuperar'])) {
+					
+					$mantenedor = $this->Usuario->find('first', array(
+						'conditions' => array(
+							'Usuario.email' => $this->request->data['Usuario']['email_recuperar'],
+							'Usuario.activo' => 1
+							),
+						'fields' => array('Usuario.id', 'Usuario.nombre', 'Usuario.email')
+						)
+					);
+
+					if (!empty($mantenedor)) {
+						$nuevaClave =  substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(10/strlen($x)) )),1,10);
+						
+						$mantenedor['Usuario']['clave'] = $nuevaClave;
+						$mantenedor['Usuario']['clave_'] = $nuevaClave;
+
+						if ( $this->Usuario->save($mantenedor) ) {
+							$this->Session->setFlash('Su nueva contraseña ha sido enviada a su correo electrónico.', null, array(), 'success');
+						}else{
+							$this->Session->setFlash('Ocurrió un error al generar su nueva contraseña. Intente nuevamente.', null, array(), 'danger');
+						}
+					}else{
+						$this->Session->setFlash('Nombre de usuario incorrecto.', null, array(), 'danger');
+					}
+
+				}else{
+					$this->Session->setFlash('Nombre de usuario y/o clave incorrectos.', null, array(), 'danger');
+				}
 			}
 		}
 
@@ -342,7 +430,7 @@ class UsuariosController extends AppController
 		{	
 			# Normalizamos la clave
 			if ( ! $this->validarClave() ) {
-				$this->Session->setFlash('Las contraseñas no estan correctas. Verifiqualas y vuelva a intentar.', null, array(), 'danger');
+				$this->Session->setFlash('Las contraseñas no estan correctas. Verifiquelas y vuelva a intentar.', null, array(), 'danger');
 				$this->redirect(array('action' => 'profile'));
 			}
 
@@ -369,7 +457,7 @@ class UsuariosController extends AppController
 		{
 			$this->request->data	= $this->Usuario->find('first', array(
 				'conditions'	=> array('Usuario.id' => $id),
-				'contain' => array('Cuenta')
+				'contain' => array('Cuenta', 'Calificacion', 'Codigopaise', 'Pago')
 			));
 		}
 		
@@ -420,9 +508,9 @@ class UsuariosController extends AppController
 
 		# Validamos la nueva contraseña
 		if ( ! empty($this->request->data['Usuario']['clave']) && ! empty($this->request->data['Usuario']['clave_nueva']) && ! empty($this->request->data['Usuario']['rep_clave_nueva']) ) {
-			
+	
 			# Verificamos que la clave se la misma registrada en la BD
-			if (AuthComponent::password($this->data['Usuario']['clave']) == $this->Auth->user('clave')) {
+			if (AuthComponent::password($this->request->data['Usuario']['clave']) == $this->Auth->user('clave')) {
 				# Verificamos que las nuevas claves sean iguales
 				if ( $this->request->data['Usuario']['clave_nueva'] == $this->request->data['Usuario']['rep_clave_nueva'] ) {
 					$this->request->data['Usuario']['clave'] = $this->request->data['Usuario']['clave_nueva'];

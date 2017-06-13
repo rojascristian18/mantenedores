@@ -240,8 +240,13 @@ class TareasController extends AppController
 		{	
 			# Bit que controla la notificación al mantenedor
 			$this->request->data['Tarea']['asignada'] = false;
-			if ( ! empty($this->request->data['Tarea']['usuario_id'])) {
+			if ( ! empty($this->request->data['Tarea']['usuario_id']) ) {
 				$this->request->data['Tarea']['asignada'] = true;
+			}
+
+			# Quitamos los puntos del precio
+			if (isset($this->request->data['Tarea']['precio'])) {
+				$this->request->data['Tarea']['precio'] = str_replace('.', '', $this->request->data['Tarea']['precio']);
 			}
 
 			$this->Tarea->create();
@@ -263,6 +268,43 @@ class TareasController extends AppController
 		$shops = $this->Tarea->Shop->find('list');
 		
 		$this->set(compact('usuarios', 'impuestos', 'idiomas', 'shops','grupocaracteristicas'));
+	}
+
+	public function admin_reabrir($id = null)
+	{	
+		if ( empty($id) ) {
+			$this->Session->setFlash('Identificador no válido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+
+		$tarea = $this->Tarea->find('first', array(
+			'conditions' => array(
+				'Tarea.id' => $id
+				)
+			));
+
+		if ( empty($tarea) ) {
+			$this->Session->setFlash('Tarea no encontrada.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$tarea['Tarea']['reabierta'] = true;
+		$tarea['Tarea']['en_revision'] = 0;
+		$tarea['Tarea']['iniciado'] = 0;
+		$tarea['Tarea']['en_progreso'] = 0;
+		$tarea['Tarea']['rechazado'] = 0;
+		$tarea['Tarea']['finalizado'] = 0;
+
+		if ( $this->Tarea->save($tarea) ) {
+			$this->Session->setFlash('Tarea abierta y notificada al mantenedor.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}else{
+			$this->Session->setFlash('Ocurrió un error al intentar abrir esta tarea.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
 	}
 
 	public function admin_edit($id = null)
@@ -289,13 +331,18 @@ class TareasController extends AppController
 				#$this->Tarea->PalabraclaveTarea->deleteAll(array('PalabraclaveTarea.tarea_id' => $id));
 			}
 
+			# Quitamos los puntos del precio
+			if (isset($this->request->data['Tarea']['precio'])) {
+				$this->request->data['Tarea']['precio'] = str_replace('.', '', $this->request->data['Tarea']['precio']);
+			}
+			
 			if ( $this->Tarea->saveAll($this->request->data) )
 			{	
 				if ( isset($this->request->data['Comentario']) ) {
 					$this->Session->setFlash('Comentario agregado.', null, array(), 'success');
 					$this->redirect(array('action' => 'edit', $id));
 				}else{
-					$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
+					$this->Session->setFlash('Tarea editada correctamente', null, array(), 'success');
 					$this->redirect(array('action' => 'index'));
 				}
 			}
@@ -326,7 +373,17 @@ class TareasController extends AppController
 					'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'conditions' => array('Producto.activo' => 1)), 
 					'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 			));
-			
+
+			$pNoAceptados = 0;
+
+			# Verificamos que todos los productos esten aceptados para poder aceptar y finalizar la tarea
+			if ( !empty($this->request->data['Producto'])) {
+				foreach ($this->request->data['Producto'] as $key => $value) {
+					if ($value['aceptado'] == 0) {
+						$pNoAceptados++;
+					}
+				}
+			}
 		}
 
 		$usuarios	= $this->Tarea->Usuario->find('list');
@@ -337,7 +394,7 @@ class TareasController extends AppController
 		$shops = $this->Tarea->Shop->find('list');
 		$revisiones = $this->obtenerRevisiones();
 		
-		$this->set(compact('usuarios', 'impuestos', 'idiomas', 'shops', 'parentTareas', 'tiendas', 'grupocaracteristicas', 'revisiones'));
+		$this->set(compact('usuarios', 'impuestos', 'idiomas', 'shops', 'parentTareas', 'tiendas', 'grupocaracteristicas', 'revisiones', 'pNoAceptados'));
 	}
 
 
@@ -379,6 +436,29 @@ class TareasController extends AppController
 
 			$this->set(compact('importancias'));
 		}
+
+	}
+
+
+	public function admin_view($id = null)
+	{	
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		if ( ! $this->Tarea->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$this->request->data	= $this->Tarea->find('first', array(
+			'conditions'	=> array('Tarea.id' => $id),
+			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
+		));
+
+		$importancias = ClassRegistry::init('Importancia')->find('list', array('conditions' => array('Importancia.activo' => 1)));
+
+		$this->set(compact('importancias'));
 
 	}
 
@@ -441,35 +521,50 @@ class TareasController extends AppController
 	}
 
 
-	public function admin_accept( $id = null ) {
-		# Cambiamos el datasource de los modelos que necesitamos externos
-		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+	public function admin_accept() {
 
-		$this->Tarea->id = $id;
-		if ( ! $this->Tarea->exists() )
+		if ( $this->request->is('post') )
 		{
+			# Cambiamos el datasource de los modelos que necesitamos externos
+			$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+
+			$this->Tarea->id = $this->request->data['Tarea']['id'];
+			if ( ! $this->Tarea->exists() )
+			{
+				$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+				$this->redirect(array('action' => 'index'));
+			}
+
+			# Estados de cierre de tarea
+			$estados = array(
+				'Tarea' => array(
+					'id' => $this->request->data['Tarea']['id'],
+					'en_revision' => 0,
+					'en_progreso' => 0,
+					'rechazado' => 0,
+					'finalizado' => 1,
+					'fecha_finalizado' => date('Y-m-d H:i:s')
+					)
+				);
+
+			# Calificación
+			$calificacion = array(
+				'usuario_id' => $this->request->data['Tarea']['id_usuario'],
+				'calificacion' => $this->request->data['Tarea']['calificacion_media'],
+				'mensaje' => $this->request->data['Tarea']['mensaje']
+			);
+			
+			if ( ClassRegistry::init('Calificacion')->save($calificacion) && $this->Tarea->save($estados) )
+			{	
+				$this->Session->setFlash('Tarea aceptada y finalizada.', null, array(), 'success');
+				$this->redirect(array('action' => 'index'));
+			}
+			$this->Session->setFlash('Error al aceptar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}else{
 			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
 			$this->redirect(array('action' => 'index'));
 		}
-
-		$estados = array(
-			'Tarea' => array(
-				'id' => $id,
-				'en_revision' => 0,
-				'en_progreso' => 0,
-				'rechazado' => 0,
-				'finalizado' => 1,
-				'fecha_finalizado' => date('Y-m-d H:i:s')
-				)
-			);
-
-		if ( $this->Tarea->save($estados) )
-		{
-			$this->Session->setFlash('Tarea aceptada y finalizada.', null, array(), 'success');
-			$this->redirect(array('action' => 'index'));
-		}
-		$this->Session->setFlash('Error al aceptar la tarea. Por favor intenta nuevamente.', null, array(), 'danger');
-		$this->redirect(array('action' => 'index'));
 	}
 
 
@@ -539,6 +634,399 @@ class TareasController extends AppController
 	}
 
 
+	public function getExcelExportFormat($version = '')
+	{
+		if (empty($version)) {
+			return false;
+		}
+
+		$arrayFormato = array();
+
+		switch ($version) {
+			case '1.6.1.11':
+				$arrayFormato = array(
+					'ID' => '',
+					'Active (0/1)' => 0,
+					'Name *' => '',
+					'Categories (x,y,z...)' => '',
+					'Price tax excluded or Price tax included' => '',
+					'Tax rules ID' => '',
+					'Wholesale price' => '',
+					'On sale (0/1)' => '',
+					'Discount amount' => '',
+					'Discount percent' => '',
+					'Discount from (yyyy-mm-dd)' => '',
+					'Discount to (yyyy-mm-dd)' => '',
+					'Reference #' => '',
+					'Supplier reference #' => '',
+					'Supplier' => '',
+					'Manufacturer' => '',
+					'EAN13' => '',
+					'UPC' => '',
+					'Ecotax' => '',
+					'Width' => '',
+					'Height' => '',
+					'Depth' => '',
+					'Weight' => '',
+					'Quantity' => '',
+					'Minimal quantity' => '',
+					'Visibility' => '',
+					'Additional shipping cost' => '',
+					'Unity' => '',
+					'Unit price' => '',
+					'Short description' => '',
+					'Description' => '',
+					'Tags (x,y,z...)' => '',
+					'Meta title' => '',
+					'Meta keywords' => '',
+					'Meta description' => '',
+					'URL rewritten' => '',
+					'Text when in stock' => '',
+					'Text when backorder allowed' => '',
+					'Available for order (0 = No, 1 = Yes)' => '',
+					'Product available date' => '',
+					'Product creation date' => '',
+					'Show price (0 = No, 1 = Yes)' => '',
+					'Image URLs (x,y,z...)' => '',
+					'Delete existing images (0 = No, 1 = Yes)' => 0,
+					'Feature(Name:Value:Position)' => '',
+					'Available online only (0 = No, 1 = Yes)' => 0,
+					'Condition' => '',
+					'Customizable (0 = No, 1 = Yes)' => '',
+					'Uploadable files (0 = No, 1 = Yes)' => '',
+					'Text fields (0 = No, 1 = Yes)' => '',
+					'Out of stock' => '',
+					'ID / Name of shop' => '',
+					'Advanced stock management' => '',
+					'Depends On Stock' => '',
+					'Warehouse' => ''
+					);
+				break;
+			case '1.6.0.8' :
+				$arrayFormato = array(
+					'ID' => '',
+					'Active (0/1)' => 0,
+					'Name *' => '',
+					'Categories (x,y,z...)' => '',
+					'Price tax excluded or Price tax included' => '',
+					'Tax rules ID' => '',
+					'Wholesale price' => '',
+					'On sale (0/1)' => '',
+					'Discount amount' => '',
+					'Discount percent' => '',
+					'Discount from (yyyy-mm-dd)' => '',
+					'Discount to (yyyy-mm-dd)' => '',
+					'Reference #' => '',
+					'Supplier reference #' => '',
+					'Supplier' => '',
+					'Manufacturer' => '',
+					'EAN13' => '',
+					'UPC' => '',
+					'Ecotax' => '',
+					'Width' => '',
+					'Height' => '',
+					'Depth' => '',
+					'Weight' => '',
+					'Quantity' => '',
+					'Minimal quantity' => '',
+					'Visibility' => '',
+					'Additional shipping cost' => '',
+					'Unity' => '',
+					'Unit price' => '',
+					'Short description' => '',
+					'Description' => '',
+					'Tags (x,y,z...)' => '',
+					'Meta title' => '',
+					'Meta keywords' => '',
+					'Meta description' => '',
+					'URL rewritten' => '',
+					'Text when in stock' => '',
+					'Text when backorder allowed' => '',
+					'Available for order (0 = No, 1 = Yes)' => '',
+					'Product available date' => '',
+					'Product creation date' => '',
+					'Show price (0 = No, 1 = Yes)' => '',
+					'Image URLs (x,y,z...)' => '',
+					'Delete existing images (0 = No, 1 = Yes)' => 0,
+					'Feature(Name:Value:Position)' => '',
+					'Available online only (0 = No, 1 = Yes)' => 0,
+					'Condition' => '',
+					'Customizable (0 = No, 1 = Yes)' => '',
+					'Uploadable files (0 = No, 1 = Yes)' => '',
+					'Text fields (0 = No, 1 = Yes)' => '',
+					'Out of stock' => '',
+					'ID / Name of shop' => '',
+					'Advanced stock management' => '',
+					'Depends On Stock' => '',
+					'Warehouse' => ''
+					);
+			break;
+			
+			default:
+				$arrayFormato = array(
+					'ID' => '',
+					'Active (0/1)' => 0,
+					'Name *' => '',
+					'Categories (x,y,z...)' => '',
+					'Price tax excluded or Price tax included' => '',
+					'Tax rules ID' => '',
+					'Wholesale price' => '',
+					'On sale (0/1)' => '',
+					'Discount amount' => '',
+					'Discount percent' => '',
+					'Discount from (yyyy-mm-dd)' => '',
+					'Discount to (yyyy-mm-dd)' => '',
+					'Reference #' => '',
+					'Supplier reference #' => '',
+					'Supplier' => '',
+					'Manufacturer' => '',
+					'EAN13' => '',
+					'UPC' => '',
+					'Ecotax' => '',
+					'Width' => '',
+					'Height' => '',
+					'Depth' => '',
+					'Weight' => '',
+					'Quantity' => '',
+					'Minimal quantity' => '',
+					'Visibility' => '',
+					'Additional shipping cost' => '',
+					'Unity' => '',
+					'Unit price' => '',
+					'Short description' => '',
+					'Description' => '',
+					'Tags (x,y,z...)' => '',
+					'Meta title' => '',
+					'Meta keywords' => '',
+					'Meta description' => '',
+					'URL rewritten' => '',
+					'Text when in stock' => '',
+					'Text when backorder allowed' => '',
+					'Available for order (0 = No, 1 = Yes)' => '',
+					'Product available date' => '',
+					'Product creation date' => '',
+					'Show price (0 = No, 1 = Yes)' => '',
+					'Image URLs (x,y,z...)' => '',
+					'Delete existing images (0 = No, 1 = Yes)' => 0,
+					'Feature(Name:Value:Position)' => '',
+					'Available online only (0 = No, 1 = Yes)' => 0,
+					'Condition' => '',
+					'Customizable (0 = No, 1 = Yes)' => '',
+					'Uploadable files (0 = No, 1 = Yes)' => '',
+					'Text fields (0 = No, 1 = Yes)' => '',
+					'Out of stock' => '',
+					'ID / Name of shop' => '',
+					'Advanced stock management' => '',
+					'Depends On Stock' => '',
+					'Warehouse' => ''
+					);
+			break;
+		}
+
+		return $arrayFormato;
+	}
+
+
+	public function admin_exportar_productos( $id = null) {
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoRegla', 'ImpuestoReglaGrupo', 'Especificacion', 'EspecificacionIdioma' ,'ImpuestoIdioma', 'Categoria', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		$this->Tarea->id = $id;
+		if ( ! $this->Tarea->exists() )
+		{
+			$this->Session->setFlash('No existe la tarea.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$datos			= $this->Tarea->find('first', array(
+			'conditions' => array(
+				'Tarea.id' => $id
+				),
+			'contain' => array(
+				'Producto' => array(
+					'Proveedor',
+					'Fabricante',
+					'Grupocaracteristica' => array(
+						'Palabraclave',
+						'Categoria'
+						),
+					'Especificacion' => array(
+						'Idioma'
+						),
+					'Imagen'
+					),
+				'ImpuestoReglaGrupo' => array(
+					'ImpuestoRegla'
+					),
+				'Idioma',
+				'Shop'
+				)
+		));
+
+		/**
+		* Para armar el excell necesitamos
+		* Nombre
+		* Categorias (x,y,z...) ids
+		* Precio con IVA
+		* Impuesto regla (id)
+		* Referencia
+		* Referencia de proveedor
+		* Proveedor (nombre)
+		* Fabricante (nombre)
+		* Largo, Alto, Profundidad, Peso (cm con 1 decimal)
+		* Cantidad
+		* Descripcion corta
+		* Descripcion
+		* Meta titulo
+		* Meta palabras claves
+		* Meta descrión
+		* Slug
+		* Urls imagenes separadas por (,)
+		* Especificaciones, nombre:valor:posición
+		* ID SHOP
+		* 
+		*/
+		# $this->getPrestahopExportFormat($this->request->data['Tarea']['version']);
+		
+		# Variable que almacenará los productos con el formato elegido
+		$dataProducto =  array();
+
+		App::uses('CakeText', 'Utility');
+		
+		foreach ($datos['Producto'] as $key => $producto) {
+
+			$dataProducto[$key]['Producto'] = $this->getExcelExportFormat($this->request->data['Tarea']['version']);
+			
+			# Nombre
+			if (isset($producto['nombre_final'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Name *' => $producto['nombre_final']));
+			}
+
+			# Categorias
+			if (isset($producto['Grupocaracteristica']['Categoria']))
+			{
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
+					'Categories (x,y,z...)' => implode(',', Hash::extract($producto['Grupocaracteristica']['Categoria'], '{n}.id_category'))));
+			}
+
+			# Precio
+			if (isset($producto['precio'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Price tax excluded or Price tax included' => $producto['precio']));
+			}
+
+			# Referencia
+			if (isset($producto['referencia'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Reference #' => $producto['referencia']));
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Supplier reference #' => $producto['referencia']));
+			}
+
+			# Proveedor
+			if (isset($producto['proveedor_id'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Supplier' => $producto['Proveedor']['name']));
+			}
+
+			# Fabricante
+			if (isset($producto['fabricante_id'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Manufacturer' => $producto['Fabricante']['name']));
+			}
+
+			# Largo
+			if (isset($producto['largo'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Width' => $producto['largo']));
+			}
+
+			# Alto
+			if (isset($producto['alto'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Height' => $producto['alto']));
+			}
+
+			# Profundidad
+			if (isset($producto['profundidad'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Depth' => $producto['profundidad']));
+			}
+
+			# Peso
+			if (isset($producto['peso'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Weight' => $producto['peso']));
+			}
+
+			# Stock inicial
+			if (isset($producto['cantidad'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Quantity' => $producto['cantidad']));
+			}
+
+			# Descripción corta
+			if (isset($producto['descripcion_corta'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Short description' => $producto['descripcion_corta'] ));
+			}
+
+			# Descripción
+			if (isset($producto['descripcion'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Description' => $producto['descripcion'] ));
+			}
+
+			# Meta titulo
+			if (isset($producto['meta_titulo'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Meta title' => $producto['meta_titulo'] ));
+			}
+
+			# Meta Keywords
+			if (isset($producto['Grupocaracteristica']['Palabraclave'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
+					'Meta keywords' => implode(',', Hash::extract($producto['Grupocaracteristica']['Palabraclave'], '{n}.nombre'))));
+			}
+
+			# Meta descripcion
+			if (isset($producto['meta_descripcion'])) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Meta description' => strip_tags($producto['meta_descripcion']) ));
+			}
+
+			# Imágenes
+			if (isset($producto['Imagen'])) {
+				$imagenes =  array();
+				
+				foreach ($producto['Imagen'] as $i => $imagen) {
+					$imagenes[$i] = sprintf('%s%swebroot/img/Imagen/%d/%s', Router::fullBaseUrl(), $this->webroot, $imagen['id'], $imagen['imagen']);
+				}
+
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
+					'Image URLs (x,y,z...)' => implode(',', $imagenes) ) );
+			}
+
+			# Características
+			if ( isset($producto['Especificacion']) ) {
+				$especificaciones = array();
+				foreach ($producto['Especificacion'] as $ix => $especificacion) {
+					foreach ($especificacion['Idioma'] as $ln => $idioma) {
+						if ($idioma['id_lang'] == $datos['Tarea']['idioma_id'] && !empty($especificacion['EspecificacionesProducto']['valor'])) {
+							$especificaciones[$ix] = sprintf('%s:%s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $especificacion['EspecificacionesProducto']['id']);		
+						}else{
+							$this->Session->setFlash('Error al generar el excel. La tarea no tiene configurado el idioma o existe un problema de idiomas en el comercio.', null, array(), 'danger');
+							$this->redirect(array('action' => 'view', $id));
+						}
+					}
+				}
+
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
+					'Feature(Name:Value:Position)' => implode(',', $especificaciones) ) );
+
+			}
+
+			# Shop id
+			if ( isset($datos['Tarea']['shop_id']) ) {
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('ID / Name of shop' => $datos['Tarea']['shop_id'] ));
+			}
+
+		}
+		
+		$campos			= array_keys($this->getExcelExportFormat($this->request->data['Tarea']['version']));
+		$modelo			= $this->Tarea->alias;
+
+		$this->set(compact('dataProducto', 'campos', 'modelo'));
+	}
+
+
 	public function guardarRevision() {
 
 		
@@ -576,12 +1064,13 @@ class TareasController extends AppController
 
 		$paginate = array(
 			'recursive' => 0,
-			'order' => 'Tarea.fecha_entrega ASC'
+			'order' => 'Tarea.id DESC'
 			);
 
 		$paginate['conditions'] = array(
 			'Tarea.parent_id' => null,
-			'Tarea.usuario_id' => $this->Session->read('Auth.Mantenedor.id')
+			'Tarea.usuario_id' => $this->Session->read('Auth.Mantenedor.id'),
+			'Tarea.tienda_id' => $this->Session->read('Tienda.id')
 			);
 
     	$total = 0;
@@ -610,7 +1099,6 @@ class TareasController extends AppController
 			if ( empty($this->request->data['Filtro']['estado']) && ! empty($this->request->data['Filtro']['f_inicio']) && ! empty($this->request->data['Filtro']['f_final']) ) {
 				$this->redirect(array('controller' => 'tareas', 'action' => 'index', 'f_inicio' => $this->request->data['Filtro']['f_inicio'], 'f_final' => $this->request->data['Filtro']['f_final']));
 			}
-
 		}
 
 		/**
@@ -735,6 +1223,12 @@ class TareasController extends AppController
 			# Actualizamos los comentarios no visualizados a visualizado
 			$this->visualizarComentarios($id);
 
+			# Cambiamos el estado a en prgreso
+			if ( ! $this->cambiarEstadoTarea($id, 'en_progreso') ) {
+				$this->Session->setFlash('Error al ingresar a la tarea', null, array(), 'danger');
+				$this->redirect(array('action' => 'index'));
+			}
+
 			$this->request->data	= $this->Tarea->find('first', array(
 				'conditions'	=> array('Tarea.id' => $id),
 				'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
@@ -745,6 +1239,40 @@ class TareasController extends AppController
 			$this->set(compact('importancias'));
 		}
 
+		BreadcrumbComponent::add(sprintf('Trabajando en %s', $this->request->data['Tarea']['nombre']));
+
+	}
+
+
+	public function maintainers_view($id = null)
+	{	
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		if ( ! $this->Tarea->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$tarea = $this->esMiTareaFinalizada($id);
+
+		if ( ! $tarea ) {
+			$this->Session->setFlash('Esta tarea ya no se encuentra disponible.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$this->request->data	= $this->Tarea->find('first', array(
+			'conditions'	=> array('Tarea.id' => $id),
+			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
+		));
+
+		$importancias = ClassRegistry::init('Importancia')->find('list', array('conditions' => array('Importancia.activo' => 1)));
+
+		BreadcrumbComponent::add( $this->request->data['Tarea']['nombre'] );
+
+		$this->set(compact('importancias'));
+		
 	}
 
 	public function maintainers_start($id = null) {

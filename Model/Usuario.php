@@ -176,6 +176,19 @@ class Usuario extends AppModel
 			'finderQuery'			=> '',
 			'counterQuery'			=> ''
 		),
+		'Producto' => array(
+			'className'				=> 'Producto',
+			'foreignKey'			=> 'usuario_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
+		),
 		'Cuenta' => array(
 			'className'				=> 'Cuenta',
 			'foreignKey'			=> 'usuario_id',
@@ -191,6 +204,19 @@ class Usuario extends AppModel
 		),
 		'Comentario' => array(
 			'className'				=> 'Comentario',
+			'foreignKey'			=> 'usuario_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
+		),
+		'Pago' => array(
+			'className'				=> 'Pago',
 			'foreignKey'			=> 'usuario_id',
 			'dependent'				=> false,
 			'conditions'			=> '',
@@ -247,7 +273,7 @@ class Usuario extends AppModel
 		/**
 		 * Dispara eventos al guardar usuario (envio correos)
 		 */
-		if ( ! empty($this->data[$this->alias]) && isset($this->data[$this->alias]['creado']) && $this->data[$this->alias]['creado'] == true) {
+		if ( ! empty($this->data[$this->alias]) && isset($this->data[$this->alias]['creado']) && $this->data[$this->alias]['creado'] == true || isset($this->data[$this->alias]['clave_'])) {
 
 			$evento			= new CakeEvent('Model.Usuario.afterSave', $this, $this->data);
 			$this->getEventManager()->dispatch($evento);

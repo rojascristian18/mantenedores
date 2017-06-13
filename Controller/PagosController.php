@@ -87,6 +87,41 @@ class PagosController extends AppController
 	}
 
 
+	public function admin_detail($id = null) {
+
+		if ( ! $this->Pago->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$pago = $this->Pago->find('first', array(
+			'conditions' => array('Pago.id' => $id),
+			'contain' => array(
+				'Tarea' => array(
+					'Tienda', 
+					'Administrador'
+					), 
+				'Cuenta' => array(
+					'TipoCuenta', 
+					'Banco'))
+			));
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		$productos = $this->Pago->Tarea->Producto->find('all', array(
+			'conditions' => array(
+				'Producto.usuario_id' => $pago['Pago']['usuario_id'],
+				'Producto.tarea_id' => $pago['Pago']['tarea_id']
+				),
+			'contain' => array('Fabricante', 'Proveedor')
+			));
+		
+		$this->set(compact('pago', 'productos'));
+	}
+
+
 	/**
 	 * Mantenedores
 	 */
@@ -95,11 +130,50 @@ class PagosController extends AppController
 	public function maintainers_index() {
 		$this->paginate		= array(
 			'recursive'			=> 0,
-			'Pago.usuario_id' => $this->Auth->user('id')
+			'conditions' => array(
+				'Pago.usuario_id' => $this->Auth->user('id')
+				)
 		);
 		$pagos	= $this->paginate();
+
+		BreadcrumbComponent::add('Mis pagos ');
 	
 		$estados = array( '0' => 'No pagado', '1' => 'Pagodo' );
 		$this->set(compact('pagos', 'estados'));
+	}
+
+
+	public function maintainers_detail($id = null) {
+
+		if ( ! $this->Pago->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		$pago = $this->Pago->find('first', array(
+			'conditions' => array('Pago.id' => $id),
+			'contain' => array(
+				'Tarea' => array(
+					'Tienda', 
+					'Administrador'
+					), 
+				'Cuenta' => array(
+					'TipoCuenta', 
+					'Banco'))
+			));
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop', 'Proveedor', 'Fabricante'));
+
+		$productos = $this->Pago->Tarea->Producto->find('all', array(
+			'conditions' => array(
+				'Producto.usuario_id' => $pago['Pago']['usuario_id'],
+				'Producto.tarea_id' => $pago['Pago']['tarea_id']
+				),
+			'contain' => array('Fabricante', 'Proveedor')
+			));
+
+		$this->set(compact('pago', 'productos'));
 	}
 }

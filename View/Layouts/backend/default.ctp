@@ -24,6 +24,7 @@
 			'/backend/js/plugins/jquery/jquery-ui.min',
 			'/backend/js/plugins/bootstrap/bootstrap.min',
 			'/backend/js/plugins/bootstrap/bootstrap-select',
+			'/backend/js/plugins/jquery-validation/jquery.validate',
 			'/backend/js/plugins/datatables/jquery.dataTables.min',
 			'/backend/js/plugins/noty/jquery.noty',
 			'/backend/js/plugins/noty/layouts/topRight',
@@ -32,6 +33,7 @@
 			'/backend/js/plugins/summernote/summernote',
 			'/backend/js/plugins/summernote/summernote_espanol',
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
+			
 			//'/backend/js/plugins',
 			'/backend/js/custom',
 			/*

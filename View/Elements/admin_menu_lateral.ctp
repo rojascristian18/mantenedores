@@ -35,6 +35,7 @@
             </div>                                                                        
         </li>
         <li class="<?= ($this->Html->menuActivo(array('controller' => 'tareas', 'action' => 'index')) ? 'active' : ''); ?>"><?= $this->Html->link('<span class="fa fa-dashboard"></span> <span class="xn-text">Dashboard</span>', array('controller' => 'tareas', 'action' => 'index'), array('escape' => false) ); ?></li>
+        <li class="<?= ($this->Html->menuActivo(array('controller' => 'configuraciones', 'action' => 'index')) ? 'active' : ''); ?>"><?= $this->Html->link('<span class="fa fa-cogs"></span> <span class="xn-text">Configuraciones</span>', array('controller' => 'configuraciones', 'action' => 'index'), array('escape' => false) ); ?></li>
 		<!-- Get Modules View -->	
 		<?= $this->element('modulos'); ?>
 

@@ -9,8 +9,12 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">Listado de Bancos</h3>
 					<div class="btn-group pull-right">
+					<? if ($permisos['agregar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Banco', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+					<? endif; ?>
+					<? if ($permisos['exportar']) : ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+					<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -31,8 +35,19 @@
 									<td><?= ($banco['Banco']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td><?= h($banco['Banco']['created']); ?>&nbsp;</td>
 									<td>
-									<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
-									<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? if ($permisos['editar']) : ?>
+										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['eliminar']) : ?>
+										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['activar']) : ?>
+										<? if ($banco['Banco']['activo']) : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-primary confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?>
+										<? else : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $banco['Banco']['id']), array('class' => 'btn btn-xs btn-success confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?>
+										<? endif; ?>
+									<? endif; ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>

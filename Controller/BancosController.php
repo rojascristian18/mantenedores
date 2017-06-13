@@ -85,4 +85,39 @@ class BancosController extends AppController
 
 		$this->set(compact('datos', 'campos', 'modelo'));
 	}
+
+
+	public function admin_activar( $id = null ) {
+		$this->Banco->id = $id;
+		if ( ! $this->Banco->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Banco->saveField('activo', 1) )
+		{
+			$this->Session->setFlash('Registro activado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al activar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
+
+	public function admin_desactivar( $id = null ) {
+		$this->Banco->id = $id;
+		if ( ! $this->Banco->exists() )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->Banco->saveField('activo', 0) )
+		{
+			$this->Session->setFlash('Registro desactivado correctamente.', null, array(), 'success');
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash('Error al desactivar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+		$this->redirect(array('action' => 'index'));
+	}
 }

@@ -132,9 +132,17 @@ class AppController extends Controller
 
 		/**
 		 * Cambiar tienda
-		 */ 
+		 */
+
 		$this->cambioTienda();
 		
+		if ($this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_edit', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
+			$this->forzarCambioTienda();
+		}
+
+		if ($this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_work', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
+			$this->forzarCambioTienda();
+		}
 		
 	}
 
@@ -231,12 +239,18 @@ class AppController extends Controller
 				
 			}
 
+			// Tareas
+			$tareasNotificacion = $this->tareasSinIniciar();
+
+			// Comentarios
+			$comentariosNotificacion =  $this->tareasComentarios();
+
 			$cuenta = ClassRegistry::init('Cuenta')->find('first', array(
 				'conditions' => array('usuario_id' => $this->Auth->user('id')),
 				'contain' => array('Banco', 'TipoCuenta')
 				));
 			
-			$this->set(compact('tiendasList', 'miAcumuladoMesActual', 'miAcumuladoTotal', 'cuenta'));
+			$this->set(compact('tiendasList', 'miAcumuladoMesActual', 'miAcumuladoTotal', 'cuenta', 'tareasNotificacion', 'comentariosNotificacion'));
 		}
 
 
@@ -390,6 +404,45 @@ class AppController extends Controller
 		return $misTareas;
 	}
 
+
+	/**
+	 * Muestra las tareas que se han enviado a revisión al administrador responsable
+	 * @return 		array 	Listado de tareas
+	 */	
+	public function	tareasSinIniciar() {
+
+		$misTareas = ClassRegistry::init('Tarea')->find('all', array(
+			'conditions' => array(
+				'Tarea.iniciado' => 1,
+				'Tarea.finalizado' => 0,
+				'Tarea.en_progreso' => 1,
+				'Tarea.en_revision' => 0,
+				'Tarea.usuario_id' => $this->Auth->user('id')
+				),
+			'contain' => array(
+				'Usuario',
+				'Tienda'
+				),
+			'fields' => array(
+				'Tarea.nombre',
+				'Tarea.created',
+				'Tarea.activo',
+				'Tarea.en_revision',
+				'Tarea.porcentaje_realizado',
+				'Usuario.nombre',
+				'Usuario.email',
+				'Tienda.nombre',
+				'Tarea.id'
+				),
+			'limit' => 50,
+			'order' => array(
+				'Tarea.modified' => 'DESC'
+				)
+			));
+
+		return $misTareas;
+	}
+
 	/***		
 		INCOMPLETO
 	**/
@@ -419,6 +472,15 @@ class AppController extends Controller
 
 		
 		$comentarios = ClassRegistry::init('Comentario')->find('all', $options);
+
+
+		foreach ($comentarios as $key => $value) {
+
+			if ( ! $this->esMiTarea($value['Tarea']['id']) ) {
+				unset($comentarios[$key]);
+			}
+			
+		}
 		
 		return $comentarios;
 	}
@@ -477,14 +539,37 @@ class AppController extends Controller
 				$this->Session->write('Tienda', $tienda['Tienda']);
 				
 				# Redireccionamos
-				$this->redirect(array('action' => 'index'));
+				if ( isset($this->request->params['maintainers']) ) {
+					$this->redirect(array('controller' => 'tareas', 'action' => 'index'));	
+				}else{
+					$this->redirect(array('action' => 'index'));
+				}
 			}
 
 			# Cambiamos Session Tienda
 			$this->Session->write('Tienda', $tienda['Tienda']);
 
 			$this->redirect(array('action' => $action));
+			
 		}
+
+	}
+
+	private function forzarCambioTienda()
+	{
+		$tarea = ClassRegistry::init('Tarea')->find('first', array(
+			'conditions' => array('Tarea.id' => $this->request->params['pass'][0])
+			)
+		);
+
+		# Tema de la tienda
+		$tienda = ClassRegistry::init('Tienda')->find('first', array(
+			'conditions' => array('Tienda.id' => $tarea['Tarea']['tienda_id'])
+			));
+
+		# Cambiamos Session Tienda
+		$this->Session->write('Tienda', $tienda['Tienda']);
+		return;
 
 	}
 
@@ -672,7 +757,9 @@ class AppController extends Controller
 		if ( isset($this->request->params['maintainers']) ) {
 			$options['conditions'] = array(
 				'Tarea.id' => $id,
-				'Tarea.usuario_id' => $this->Auth->user('id')
+				'Tarea.usuario_id' => $this->Auth->user('id'),
+				'Tarea.en_revision' => 0,
+				'Tarea.finalizado' => 0,
 			);
 		}
 
@@ -682,6 +769,69 @@ class AppController extends Controller
 
 		if (!empty($miTarea)) {
 			return $miTarea;
+		}
+		
+		return false;
+	}
+
+	/**
+	 * Funcíon que permite identificar si la tarea a la que se está visualizando está asignada al visitante.
+	 * @param  int 		$id 	Identificador de la tarea
+	 * @return bool
+	 */
+	public function esMiTareaFinalizada( $id = null ) {
+
+		if ( empty($id) ) {
+			return false;
+		}
+
+		if ( isset($this->request->params['admin']) ) {
+			$options['conditions'] = array(
+				'Tarea.id' => $id,
+				'Tarea.administrador_id' => $this->Auth->user('id')
+			);
+		}
+
+		if ( isset($this->request->params['maintainers']) ) {
+			$options['conditions'] = array(
+				'Tarea.id' => $id,
+				'Tarea.usuario_id' => $this->Auth->user('id'),
+				'Tarea.en_revision' => 0,
+				'Tarea.finalizado' => 1,
+			);
+		}
+
+		$options['fields'] = array('id', 'administrador_id', 'nombre');
+
+		$miTarea = ClassRegistry::init('Tarea')->find('first', $options);
+
+		if (!empty($miTarea)) {
+			return $miTarea;
+		}
+		
+		return false;
+	}
+
+
+	public function esMiProducto( $id = null, $tarea = null ) {
+
+		if ( empty($id) ) {
+			return false;
+		}
+		
+		$options['conditions'] = array(
+			'Producto.id' => $id,
+			'Producto.usuario_id' => $this->Auth->user('id'),
+			'Producto.tarea_id' => $tarea,
+			'Producto.aceptado' => 0
+		);
+
+		$options['fields'] = array('id', 'usuario_id');
+
+		$miProducto = ClassRegistry::init('Producto')->find('first', $options);
+		
+		if (!empty($miProducto)) {
+			return true;
 		}
 		
 		return false;

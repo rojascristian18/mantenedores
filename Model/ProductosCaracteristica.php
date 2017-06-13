@@ -46,5 +46,15 @@ class ProductosCaracteristica extends AppModel
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 		),
+		'valor' => array(
+			'notBlank' => array(
+				'rule'			=> array('notBlank'),
+				'last'			=> true,
+				'message'		=> 'El valor de la característica está vacio.',
+				//'allowEmpty'	=> true,
+				//'required'		=> false,
+				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
+			),
+		),
 	);
 }

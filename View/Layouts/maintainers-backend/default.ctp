@@ -33,6 +33,7 @@
 			'/maintainers-backend/js/plugins/summernote/summernote_espanol',
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-file-input',
 			'/maintainers-backend/js/plugins/owl/owl.carousel.min',
+			'/maintainers-backend/js/plugins/tour/intro.min',
 			'/maintainers-backend/js/custom'
 			/*
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-datepicker',
@@ -74,5 +75,13 @@
         <audio id="audio-alert" src="<?= $this->Html->url('/maintainers-backend/audio/alert.mp3'); ?>" preload="auto"></audio>
         <audio id="audio-fail" src="<?= $this->Html->url('/maintainers-backend/audio/fail.mp3'); ?>" preload="auto"></audio>
 		<?= $this->Html->script(array('/maintainers-backend/js/actions')); ?>
+
+		<? if ( $this->Session->read('Auth.Mantenedor.tour_inicio') ) : ?>
+		<script type="text/javascript">
+			/*$(window).on('load', function(){
+				introJs().start();
+			});*/
+		</script>
+		<? endif; ?>
     </body>
 </html>

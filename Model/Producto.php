@@ -6,6 +6,7 @@ class Producto extends AppModel
 	 * CONFIGURACION DB
 	 */
 	public $displayField	= 'nombre';
+	public $tarea_identificador = null;
 
 	/**
 	 * BEHAVIORS
@@ -40,7 +41,7 @@ class Producto extends AppModel
 			'numeric' => array(
 				'rule'			=> array('numeric'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Campo proveedor es obligatorio.',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -50,7 +51,7 @@ class Producto extends AppModel
 			'numeric' => array(
 				'rule'			=> array('numeric'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Campo marca es obligatorio.',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -60,7 +61,7 @@ class Producto extends AppModel
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Campo referencia es obligatorio',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -70,17 +71,21 @@ class Producto extends AppModel
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Campo carácteristicas para el nombre es obligatorio.',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
+			'between' => array(
+                'rule' => array('lengthBetween', 5, 50),
+                'message' => 'Campo caracteristicas debe tener un largo entre 5 y 60 carácteres.'
+            )
 		),
 		'nombre_final' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Campo nombre final es obligatorio',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -96,7 +101,22 @@ class Producto extends AppModel
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 		),
-		
+		'descripcion_corta' => array(
+			'between' => array(
+                'rule' => array('lengthBetween', 50, 800),
+                'message' => 'La descripción corta debe tener un largo entre 50 y 800 carácteres.'
+            )
+		),
+		'precio' => array(
+			'notBlank' => array(
+				'rule'			=> array('notBlank'),
+				'last'			=> true,
+				'message'		=> 'Campo precio es obligatorio.',
+				//'allowEmpty'	=> true,
+				//'required'		=> false,
+				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
+			),
+		),
 		'cantidad' => array(
 			'numeric' => array(
 				'rule'			=> array('numeric'),
@@ -146,6 +166,15 @@ class Producto extends AppModel
 		'Tarea' => array(
 			'className'				=> 'Tarea',
 			'foreignKey'			=> 'tarea_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tarea')
+		),
+		'Usuario' => array(
+			'className'				=> 'Usuario',
+			'foreignKey'			=> 'usuario_id',
 			'conditions'			=> '',
 			'fields'				=> '',
 			'order'					=> '',
@@ -260,7 +289,7 @@ class Producto extends AppModel
 			$this->data[$this->alias]['slug'] = Inflector::slug(strtolower($this->data[$this->alias]['nombre_final']));
 
 			# cantidad de productos default
-			$this->data[$this->alias]['cantidad'] = 5;
+			$this->data[$this->alias]['cantidad'] = configuracion('stock_minimo');
 
 			# meta titulo
 			$this->data[$this->alias]['meta_titulo'] = $this->data[$this->alias]['nombre_final'];
@@ -299,36 +328,55 @@ class Producto extends AppModel
 		return round(( $cantProductos * 100 ) / $cantPermitidos );
 	}
 
+	public function guardarPorcentajeTarea($id_tarea = null)
+	{
+		# Obtenemos la información de la tarea del producto
+		$tarea = ClassRegistry::init('Tarea')->find('first', array(
+			'conditions' => array(
+				'Tarea.id' => $id_tarea
+				),
+			'contain' => array(
+				'Producto' => array(
+					'conditions' => array(
+						'Producto.activo' => 1
+						)
+					)
+				)
+			));
+
+		$cantProductos = count($tarea['Producto']);
+		
+		if ($tarea['Tarea']['cantidad_productos'] > 0) {
+			# Cambiar datasource
+			$this->cambiarDatasourceModelo(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
+
+			ClassRegistry::init('Tarea')->id = $tarea['Tarea']['id'];
+			ClassRegistry::init('Tarea')->saveField('porcentaje_realizado', $this->calcularPorcentajeTarea($tarea['Tarea']['cantidad_productos'], $cantProductos) , array('callbacks' => false));
+		}
+	}
+
 	public function afterSave($created, $options = array()) {
 		parent::afterSave($created);
 
 		if (isset($this->data[$this->alias]['tarea_id'])) {
-			# actualizamos el porcentaje de la tarea
-			$tarea = ClassRegistry::init('Tarea')->find('first', array(
-				'conditions' => array(
-					'Tarea.id' => $this->data[$this->alias]['tarea_id']
-					),
-				'contain' => array(
-					'Producto' => array(
-						'conditions' => array(
-							'Producto.activo' => 1
-							)
-						)
-					)
-				));
-
-			$cantProductos = count($tarea['Producto']);
-
-			
-			if ($cantProductos > 0 && $tarea['Tarea']['cantidad_productos'] > 0) {
-
-
-				# Cambiar datasource
-				$this->cambiarDatasourceModelo(array('Impuesto', 'ImpuestoIdioma', 'Idioma', 'Shop'));
-
-				ClassRegistry::init('Tarea')->id = $tarea['Tarea']['id'];
-				ClassRegistry::init('Tarea')->saveField('porcentaje_realizado', $this->calcularPorcentajeTarea($tarea['Tarea']['cantidad_productos'], $cantProductos) , array('callbacks' => false));
-			}
+			# Actualizar porcentaje de tarea
+			$this->guardarPorcentajeTarea($this->data[$this->alias]['tarea_id']);
 		}
+	}
+
+	public function beforeDelete($cascade = true)
+	{
+		$producto = $this->find('first', array('conditions' => array('id' => $this->id)));
+
+		if (!empty($producto)) {
+			$this->tarea_identificador = $producto['Producto']['tarea_id'];
+		}
+	}
+
+
+	public function afterDelete()
+	{	
+		# Actualizar porcentaje de tarea
+		$this->guardarPorcentajeTarea($this->tarea_identificador);
 	}
 }

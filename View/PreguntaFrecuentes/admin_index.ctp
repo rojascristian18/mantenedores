@@ -1,5 +1,5 @@
 <div class="page-title">
-	<h2><span class="fa fa-list"></span> Pregunta Frecuentes</h2>
+	<h2><span class="fa fa-question-circle"></span> Preguntas Frecuentes</h2>
 </div>
 
 <div class="page-content-wrap">
@@ -7,41 +7,61 @@
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Listado de Pregunta Frecuentes</h3>
+					<h3 class="panel-title">Listado de Preguntas Frecuentes</h3>
 					<div class="btn-group pull-right">
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nuevo Pregunta Frecuente', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
-						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+						<? if ($permisos['agregar']) : ?>
+							<?= $this->Html->link('<i class="fa fa-plus"></i> Nueva Pregunta Frecuente', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
+						<? endif; ?>
+						<? if ($permisos['exportar']) : ?>
+							<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+						<? endif; ?>
 					</div>
 				</div>
 				<div class="panel-body">
 					<div class="table-responsive">
+						<?= $this->Form->create('PreguntaFrecuente', array('action' => 'ordenar'), array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 						<table class="table">
 							<thead>
 								<tr class="sort">
-													<th><?= $this->Paginator->sort('pregunta', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('respuesta', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('slug', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('orden', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-															<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
-													<th>Acciones</th>
+									<th><?= $this->Paginator->sort('orden', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('pregunta', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('respuesta', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('slug', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('activo', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th>Acciones</th>
 								</tr>
 							</thead>
-							<tbody>
-								<?php foreach ( $preguntaFrecuentes as $preguntaFrecuente ) : ?>
-								<tr>
-													<td><?= h($preguntaFrecuente['PreguntaFrecuente']['pregunta']); ?>&nbsp;</td>
-													<td><?= h($preguntaFrecuente['PreguntaFrecuente']['respuesta']); ?>&nbsp;</td>
-													<td><?= h($preguntaFrecuente['PreguntaFrecuente']['slug']); ?>&nbsp;</td>
-													<td><?= h($preguntaFrecuente['PreguntaFrecuente']['orden']); ?>&nbsp;</td>
-													<td><?= ($preguntaFrecuente['PreguntaFrecuente']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
-											<td>
+							<tbody class="js-generico-contenedor-sort">
+								<?php foreach ( $preguntaFrecuentes as $ix => $preguntaFrecuente ) : ?>
+								<tr class="ui-state-default">
+									<td class="js-generico-orden" data-id="<?=$preguntaFrecuente['PreguntaFrecuente']['id'];?>"><i class="fa fa-bars"></i>&nbsp;
+									<?= $this->Form->input(sprintf('%d.id', $ix), array('type' => 'hidden'));?>
+									<?= $this->Form->input(sprintf('%d.orden', $ix), array('type' => 'hidden', 'class' => 'order-input')); ?>
+									</td>
+									<td><?= h($preguntaFrecuente['PreguntaFrecuente']['pregunta']); ?>&nbsp;</td>
+									<td><?= $this->Text->truncate($preguntaFrecuente['PreguntaFrecuente']['respuesta'], 150); ?>&nbsp;</td>
+									<td><?= h($preguntaFrecuente['PreguntaFrecuente']['slug']); ?>&nbsp;</td>
+									<td><?= ($preguntaFrecuente['PreguntaFrecuente']['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
+									<td>
+									<? if ($permisos['editar']) : ?>
 										<?= $this->Html->link('<i class="fa fa-edit"></i> Editar', array('action' => 'edit', $preguntaFrecuente['PreguntaFrecuente']['id']), array('class' => 'btn btn-xs btn-info', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
-										<?= $this->Form->postLink('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $preguntaFrecuente['PreguntaFrecuente']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['eliminar']) : ?>
+										<?= $this->Html->link('<i class="fa fa-remove"></i> Eliminar', array('action' => 'delete', $preguntaFrecuente['PreguntaFrecuente']['id']), array('class' => 'btn btn-xs btn-danger confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Eliminar este registro', 'escape' => false)); ?>
+									<? endif; ?>
+									<? if ($permisos['activar']) : ?>
+										<? if ($preguntaFrecuente['PreguntaFrecuente']['activo']) : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye-slash"></i> Desactivar', array('action' => 'desactivar', $preguntaFrecuente['PreguntaFrecuente']['id']), array('class' => 'btn btn-xs btn-primary confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Desactivar este registro', 'escape' => false)); ?>
+										<? else : ?>
+											<?= $this->Form->postLink('<i class="fa fa-eye"></i> Activar', array('action' => 'activar', $preguntaFrecuente['PreguntaFrecuente']['id']), array('class' => 'btn btn-xs btn-success confirmar-eliminacion', 'rel' => 'tooltip', 'title' => 'Activar este registro', 'escape' => false)); ?>
+										<? endif; ?>
+									<? endif; ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>
 							</tbody>
 						</table>
+						<?= $this->Form->end(); ?>
 					</div>
 				</div>
 			</div>

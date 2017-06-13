@@ -26,14 +26,14 @@
 		<div class="col-xs-12 col-sm-6 pull-right">
 			<div class="widget widget-primary widget-carousel">
                 <div class="owl-carousel">
-                	<? if( !empty($miAcumuladoMesActual) ) : ?>
+                	<? if( isset($miAcumuladoMesActual) ) : ?>
                     <div>                                    
                         <div class="widget-title">Acumulado no pagado</div>                                                                        
                         <div class="widget-subtitle">del <?=date('Y-m-01');?> a la fecha</div>
                         <div class="widget-int"><?= CakeNumber::currency($miAcumuladoMesActual, 'CLP'); ?></div>
                     </div>
                 	<? endif; ?>
-                    <? if( !empty($miAcumuladoTotal) ) : ?>
+                    <? if( isset($miAcumuladoTotal) ) : ?>
                     <div>                                    
                         <div class="widget-title">Acumulado total</div>                                                                        
                         <div class="widget-subtitle">no pagado</div>
@@ -138,6 +138,7 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
+									<th><?= $this->Paginator->sort('id', 'Identificador', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('nombre', 'Tarea', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('administrador_id', 'Admnistrador', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('iniciado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
@@ -152,6 +153,7 @@
 							<tbody>
 								<?php foreach ( $tareas as $tarea ) : ?>
 								<tr>
+									<td><?= sprintf('#%d', $tarea['Tarea']['id']); ?></td>
 									<td><?= $tarea['Tarea']['nombre']; ?></td>
 									<td><?= $tarea['Administrador']['nombre']; ?></td>
 									<td><?= ($tarea['Tarea']['iniciado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>

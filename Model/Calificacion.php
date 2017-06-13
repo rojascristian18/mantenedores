@@ -84,7 +84,8 @@ class Calificacion extends AppModel
 					),
 				'contain' => array(
 					sprintf('%s', $this->alias)
-					)
+					),
+				'fields' => array('Usuario.id')
 				));
 
 			$media = 0;

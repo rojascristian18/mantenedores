@@ -90,4 +90,5 @@ class AppModel extends Model
 			ClassRegistry::init($instancia)->useDbConfig 	= CakeSession::read('Tienda.db_configuracion');
 		}
 	}
+
 }

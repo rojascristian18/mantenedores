@@ -9,13 +9,39 @@
     </div>
     <div class="panel-body list-group scroll" style="height: 200px;">
     <? foreach ($tareasNotificacion as $index => $tarea) : ?>
-    	<?=$this->Html->link(
-    		'<strong>['.$tarea['Tienda']['nombre'].'] '.$tarea['Tarea']['nombre'].'</strong>
-            <div class="progress progress-small progress-striped active">
-                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="'.$tarea['Tarea']['porcentaje_realizado'].'" aria-valuemin="0" aria-valuemax="100" style="width: '.$tarea['Tarea']['porcentaje_realizado'].'%;">'.$tarea['Tarea']['porcentaje_realizado'].'%</div>
-            </div>
-            <small class="text-muted">'.$tarea['Usuario']['nombre'].' <'.$tarea['Usuario']['email'].'>, '.$this->Time->format($tarea['Tarea']['created'], '%e de %m, %Y').' / '.$tarea['Tarea']['porcentaje_realizado'].'% completado</small>', 
-            array('controller' => 'tareas', 'action' => 'edit', $tarea['Tarea']['id']), array('escape' => false, 'class' => 'list-group-item')); ?>
+        <? $progressBar = ''; ?>
+        <? if ( $tarea['Tarea']['porcentaje_realizado'] < 50 ) : ?>
+            <?  
+                $progressBar = '<div class="progress progress-small progress-striped active">';
+                $progressBar .= '<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="' . $tarea['Tarea']['porcentaje_realizado'] . '"';
+                $progressBar .= 'aria-valuemin="0" aria-valuemax="100" style="width: ' . $tarea['Tarea']['porcentaje_realizado'] . '%;">';
+                $progressBar .= $tarea['Tarea']['porcentaje_realizado'].'%</div>';
+                $progressBar .= '</div>';
+            ?>
+        <? endif; ?>
+        <? if ( $tarea['Tarea']['porcentaje_realizado'] >= 50 && $tarea['Tarea']['porcentaje_realizado'] < 100 ) : ?>
+            <?  
+                $progressBar = '<div class="progress progress-small progress-striped active">';
+                $progressBar .= '<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="' . $tarea['Tarea']['porcentaje_realizado'] . '"';
+                $progressBar .= 'aria-valuemin="0" aria-valuemax="100" style="width: ' . $tarea['Tarea']['porcentaje_realizado'] . '%;">';
+                $progressBar .= $tarea['Tarea']['porcentaje_realizado'].'%</div>';
+                $progressBar .= '</div>';
+            ?>
+        <? endif; ?>
+        <? if ( $tarea['Tarea']['porcentaje_realizado'] == 100 ) : ?>
+            <?  
+                $progressBar = '<div class="progress progress-small progress-striped active">';
+                $progressBar .= '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' . $tarea['Tarea']['porcentaje_realizado'] . '"';
+                $progressBar .= 'aria-valuemin="0" aria-valuemax="100" style="width: ' . $tarea['Tarea']['porcentaje_realizado'] . '%;">';
+                $progressBar .= $tarea['Tarea']['porcentaje_realizado'].'%</div>';
+                $progressBar .= '</div>';
+            ?>
+        <? endif; ?>
+        	<?=$this->Html->link(
+        		'<strong>['.$tarea['Tienda']['nombre'].'] '.$tarea['Tarea']['nombre'].'</strong>'
+                . $progressBar .
+                '<small class="text-muted">'.$tarea['Usuario']['nombre'].' <'.$tarea['Usuario']['email'].'>, '.$this->Time->format($tarea['Tarea']['created'], '%e de %m, %Y').' / '.$tarea['Tarea']['porcentaje_realizado'].'% completado</small>', 
+                array('controller' => 'tareas', 'action' => 'edit', $tarea['Tarea']['id']), array('escape' => false, 'class' => 'list-group-item')); ?>
     <? endforeach; ?>
     </div>
     <div class="panel-footer text-center">

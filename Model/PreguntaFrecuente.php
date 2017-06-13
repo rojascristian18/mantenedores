@@ -45,16 +45,6 @@ class PreguntaFrecuente extends AppModel
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 		),
-		'respuesta' => array(
-			'notBlank' => array(
-				'rule'			=> array('notBlank'),
-				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
-				//'allowEmpty'	=> true,
-				//'required'		=> false,
-				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
-			),
-		),
 		'slug' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
@@ -86,4 +76,12 @@ class PreguntaFrecuente extends AppModel
 			),
 		),
 	);
+
+
+	public function beforeSave($options = array()) {
+		if (isset($this->data[$this->alias]['pregunta'])) {
+			# Slug
+			$this->data[$this->alias]['slug'] = Inflector::slug(strtolower($this->data[$this->alias]['pregunta']));
+		}
+	}
 }

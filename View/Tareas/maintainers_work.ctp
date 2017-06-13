@@ -68,79 +68,78 @@
 			</div>
 		</div> <!-- end col -->
 	</div> <!-- end row -->
-		<div class="row">
-			<div class="col-xs-12 col-sm-5">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Mantenedor asigando</h3>
-					</div>
-					<div class="panel-body">
-						<div class="table-responsive">
-							<table class="table tabla-sin-bordes">
-							<? if ( !empty($this->request->data['Usuario']['id']) ) : ?>
-								<tr>
-									<td colspan="2" align="center" class="mantenedor-avatar">
-										<?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image(sprintf('Usuario/%d/mini_%s', $this->request->data['Usuario']['id'] , $this->request->data['Usuario']['imagen']), array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>
-										<span class="mantenedor-avatar-nombre">
-											<?= $this->request->data['Usuario']['nombre']; ?> <?= $this->request->data['Usuario']['apellidos']; ?>
-										</span>
-									</td>
-								</tr>
-								<tr>
-									<th><label><?=__('Rut');?></label></th>
-									<td><?= $this->request->data['Usuario']['rut']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Email');?></label></th>
-									<td><?= $this->request->data['Usuario']['email']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Fono');?></label></th>
-									<td><?= $this->request->data['Usuario']['fono']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Calificación');?></label></th>
-									<td><?= $this->Html->estrellas($this->request->data['Usuario']['calificacion_media']); ?></td>
-								</tr>
-							<? else : ?>
-								<tr>
-									<td colspan="2">Aún no se ha asignado esta tarea a un mantenedor.</td>
-								</tr>
-							<? endif; ?>
-							</table>
-						</div>
+	<!--<div class="row">
+		<div class="col-xs-12 col-sm-5">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Mantenedor asigando</h3>
+				</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table tabla-sin-bordes">
+						<? if ( !empty($this->request->data['Usuario']['id']) ) : ?>
+							<tr>
+								<td colspan="2" align="center" class="mantenedor-avatar">
+									<?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image(sprintf('Usuario/%d/mini_%s', $this->request->data['Usuario']['id'] , $this->request->data['Usuario']['imagen']), array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>
+									<span class="mantenedor-avatar-nombre">
+										<?= $this->request->data['Usuario']['nombre']; ?> <?= $this->request->data['Usuario']['apellidos']; ?>
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<th><label><?=__('Rut');?></label></th>
+								<td><?= $this->request->data['Usuario']['rut']; ?></td>
+							</tr>
+							<tr>
+								<th><label><?=__('Email');?></label></th>
+								<td><?= $this->request->data['Usuario']['email']; ?></td>
+							</tr>
+							<tr>
+								<th><label><?=__('Fono');?></label></th>
+								<td><?= $this->request->data['Usuario']['fono']; ?></td>
+							</tr>
+							<tr>
+								<th><label><?=__('Calificación');?></label></th>
+								<td><?= $this->Html->estrellas($this->request->data['Usuario']['calificacion_media']); ?></td>
+							</tr>
+						<? else : ?>
+							<tr>
+								<td colspan="2">Aún no se ha asignado esta tarea a un mantenedor.</td>
+							</tr>
+						<? endif; ?>
+						</table>
 					</div>
 				</div>
 			</div>
-			<div class="col-xs-12 col-sm-7">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Grupos disponibles</h3>
-					</div>
-					<div class="panel-body">
-						<div class="table-responsive">
-							<table class="table table-stripped">
-								<thead>
-									<th>Grupo</th>
-								</thead>
-								<tbody>
-								<? if (!empty($this->request->data['Grupocaracteristica'])) : ?>
-								
-									<? foreach ($this->request->data['Grupocaracteristica'] as $indice => $grupo) : ?>
-									<tr>
-		    							<td><?=$grupo['nombre'];?></td>
-		    						</tr>
-									<? endforeach; ?>
+		</div>
+		<div class="col-xs-12 col-sm-7">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Grupos disponibles</h3>
+				</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table table-stripped">
+							<thead>
+								<th>Grupo</th>
+							</thead>
+							<tbody>
+							<? if (!empty($this->request->data['Grupocaracteristica'])) : ?>
+							
+								<? foreach ($this->request->data['Grupocaracteristica'] as $indice => $grupo) : ?>
+								<tr>
+	    							<td><?=$grupo['nombre'];?></td>
+	    						</tr>
+								<? endforeach; ?>
 
-								<? endif; ?>
-								</tbody>
-							</table>
-						</div>
+							<? endif; ?>
+							</tbody>
+						</table>
 					</div>
 				</div>
-			</div> <!-- end col -->
-		</div>
-	</div> <!-- end row -->
+			</div>
+		</div> <!-- end col -->
+	<!--</div>--> <!-- end row -->
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
@@ -154,7 +153,6 @@
 								<tr>
 									<th>Nombre</th>
 									<th>Descripción</th>
-									<th>Activo</th>
 									<th>Archivo</th>
 								</tr>
 							</thead>
@@ -167,7 +165,6 @@
 										<?= $adjunto['nombre']; ?>
 									</td>
 									<td><?= $adjunto['descripcion']; ?></td>
-									<td><td><?= ($adjunto['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td>
 									<? if (!empty($adjunto['url_archivo'])) : ?>
 										<?= $this->Html->link(
@@ -199,7 +196,7 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<h3 class="panel-title">Productos de la tarea</h3>
-					<p class="parrafo-panel">Los productos que no estan activados no se contemplan para el progreso y monetización de la tarea. Tampoco se muestran en la revisión de la tarea.</p>
+					<p class="parrafo-panel">Los productos que no se pueden modificar están aceptados por el administrador o no pertenecen a usted.</p>
 					<? if ( count($this->request->data['Producto']) < $this->request->data['Tarea']['cantidad_productos'] ) : ?>
 					<?=$this->Html->link('<i class="fa fa-plus"></i> Agregar producto', array('controller' => 'productos', 'action' => 'add', $this->request->data['Tarea']['id']), array('class' => 'btn btn-success btn-xs pull-right', 'escape' => false)); ?>
 					<? endif; ?>
@@ -230,19 +227,19 @@
 									<td><?= $fabricante = (!empty($producto['fabricante_id'])) ? $producto['Fabricante']['name'] : 'No agregado' ; ?></td>
 									<td><?= $activo = ($producto['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td>
-									<div class="btn-group">
-                                        <a href="#" data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true"><span class="fa fa-cog"></span> Acciones</a>
-                                        <ul class="dropdown-menu dropdown-menu-left" role="menu">
-                                            <li role="presentation" class="dropdown-header">Seleccione</li>
-											<li><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'edit', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
-											</li>
-											<? if( $producto['activo'] ) : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-ban"></i> Quitar de la tarea', array('controller' => 'productos', 'action' => 'desactivar', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Desactivar este producto', 'escape' => false)); ?></li>
-											<? else : ?>
-												<li><?= $this->Form->postLink('<i class="fa fa-check"></i> Activar', array('controller' => 'productos', 'action' => 'activar', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Activar este producto', 'escape' => false)); ?></li>
-											<? endif; ?>
-										</ul>
-                                    </div>
+									<? if (!$producto['aceptado'] && $producto['usuario_id'] == $this->Session->read('Auth.Mantenedor.id')) : ?>
+										<div class="btn-group">
+	                                        <a href="#" data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true"><span class="fa fa-cog"></span> Acciones</a>
+	                                        <ul class="dropdown-menu dropdown-menu-left" role="menu">
+	                                            <li role="presentation" class="dropdown-header">Seleccione</li>
+												<li><?= $this->Html->link('<i class="fa fa-edit"></i> Revisar', array('controller' => 'productos', 'action' => 'edit', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Editar este registro', 'escape' => false)); ?>
+												</li>
+												<li><?= $this->Form->postLink('<i class="fa fa-trash"></i> Eliminar', array('controller' => 'productos', 'action' => 'delete', $producto['id'], $producto['tarea_id']), array('class' => '', 'rel' => 'tooltip', 'title' => 'Eliminar este producto', 'escape' => false)); ?></li>
+											</ul>
+	                                    </div>
+	                                <? else : ?>
+	                                	<button class="btn btn-success btn-xs" disabled>Imposible cambiar</button>
+                                   <? endif; ?>
 								</tr>
 							<? endforeach; ?>
 							</tbody>

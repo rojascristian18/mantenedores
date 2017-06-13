@@ -13,6 +13,7 @@ foreach ( $campos as $campo )
 {
 	array_push($cabeceras, array_merge(array('label' => Inflector::humanize($campo)), $opciones));
 }
+
 $this->PhpExcel->addTableHeader($cabeceras, array('bold' => true));
 
 /**

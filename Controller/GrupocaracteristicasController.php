@@ -6,7 +6,8 @@ class GrupocaracteristicasController extends AppController
 	{
 		$this->paginate		= array(
 			'recursive'			=> 0,
-			'order' => array('Grupocaracteristica.modified' => 'DESC')
+			'order' => array('Grupocaracteristica.modified' => 'DESC'),
+			'conditions' => array('Grupocaracteristica.tienda_id' => $this->Session->read('Tienda.id')) 
 		);
 		$grupocaracteristicas	= $this->paginate();
 		$this->set(compact('grupocaracteristicas'));
@@ -76,7 +77,7 @@ class GrupocaracteristicasController extends AppController
 		}
 
 		if ( $this->request->is('post') || $this->request->is('put') )
-		{	
+		{		
 			if ( ! empty($this->request->data['Especificacion']) ) {
 				# Limpiamos las especificaciones
 				$this->request->data['Especificacion'] = $this->limpiarEspecificaciones($this->request->data['Especificacion']);
@@ -90,14 +91,14 @@ class GrupocaracteristicasController extends AppController
 			}else{
 				$this->request->data['Grupocaracteristica']['count_categorias'] = 0;
 			}
-
+			
 			if ( ! empty($this->request->data['Palabraclave'])) {
 				# Limpiamos las categorias
 				$this->request->data['Palabraclave'] = $this->limpiarPalabraclaves($this->request->data['Palabraclave']);
 			}else{
 				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
 			}
-
+			#prx($this->request->data);
 			# Eliminar caracteristicas anteriores Con callbacks
 			$this->Grupocaracteristica->GrupocaracteristicaEspecificacion->deleteAll(array('GrupocaracteristicaEspecificacion.grupocaracteristica_id' => $id));
 			# Eliminar categorias anteriores Con callbacks
@@ -105,7 +106,7 @@ class GrupocaracteristicasController extends AppController
 			# Eliminar categorias anteriores Con callbacks
 			$this->Grupocaracteristica->GrupocaracteristicaPalabraclave->deleteAll(array('GrupocaracteristicaPalabraclave.grupocaracteristica_id' => $id));
 
-			#prx($this->request->data);			
+					
 			if ( $this->Grupocaracteristica->save($this->request->data) )
 			{
 				$this->Session->setFlash('Registro editado correctamente', null, array(), 'success');
@@ -298,12 +299,8 @@ class GrupocaracteristicasController extends AppController
 
 
 	private function limpiarPalabraclaves ($palabraclaves =  array()) {
-		if ( !empty($palabraclaves) ) {
-			foreach ($palabraclaves as $indice => $palabraclave) {
-				if ($palabraclave['id'] == 0) {
-					unset($palabraclaves[$indice]);
-				}
-			}
+		if ( empty($palabraclaves['Palabraclave']) ) {
+			return '';
 		}
 
 		return $palabraclaves;
@@ -534,6 +531,9 @@ class GrupocaracteristicasController extends AppController
 			'OR' => array(
 				'Grupocaracteristica.nombre LIKE "%' . $palabra . '%"',
 				'Grupocaracteristica.id LIKE "%' . $palabra . '%"' 
+				),
+			'AND' => array(
+				'Grupocaracteristica.tienda_id' => $this->Session->read('Tienda.id')
 				)
 			);
 

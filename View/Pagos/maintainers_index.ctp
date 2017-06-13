@@ -76,6 +76,7 @@
 									<th><?= $this->Paginator->sort('pagado', 'Estado', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('monto_pagado', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('cuenta_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
+									<th><?= $this->Paginator->sort('created', 'Creada', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th>Acciones</th>
 								</tr>
 							</thead>
@@ -87,6 +88,7 @@
 									<td><?= ($pago['Pago']['pagado'] ? '<i class="fa fa-check"></i> Pagado' : '<i class="fa fa-remove"></i> No pagado'); ?>&nbsp;</td>
 									<td><?= $pago['Pago']['monto_pagado']; ?></td>
 									<td><?= $pago['Cuenta']['cuenta']; ?></td>
+									<td><?= $pago['Pago']['created']; ?></td>
 									<td>
                                       <?= $this->Html->link('<i class="fa fa-eye"></i> Detalle', array('action' => 'detail', $pago['Pago']['id']), array('class' => 'btn btn-primary btn-xs', 'escape' => false)); ?>
 									</td>

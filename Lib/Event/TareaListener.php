@@ -14,7 +14,7 @@ class TareaListener implements CakeEventListener
 	}
 
 	public function enviarEmailMantenedor(CakeEvent $evento)
-	{
+	{	
 
 		# Seleccionamos la plantilla según el condiciones
 		# Estados posibles
@@ -65,7 +65,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -116,7 +116,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -166,7 +166,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -216,7 +216,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -266,7 +266,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -318,7 +318,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -326,6 +326,59 @@ class TareaListener implements CakeEventListener
 				'reintentos'				=> 0,
 				'atachado'					=> null
 			));
+		}
+
+
+		if ( isset($evento->data['Tarea']['notificar_reabrir_tarea']) ) {
+			
+			# Buscamos la información del mantenedor que se debe notificar
+			$mantenedor = ClassRegistry::init('Usuario')->find('first', array(
+				'conditions' => array(
+					'Usuario.id' => $evento->data['Tarea']['usuario_id'],
+					'Usuario.activo' => 1
+					)
+				)
+			);
+
+			$mantenedor['Tarea'] = $evento->data['Tarea'];
+
+			/**
+			 * Clases requeridas
+			 */
+			$alerta						= $mantenedor;
+			$this->View					= new View();
+			$this->View->viewPath		= 'Correos' . DS . 'html';
+			$this->View->layoutPath		= 'Emails' . DS . 'html';
+			$this->View->set(compact('alerta'));
+			$this->Correo				= ClassRegistry::init('Correo');
+			
+			/**
+			 * Correos a mantenedor asignación de tarea
+			 */
+			$html						= $this->View->render('notificar_reabrir_tarea');
+			
+			/**
+			 * Guarda el email a enviar
+			 */
+			$this->Correo->create();
+			$this->Correo->save(array(
+				'estado'					=> 'Notificación de tarea re abierta',
+				'html'						=> $html,
+				'asunto'					=> sprintf('[NDRZA] La tarea %d ha sido re abierta', $mantenedor['Tarea']['id']),
+				'destinatario_email'		=> $alerta['Usuario']['email'],
+				'destinatario_nombre'		=> $alerta['Usuario']['nombre'],
+				'remitente_email'			=> 'no-reply@nodriza.cl',
+				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
+				'cc_email'					=> '',
+				'bcc_email'					=> configuracion('bcc_tareas'),
+				'traza'						=> null,
+				'proceso_origen'			=> null,
+				'procesado'					=> 0,
+				'enviado'					=> 0,
+				'reintentos'				=> 0,
+				'atachado'					=> null
+			));
+			
 		}
 
 
@@ -369,7 +422,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_tareas'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -423,7 +476,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_comentarios'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,
@@ -477,7 +530,7 @@ class TareaListener implements CakeEventListener
 				'remitente_email'			=> 'no-reply@nodriza.cl',
 				'remitente_nombre'			=> 'Portal mantenedores - Nodriza Spa',
 				'cc_email'					=> '',
-				'bcc_email'					=> 'cristian.rojas@nodriza.cl',
+				'bcc_email'					=> configuracion('bcc_comentarios'),
 				'traza'						=> null,
 				'proceso_origen'			=> null,
 				'procesado'					=> 0,

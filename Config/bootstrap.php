@@ -139,3 +139,32 @@ function prx()
 		pr($arg);
 	exit;
 }
+
+// URL Base para consola
+if ( !defined('FULL_BASE_URL') ) {
+	define('FULL_BASE_URL', 'http://dev.nodriza.cl/mantenedores/');
+}
+
+
+/**
+ * Función que permite obtener el valor de la tabla configuración 
+ * según el índice indicado en el parámero slug.
+ * @param 	string 	$slug 	Indice que se desea obtener
+ * @return  string
+ */
+function configuracion($slug = '') {
+	if ( !empty($slug) ) {
+		$configuracion = ClassRegistry::init('Configuracion')->find('first', array(
+			'conditions' => array(
+				'Configuracion.id' => 1
+				),
+			'fields' => array($slug)
+			));
+		if ( !empty($configuracion) ) {
+			return $configuracion['Configuracion'][$slug];
+		}else{
+			return '';
+		}
+		
+	}
+}
