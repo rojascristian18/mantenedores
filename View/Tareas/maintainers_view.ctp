@@ -68,85 +68,13 @@
 			</div>
 		</div> <!-- end col -->
 	</div> <!-- end row -->
-		<div class="row">
-			<div class="col-xs-12 col-sm-5">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Mantenedor asigando</h3>
-					</div>
-					<div class="panel-body">
-						<div class="table-responsive">
-							<table class="table tabla-sin-bordes">
-							<? if ( !empty($this->request->data['Usuario']['id']) ) : ?>
-								<tr>
-									<td colspan="2" align="center" class="mantenedor-avatar">
-										<?= $imagenPerfil = (!empty($this->request->data['Usuario']['imagen'])) ? $this->Html->image(sprintf('Usuario/%d/mini_%s', $this->request->data['Usuario']['id'] , $this->request->data['Usuario']['imagen']), array('class' => 'img-responsive img-circle', 'alt' => $this->request->data['Usuario']['nombre'])) : $this->Html->image('logo_user.jpg', array('class' => 'img-responsive img-circle image-perfil-list', 'alt' => $this->request->data['Usuario']['nombre'])) ; ?>
-										<span class="mantenedor-avatar-nombre">
-											<?= $this->request->data['Usuario']['nombre']; ?> <?= $this->request->data['Usuario']['apellidos']; ?>
-										</span>
-									</td>
-								</tr>
-								<tr>
-									<th><label><?=__('Rut');?></label></th>
-									<td><?= $this->request->data['Usuario']['rut']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Email');?></label></th>
-									<td><?= $this->request->data['Usuario']['email']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Fono');?></label></th>
-									<td><?= $this->request->data['Usuario']['fono']; ?></td>
-								</tr>
-								<tr>
-									<th><label><?=__('Calificación');?></label></th>
-									<td><?= $this->Html->estrellas($this->request->data['Usuario']['calificacion_media']); ?></td>
-								</tr>
-							<? else : ?>
-								<tr>
-									<td colspan="2">Aún no se ha asignado esta tarea a un mantenedor.</td>
-								</tr>
-							<? endif; ?>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xs-12 col-sm-7">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Grupos</h3>
-					</div>
-					<div class="panel-body">
-						<div class="table-responsive">
-							<table class="table table-stripped">
-								<thead>
-									<th>Grupo</th>
-								</thead>
-								<tbody>
-								<? if (!empty($this->request->data['Grupocaracteristica'])) : ?>
-								
-									<? foreach ($this->request->data['Grupocaracteristica'] as $indice => $grupo) : ?>
-									<tr>
-		    							<td><?=$grupo['nombre'];?></td>
-		    						</tr>
-									<? endforeach; ?>
-
-								<? endif; ?>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div> <!-- end col -->
-		</div>
-	</div> <!-- end row -->
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<h3 class="panel-title">Materiales de la tarea</h3>
 				</div>
+				<? if ( ! empty($this->request->data['Adjunto']) ) : ?>
 				<div class="panel-body">
 					<div class="table-responsive">
 						<table class="table js-clon-scope">
@@ -160,7 +88,7 @@
 							</thead>
 							<tbody class="js-clon-contenedor">
 								
-								<? if ( ! empty($this->request->data['Adjunto']) ) : ?>
+								
 								<? foreach ( $this->request->data['Adjunto'] as $index => $adjunto ) : ?>
 								<tr>
 									<td>
@@ -186,11 +114,16 @@
 									</td>
 								</tr>
 								<? endforeach; ?>
-								<? endif; ?>
+								
 							</tbody>
 						</table>
 					</div>
 				</div>
+				<? else : ?>
+				<div class="panel-body">
+					<p>No registra materiales</p>
+				</div>
+				<? endif; ?>
 			</div>
 		</div>
 	</div>
@@ -199,7 +132,7 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<h3 class="panel-title">Productos agregados</h3>
-					<p class="parrafo-panel">Revise uno a uno los productos de la tarea antes de darla por finalizada para garantizar una correcta subida.</p>
+					<p class="parrafo-panel">Listado de los productos agregados a esta tarea.</p>
 				</div>
 				<div class="panel-body">
 					<div class="table-responsive">
@@ -207,24 +140,22 @@
 							<thead>
 								<th>Referecia</th>
 								<th>Nombre final</th>
-								<th>Precio</th>
 								<th>Grupo</th>
-								<th>Proveedor</th>
+								<th>Marca</th>
 								<th>Fabricante</th>
 								<th>Aceptado</th>
-								<th>Acción</th>
+								<!--<th>Acción</th>-->
 							</thead>
 							<tbody>
 							<? foreach ($this->request->data['Producto'] as $indice => $producto) : ?>
 								<tr>
 									<td><?= $referencia = (!empty($producto['referencia'])) ? $producto['referencia'] : 'No agregado' ; ?></td>
 									<td><?= $nombre = (!empty($producto['nombre_final'])) ? $producto['nombre_final'] : 'No agregado' ; ?></td>
-									<td><?= $precio = (!empty($producto['precio'])) ? CakeNumber::currency($producto['precio'], 'CLP') : 'No agregado' ; ?></td>
 									<td><?= $grupo = (!empty($producto['grupocaracteristica_id'])) ? $producto['Grupocaracteristica']['nombre'] : 'No agregado' ; ?></td>
-									<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>
+									<td><?= $marca = (!empty($producto['marca_id'])) ? $producto['Marca']['nombre'] : 'No agregado' ; ?></td>
 									<td><?= $fabricante = (!empty($producto['fabricante_id'])) ? $producto['Fabricante']['name'] : 'No agregado' ; ?></td>
 									<td><?= ($producto['aceptado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
-									<td><?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('controller' => 'productos', 'action' => 'view', $producto['id']), array('class' => 'btn btn-info btn-xs', 'rel' => 'tooltip', 'title' => 'Ver este registro', 'escape' => false)); ?></td>
+									<!--<td><?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('controller' => 'productos', 'action' => 'view', $producto['id']), array('class' => 'btn btn-info btn-xs', 'rel' => 'tooltip', 'title' => 'Ver este registro', 'escape' => false)); ?></td>-->
 								</tr>
 							<? endforeach; ?>
 							</tbody>
@@ -240,6 +171,7 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">Comentarios de la tarea</h3>
 				</div>
+				<? if ( !empty($this->request->data['Comentario']) ) : ?>
 				<div class="panel-body panel-gris">
 					<div class="comentarios">
 						<div class="comentarios-contenedor">
@@ -301,6 +233,11 @@
 						</div>
 					</div>
 				</div>
+				<? else : ?>
+				<div class="panel-body">
+					<p>No registra comentarios.</p>
+				</div>
+				<? endif; ?>
 			</div>
 		</div>
 	</div>

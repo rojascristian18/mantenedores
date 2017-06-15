@@ -208,9 +208,10 @@
 								<th>Aceptado</th>
 								<th>Referecia</th>
 								<th>Nombre final</th>
-								<th>Precio</th>
+								<!--<th>Precio</th>-->
 								<th>Grupo</th>
-								<th>Proveedor</th>
+								<!--<th>Proveedor</th>-->
+								<th>Marca</th>
 								<th>Fabricante</th>
 								<th>Activado</th>
 								<th>Acción</th>
@@ -223,7 +224,8 @@
 									<td><?= $nombre = (!empty($producto['nombre_final'])) ? $producto['nombre_final'] : 'No agregado' ; ?></td>
 									<td><?= $precio = (!empty($producto['precio'])) ? CakeNumber::currency($producto['precio'], 'CLP') : 'No agregado' ; ?></td>
 									<td><?= $grupo = (!empty($producto['grupocaracteristica_id'])) ? $producto['Grupocaracteristica']['nombre'] : 'No agregado' ; ?></td>
-									<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>
+									<!--<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>-->
+									<td><?= $marca = (!empty($producto['marca_id'])) ? $producto['Marca']['nombre'] : 'No agregado' ; ?></td>
 									<td><?= $fabricante = (!empty($producto['fabricante_id'])) ? $producto['Fabricante']['name'] : 'No agregado' ; ?></td>
 									<td><?= $activo = ($producto['activo'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td>

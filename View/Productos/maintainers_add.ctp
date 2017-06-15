@@ -24,10 +24,10 @@
 				<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" class="active"><a href="#informacion" aria-controls="informacion" role="tab" data-toggle="tab"><i class="fa fa-info"></i> Información</a></li>
-						<li role="presentation"><a href="#precio" aria-controls="precio" role="tab" data-toggle="tab"><i class="fa fa-dollar"></i> Precio</a></li>
+						<!--<li role="presentation"><a href="#precio" aria-controls="precio" role="tab" data-toggle="tab"><i class="fa fa-dollar"></i> Precio</a></li>-->
 						<li role="presentation"><a href="#dimensiones" aria-controls="dimensiones" role="tab" data-toggle="tab"><i class="fa fa-crop"></i> Dimensiones</a></li>
 						<li role="presentation"><a href="#caracteristicas" aria-controls="caracteristicas" role="tab" data-toggle="tab"><i class="fa fa-object-group"></i> Características</a></li>
-						<li role="presentation"><a href="#proveedor" aria-controls="proveedor" role="tab" data-toggle="tab"><i class="fa fa-truck"></i> Proveedor</a></li>
+						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante</a></li>
 						<li role="presentation"><a href="#imagenes" aria-controls="imagenes" role="tab" data-toggle="tab"><i class="fa fa-picture-o"></i> Imágenes</a></li>
 					</ul>
 
@@ -51,10 +51,10 @@
 							<div class="divisor-sm"></div>
 							<div class="row form-group">
 								<div class="col-xs-12 col-sm-4">
-									<?= $this->Form->label('fabricante_id', _('Seleccione la marca del producto (*)'));?>
+									<?= $this->Form->label('marca_id', _('Seleccione la marca del producto (*)'));?>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<?= $this->Form->input('fabricante_id', array('class' => 'form-control string_marca', 'empty' => 'Seleccione marca')); ?>
+									<?= $this->Form->input('marca_id', array('class' => 'form-control string_marca', 'empty' => 'Seleccione marca')); ?>
 								</div>
 							</div>
 							<div class="divisor-sm"></div>
@@ -66,17 +66,6 @@
 									<?= $this->Form->input('nombre', array('placeholder' => 'Ingrese características importantes del producto', 'class' => 'form-control string_nombre')); ?>
 								</div>
 							</div>
-							<div class="divisor-sm"></div>
-							<div class="row form-group">
-								<div class="col-xs-12 col-sm-4">
-									<?= $this->Form->label('nombre_final', 'Nombre final del producto <br/><small><b>(categoría + carácteristicas + marca)</b></small>'); ?>
-								</div>
-								<div class="col-xs-12 col-sm-8">
-									<span class="form-control string_nombre_final"><span class="grupo_preview"></span> <span class="nombre_preview"></span> <span class="marca_preview"></span></span>
-									<?= $this->Form->input('nombre_final', array('type' => 'hidden', 'class' => 'input_nombre_final')); ?>
-								</div>
-							</div>
-							<div class="divisor-md"></div>
 							<div class="row form-group">
 								<div class="col-xs-12 col-sm-4">
 									<?= $this->Form->label('referencia', 'Referencia del producto (*)'); ?><br>
@@ -85,10 +74,20 @@
 									</button>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto')); ?>
+									<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto', 'class' => 'form-control string_referencia')); ?>
 								</div>
 							</div>
 							<div class="divisor-sm"></div>
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4">
+									<?= $this->Form->label('nombre_final', 'Nombre final del producto <br/><small><b>(categoría + carácteristicas + marca + referencia)</b></small>'); ?>
+								</div>
+								<div class="col-xs-12 col-sm-8">
+									<span class="form-control string_nombre_final"><span class="grupo_preview"></span> <span class="nombre_preview"></span> <span class="marca_preview"></span> <span class="referencia_preview"></span>
+									<?= $this->Form->input('nombre_final', array('type' => 'hidden', 'class' => 'input_nombre_final')); ?>
+								</div>
+							</div>
+							<div class="divisor-md"></div>
 							<div class="row form-group">
 								<div class="col-xs-12 col-sm-4">
 									<?= $this->Form->label('descripcion_corta', 'Descripción corta (*)'); ?>
@@ -110,7 +109,7 @@
 								</div>
 							</div>
 						</div>
-						<div role="tabpanel" class="tab-pane" id="precio">
+						<!--<div role="tabpanel" class="tab-pane" id="precio">
 							<div class="form-group col-xs-12">
 								<?= $this->Form->label('precio', 'Precio (obligatorio)'); ?>
 								<div class="input-group">
@@ -119,10 +118,14 @@
                                 </div>
 								
 							</div>
-						</div>
+						</div>-->
 						<div role="tabpanel" class="tab-pane" id="dimensiones">
+							<div class="alert alert-info" role="alert">
+					            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					            Debe agregar las dimensiones del producto embalado o en su caja, no las dimensiones del producto desembalado.
+					        </div>
 							<div class="form-group col-xs-12 col-sm-3">
-								<?= $this->Form->label('largo', 'Largo'); ?>
+								<?= $this->Form->label('largo', 'Largo (*)'); ?>
 								<div class="input-group">
                                     <?= $this->Form->input('largo', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
@@ -130,7 +133,7 @@
 								
 							</div>
 							<div class="form-group col-xs-12 col-sm-3">
-								<?= $this->Form->label('alto', 'Alto'); ?>
+								<?= $this->Form->label('alto', 'Alto (*)'); ?>
 								<div class="input-group">
                                     <?= $this->Form->input('alto', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
@@ -138,14 +141,14 @@
 								
 							</div>
 							<div class="form-group col-xs-12 col-sm-3">
-								<?= $this->Form->label('profundidad', 'Profundidad'); ?>
+								<?= $this->Form->label('profundidad', 'Profundidad (*)'); ?>
 								<div class="input-group">
                                     <?= $this->Form->input('profundidad', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">cm</span>
                                 </div>
 							</div>
 							<div class="form-group col-xs-12 col-sm-3">
-								<?= $this->Form->label('peso', 'Peso'); ?>
+								<?= $this->Form->label('peso', 'Peso (*)'); ?>
 								<div class="input-group">
                                     <?= $this->Form->input('peso', array('class' => 'mask_medida form-control', 'type' => 'text')); ?>
                                     <span class="input-group-addon">Kg</span>
@@ -154,11 +157,15 @@
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="caracteristicas">
+							<div class="alert alert-info" role="alert">
+					            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					            Las características del producto las encuentra en la ficha técnica del producto, ya sea, en catálogos, sitio web de la marca, etc.
+					        </div>
 							<div class="table">
 								<table class="table table.stripped">
 									<thead>
 										<th>Característica</th>
-										<th>Valor (obligatorio)</th>
+										<th>Valor (*)</th>
 									</thead>
 									<tbody class="js-add">
 										
@@ -166,19 +173,27 @@
 								</table>
 							</div>
 						</div>
-						<div role="tabpanel" class="tab-pane" id="proveedor">
+						<div role="tabpanel" class="tab-pane" id="fabricante">
 							<div class="form-group col-xs-12">
-								<?= $this->Form->label('proveedor_id', 'Proveedor'); ?>
-								<p>Seleccione a un proveedor de la lista (obligatorio)</p>
-								<?= $this->Form->input('proveedor_id'); ?>
+								<?= $this->Form->label('fabricante_id', 'Fabricante'); ?>
+								<p>Seleccione a un fabricante de la lista (*)</p>
+								<?= $this->Form->input('fabricante_id'); ?>
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="imagenes">
+							<div class="alert alert-info" role="alert">
+					            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					            Las medidas de las imágenes deben estar dentro de los siguientes rangos:
+					            <ul>
+					            	<li><b>Ancho:</b> mínimo <?= configuracion('imagen_ancho_min'); ?>px y máximo de <?= configuracion('imagen_ancho_max')?>px</li>
+					            	<li><b>Alto:</b> mínimo <?= configuracion('imagen_alto_min'); ?>px y máximo de <?= configuracion('imagen_alto_max')?>px</li>
+					            </ul>
+					        </div>
 							<div class="table-responsive">
 								<table class="table js-clon-scope">
 									<thead>
 										<tr>
-											<th>Imagen</th>
+											<th>Imagen (*)</th>
 											<th>Acciones</th>
 										</tr>
 									</thead>
@@ -200,7 +215,7 @@
 									</tbody>
 									<tfoot>
 										<tr>
-											<td colspan="2">&nbsp;</td>
+											<td colspan="1">&nbsp;</td>
 											<td><a href="#" class="btn btn-xs btn-success js-clon-agregar"><i class="fa fa-plus"></i> Agregar imagen</a></td>
 										</tr>
 									</tfoot>

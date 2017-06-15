@@ -66,6 +66,7 @@ class ProductosController extends AppController
 				'Proveedor',
 				'Fabricante',
 				'Imagen',
+				'Marca',
 				'Tarea',
 				'Grupocaracteristica'
 				)
@@ -306,6 +307,12 @@ class ProductosController extends AppController
 				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
 			}
 
+			# Validar tamaño de imagenes
+			if ( !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
+				$this->Session->setFlash(implode(' ', $this->Producto->validarTamanoImagenes($this->request->data)), null, array(), 'danger');
+				$this->redirect(array('action' => 'add', $this->request->data['Producto']['tarea_id']));
+			}
+
 			$this->Producto->create();
 			if ( $this->Producto->saveAll($this->request->data) )
 			{
@@ -321,7 +328,7 @@ class ProductosController extends AppController
 				$errores .= '</ul>';
 				
 				$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
-				$this->redirect(array('controller' => 'tareas', 'action' => 'add', $this->request->data['Producto']['tarea_id']));
+				$this->redirect(array('action' => 'add', $this->request->data['Producto']['tarea_id']));
 			}
 		}
 		
@@ -351,10 +358,11 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
+		$marcas = $this->Producto->Marca->find('list', array('conditions' => array('activo' => 1)));
 
 		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
-		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes'));
+		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes', 'marcas'));
 	}
 
 
@@ -395,6 +403,12 @@ class ProductosController extends AppController
 			# Limpiar imagenes vacias
 			$this->limpiarImagenes();
 
+			# Validar tamaño de imagenes
+			if ( !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
+				$this->Session->setFlash(implode(' ', $this->Producto->validarTamanoImagenes($this->request->data)), null, array(), 'danger');
+				$this->redirect(array('action' => 'edit', $id ,$this->request->data['Producto']['tarea_id']));
+			}
+
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
 				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
@@ -430,7 +444,8 @@ class ProductosController extends AppController
 				'Fabricante',
 				'Imagen',
 				'Tarea',
-				'Grupocaracteristica'
+				'Grupocaracteristica',
+				'Marca'
 				)
 			)
 		);
@@ -463,10 +478,11 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
+		$marcas = $this->Producto->Marca->find('list', array('conditions' => array('activo' => 1)));
 
 		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
-		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes'));
+		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes', 'marcas'));
 	}
 
 

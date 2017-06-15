@@ -147,18 +147,20 @@
                 			<thead>
                 				<th>Referencia</th>
                 				<th>Nombre</th>
-                				<th>Precio</th>
+                				<!--<th>Precio</th>-->
+                                <th>Marca</th>
                 				<th>Fabricante</th>
-                				<th>Proveedor</th>
+                				<!--<th>Proveedor</th>-->
                 				<th>Estado</th>
                 			</thead>
                 		<? foreach ($productos as $ix => $producto) : ?>
                 			<tr>
                 				<td><?=$producto['Producto']['referencia'];?></td>
                 				<td><?=$producto['Producto']['nombre_final'];?></td>
-                				<td><?=CakeNumber::currency($producto['Producto']['precio'], 'CLP');?></td>
-                				<td><?=$producto['Fabricante']['name'];?></td>
-                				<td><?=$producto['Proveedor']['name'];?></td>
+                				<!--<td><?=CakeNumber::currency($producto['Producto']['precio'], 'CLP');?></td>-->
+                				<td><?=$producto['Marca']['nombre'];?></td>
+                                <td><?=$producto['Fabricante']['name'];?></td>
+                				<!--<td><?=$producto['Proveedor']['name'];?></td>-->
                 				<td><?=$estado = ($producto['Producto']['aceptado']) ? _('Aceptado') : _('Rechazado') ; ?></td>
                 			</tr>
                 		<? endforeach?>

@@ -72,6 +72,7 @@ class AppController extends Controller
 			$this->Auth->authenticate['Form']['userModel']		= 'Administrador';
 			$this->Auth->authenticate['Form']['fields']['username'] = 'email';
 			$this->Auth->authenticate['Form']['fields']['password'] = 'clave';
+
 		}
 
 		/**
@@ -82,6 +83,7 @@ class AppController extends Controller
 			$this->layoutPath				= 'maintainers-backend';
 
 			AuthComponent::$sessionKey		= 'Auth.Mantenedor';
+
 			// Login action config
 			$this->Auth->loginAction['controller'] 	= 'usuarios';
 			$this->Auth->loginAction['action'] 		= 'login';
@@ -90,6 +92,8 @@ class AppController extends Controller
 			// Login redirect and logout redirect
 			$this->Auth->loginRedirect = '/maintainers/mis-tareas';
 			$this->Auth->logoutRedirect = '/maintainers/login';
+			$this->Auth->redirectUrl = '/maintainers/mis-tareas';
+
 
 			// Permitir a usuario no logeado ingresar a los métodos
 			// $this->Auth->allow('maintainers_registro', 'maintainers_recuperarclave');

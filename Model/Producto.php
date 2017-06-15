@@ -107,16 +107,16 @@ class Producto extends AppModel
                 'message' => 'La descripción corta debe tener un largo entre 50 y 800 carácteres.'
             )
 		),
-		'precio' => array(
-			'notBlank' => array(
-				'rule'			=> array('notBlank'),
+		/*'precio' => array(
+			'numeric' => array(
+				'rule'			=> array('numeric'),
 				'last'			=> true,
-				'message'		=> 'Campo precio es obligatorio.',
+				'message'		=> 'Precio debe contener solo números',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
-		),
+		),*/
 		'cantidad' => array(
 			'numeric' => array(
 				'rule'			=> array('numeric'),
@@ -211,6 +211,15 @@ class Producto extends AppModel
 		'Fabricante' => array(
 			'className'				=> 'Fabricante',
 			'foreignKey'			=> 'fabricante_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Grupocaracteristica')
+		),
+		'Marca' => array(
+			'className'				=> 'Marca',
+			'foreignKey'			=> 'marca_id',
 			'conditions'			=> '',
 			'fields'				=> '',
 			'order'					=> '',
@@ -322,6 +331,37 @@ class Producto extends AppModel
 
 		}
 		
+	}
+
+
+	public function validarTamanoImagenes($data = array())
+	{	
+		$errores = array();
+		# Procesamos imágenes
+		if (isset($data['Imagen']) && count($data['Imagen']) > 0 ) {
+			
+			# Verificamos que las medidas de la imagen esten dentro del rango configurado
+			foreach ($data['Imagen'] as $k => $imagen) {
+				if (isset($imagen['imagen'])) {
+					# Información de la imagen
+					list($ancho, $alto, $tipo, $atributos) = getimagesize($imagen['imagen']['tmp_name']);
+
+					# Verificamos que el tamaño esté dentro de la configuración
+					if ( $ancho < configuracion('imagen_ancho_min') 
+						|| $ancho > configuracion('imagen_ancho_max')
+						|| $alto < configuracion('imagen_alto_min')
+						|| $alto > configuracion('imagen_alto_max') ) {
+
+						$errores[$k] = 'La imagen ' . $imagen['imagen']['name'] . ' no tiene las dimensiones correctas. <br>';
+						$errores[$k] .= 'Dimensión de la imagen:';
+						$errores[$k] .= '<ul><li>Ancho: ' . $ancho . 'px</li><li>Alto: ' . $alto . 'px</li></ul><br/>';
+					}	
+				}
+			}
+
+		}
+
+		return $errores;
 	}
 
 	public function calcularPorcentajeTarea($cantPermitidos = 0, $cantProductos = 0) {

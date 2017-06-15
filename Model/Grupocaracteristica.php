@@ -163,6 +163,21 @@ class Grupocaracteristica extends AppModel
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Marca' => array(
+			'className'				=> 'Marca',
+			'joinTable'				=> 'grupocaracteristicas_marca',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'marca_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 

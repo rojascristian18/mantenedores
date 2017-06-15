@@ -531,6 +531,8 @@ jQuery(document).ready(function($)
     	$(document).ready(function(){
     		$('.string_nombre_final .nombre_preview').html($('.string_nombre').val());
 
+    		$('.string_nombre_final .referencia_preview').html($('.string_referencia').val());
+
     		var nombreGrupo = $('.string_grupo').find('option:selected').text();
     		if ($('.string_grupo').val() === '') {
     			nombreGrupo = '';
@@ -551,6 +553,12 @@ jQuery(document).ready(function($)
 
     	$('.string_nombre').on('keyup', function(event){
     		$('.string_nombre_final .nombre_preview').html($('.string_nombre').val());
+
+    		insertarNombreFinal();
+    	});
+
+    	$('.string_referencia').on('keyup', function(event){
+    		$('.string_nombre_final .referencia_preview').html($('.string_referencia').val());
 
     		insertarNombreFinal();
     	});

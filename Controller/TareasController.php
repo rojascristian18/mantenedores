@@ -370,7 +370,7 @@ class TareasController extends AppController
 					'Shop', 
 					'Grupocaracteristica', 
 					'Adjunto', 
-					'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'conditions' => array('Producto.activo' => 1)), 
+					'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'Marca', 'conditions' => array('Producto.activo' => 1)), 
 					'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 			));
 
@@ -453,7 +453,7 @@ class TareasController extends AppController
 
 		$this->request->data	= $this->Tarea->find('first', array(
 			'conditions'	=> array('Tarea.id' => $id),
-			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
+			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'Marca'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 		));
 
 		$importancias = ClassRegistry::init('Importancia')->find('list', array('conditions' => array('Importancia.activo' => 1)));
@@ -640,11 +640,11 @@ class TareasController extends AppController
 			return false;
 		}
 
-		$arrayFormato = array();
+		$_schemaExcel = array();
 
 		switch ($version) {
 			case '1.6.1.11':
-				$arrayFormato = array(
+				$_schemaExcel = array(
 					'ID' => '',
 					'Active (0/1)' => 0,
 					'Name *' => '',
@@ -703,7 +703,7 @@ class TareasController extends AppController
 					);
 				break;
 			case '1.6.0.8' :
-				$arrayFormato = array(
+				$_schemaExcel = array(
 					'ID' => '',
 					'Active (0/1)' => 0,
 					'Name *' => '',
@@ -763,7 +763,7 @@ class TareasController extends AppController
 			break;
 			
 			default:
-				$arrayFormato = array(
+				$_schemaExcel = array(
 					'ID' => '',
 					'Active (0/1)' => 0,
 					'Name *' => '',
@@ -823,7 +823,7 @@ class TareasController extends AppController
 			break;
 		}
 
-		return $arrayFormato;
+		return $_schemaExcel;
 	}
 
 
@@ -847,6 +847,7 @@ class TareasController extends AppController
 				'Producto' => array(
 					'Proveedor',
 					'Fabricante',
+					'Marca',
 					'Grupocaracteristica' => array(
 						'Palabraclave',
 						'Categoria'
@@ -1231,7 +1232,7 @@ class TareasController extends AppController
 
 			$this->request->data	= $this->Tarea->find('first', array(
 				'conditions'	=> array('Tarea.id' => $id),
-				'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
+				'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'Marca'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 			));
 
 			$importancias = ClassRegistry::init('Importancia')->find('list', array('conditions' => array('Importancia.activo' => 1)));
@@ -1264,7 +1265,7 @@ class TareasController extends AppController
 
 		$this->request->data	= $this->Tarea->find('first', array(
 			'conditions'	=> array('Tarea.id' => $id),
-			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
+			'contain' => array('Usuario', 'ImpuestoReglaGrupo', 'Idioma', 'Shop', 'Grupocaracteristica', 'Adjunto', 'Producto' => array('Fabricante', 'Proveedor', 'Grupocaracteristica', 'Marca'), 'Comentario' => array('Importancia', 'Usuario', 'Administrador'))
 		));
 
 		$importancias = ClassRegistry::init('Importancia')->find('list', array('conditions' => array('Importancia.activo' => 1)));

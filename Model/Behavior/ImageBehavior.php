@@ -85,7 +85,7 @@ class ImageBehavior extends ModelBehavior
 
 			$settings['fields'][$field]		= $conf;
 		}
-
+		
 		$this->settings[$model->name] = $settings;
 	}
 

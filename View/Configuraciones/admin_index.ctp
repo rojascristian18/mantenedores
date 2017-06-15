@@ -10,18 +10,15 @@
 				<div class="table-responsive">
 					<table class="table">
 						<tr>
+							<th colspan="2"><h5>Configuraciones de notificación</h5></th>
+						</tr>
+						<tr>
 							<th style="max-width:300px;"><label>Comenzar a notificar al mantenedor antes que su tarea finalice en :</label></th>
 							<td>
 								<div class="input-group">
 	                                <?= $this->Form->input('dias_notificar_tareas'); ?>
 	                                <span class="input-group-addon">Días</span>
 	                            </div>
-							</td>
-							</tr>
-						<tr>
-							<th style="max-width:300px;"><label>Stock inicial para todos los excel de productos :</label></th>
-							<td>
-								<?= $this->Form->input('stock_minimo'); ?>
 							</td>
 						</tr>
 						<tr>
@@ -31,6 +28,31 @@
 						<tr>
 							<th style="max-width:300px;"><label>Email cópia oculta de los comentarios <small>(Separadas por coma ',')</small>:</label></th>
 							<td><?= $this->Form->input('bcc_comentarios'); ?></td>
+						</tr>
+						<tr>
+							<th colspan="2"><h5>Configuraciones de productos</h5></th>
+						</tr>
+						<tr>
+							<th style="max-width:300px;"><label>Stock inicial para los productos :</label></th>
+							<td>
+								<?= $this->Form->input('stock_minimo'); ?>
+							</td>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('imagen_ancho_min',_('Ancho mínimo de la imagen de los productos (pixeles)'));?></th>
+							<td><?= $this->Form->input('imagen_ancho_min'); ?></td>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('imagen_ancho_max',_('Ancho máximo de la imagen de los productos (pixeles)'));?></th>
+							<td><?= $this->Form->input('imagen_ancho_max'); ?></td>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('imagen_alto_min',_('Alto mínimo de la imagen de los productos (pixeles)'));?></th>
+							<td><?= $this->Form->input('imagen_alto_min'); ?></td>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('imagen_alto_max',_('Alto máximo de la imagen de los productos (pixeles)'));?></th>
+							<td><?= $this->Form->input('imagen_alto_max'); ?></td>
 						</tr>
 					</table>
 				</div>

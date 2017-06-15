@@ -42,13 +42,18 @@ class AdministradoresController extends AppController
 
 					# Elimina la sesión de google
 					$this->Session->delete('Google.token');
+
 					# Eliminamos la sesión tienda
 					$this->Session->delete('Tienda');
+					
 					# Deslogeamos
 					$this->admin_logout();
+
 				}else {
+
 					$this->Session->setFlash('Su tienda principal es ' . $tiendaPrincipal['Tienda']['nombre'], null, array(), 'success');
 					$this->Session->write('Tienda', $tiendaPrincipal['Tienda']);
+
 				}
 
 
@@ -58,8 +63,10 @@ class AdministradoresController extends AppController
 				$administrador			= $this->Administrador->find('first', array(
 					'conditions'			=> array('Administrador.email' => $this->request->data['Administrador']['email'])
 				));
+
 				$this->Administrador->id = $administrador['Administrador']['id'];
 				$this->Administrador->saveField('ultimo_acceso', date('Y-m-d H:i:s'));
+				$this->Auth->redirectUrl = '/admin';
 				$this->redirect($this->Auth->redirectUrl());
 			}
 			else

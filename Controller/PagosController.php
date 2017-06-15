@@ -115,7 +115,7 @@ class PagosController extends AppController
 				'Producto.usuario_id' => $pago['Pago']['usuario_id'],
 				'Producto.tarea_id' => $pago['Pago']['tarea_id']
 				),
-			'contain' => array('Fabricante', 'Proveedor')
+			'contain' => array('Fabricante', 'Proveedor', 'Marca')
 			));
 		
 		$this->set(compact('pago', 'productos'));
@@ -171,7 +171,7 @@ class PagosController extends AppController
 				'Producto.usuario_id' => $pago['Pago']['usuario_id'],
 				'Producto.tarea_id' => $pago['Pago']['tarea_id']
 				),
-			'contain' => array('Fabricante', 'Proveedor')
+			'contain' => array('Fabricante', 'Proveedor', 'Marca')
 			));
 
 		$this->set(compact('pago', 'productos'));

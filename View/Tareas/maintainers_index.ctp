@@ -188,6 +188,9 @@
 										<? if ($tarea['Tarea']['iniciado'] && $tarea['Tarea']['rechazado'] ) : ?>
 											<?= $this->Html->link('<i class="fa fa-play"></i> Volver a trabajar', array('action' => 'work', $tarea['Tarea']['id']), array('class' => 'btn btn-success btn-xs', 'rel' => 'tooltip', 'title' => 'Trabajar en esta tarea', 'escape' => false)); ?>
 										<? endif;?>
+										<? if ($tarea['Tarea']['finalizado'] ) : ?>
+											<?= $this->Html->link('<i class="fa fa-eye"></i> Ver', array('action' => 'view', $tarea['Tarea']['id']), array('class' => 'btn btn-success btn-xs', 'rel' => 'tooltip', 'title' => 'Trabajar en esta tarea', 'escape' => false)); ?>
+										<? endif;?>
 									</td>
 								</tr>
 								<?php endforeach; ?>
