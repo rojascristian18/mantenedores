@@ -2,7 +2,7 @@
 	<li class="xn-icon-button">
 		<a href="#" class="x-navigation-minimize"><span class="fa fa-dedent"></span></a>
 	</li>
-	<li class="xn-search">
+	<li class="xn-search hide">
     <?= $this->Form->create('Tienda', array('class' => 'form-inline', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 	    <div class="form-group">
 	    	<?= $this->Form->select('tienda', $tiendasList, array('class' => 'form-control js-tienda', 'empty' => false)); ?>

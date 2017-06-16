@@ -20,10 +20,10 @@ class AppController extends Controller
 			)
 		),
 		'Google'		=> array(
-			'applicationName'		=> 'Newsletter Nodriza',
+			'applicationName'		=> 'Nodriza',
 			'developerKey'			=> 'cristian.rojas@nodriza.cl',
-			'clientId'				=> '1376469050-ckai861jm571qcguj2ohgepgb605uu2l.apps.googleusercontent.com',
-			'clientSecret'			=> 'Kfmh_BoEMaD6nbMHSfA8CEyW',
+			'clientId'				=> '1376469050-578ce8n9fd7sgu3iq5nvod8q5iqa9jan.apps.googleusercontent.com',
+			'clientSecret'			=> 'gkd8jEpmxF9s3qsZRgU1y1mu',
 			//'redirectUri'			=> Router::url(array('controller' => 'administradores', 'action' => 'google', 'admin' => false), true)),
 			'approvalPrompt'		=> 'auto',
 			'accessType'			=> null,//'offline',
@@ -72,6 +72,27 @@ class AppController extends Controller
 			$this->Auth->authenticate['Form']['userModel']		= 'Administrador';
 			$this->Auth->authenticate['Form']['fields']['username'] = 'email';
 			$this->Auth->authenticate['Form']['fields']['password'] = 'clave';
+
+
+			/**
+			 * OAuth Google
+			 */
+			$this->Google->cliente->setRedirectUri(Router::url(array('controller' => 'administradores', 'action' => 'login'), true));
+			$this->Google->oauth();
+
+			if ( ! empty($this->request->query['code']) && $this->Session->read('Google.code') != $this->request->query['code'] )
+			{
+				$this->Google->oauth->authenticate($this->request->query['code']);
+				$this->Session->write('Google', array(
+					'code'		=> $this->request->query['code'],
+					'token'		=> $this->Google->oauth->getAccessToken()
+				));
+			}
+
+			if ( $this->Session->check('Google.token') )
+			{
+				$this->Google->cliente->setAccessToken($this->Session->read('Google.token'));
+			}
 
 		}
 

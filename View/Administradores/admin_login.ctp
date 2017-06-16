@@ -20,6 +20,16 @@
 					<button type="submit" class="btn btn-info btn-block">Entrar</button>
 				</div>
 			</div>
+			<div class="login-or">O</div>
+			<div class="form-group">
+				<div class="login-title text-center">
+					<?= $this->Html->link(
+						$this->Html->image('/backend/img/login_google.png'),
+						$authUrl,
+						array('escape' => false)
+					); ?>
+				</div>
+			</div>
 		<?= $this->Form->end(); ?>
 	</div>
 	<div class="login-footer">

@@ -2,7 +2,7 @@
 App::uses('AppController', 'Controller');
 class AdministradoresController extends AppController
 {
-	public function crear()
+	/*public function crear()
 	{
 		$administrador		= array(
 			'nombre'			=> 'Desarrollo Nodriza Spa',
@@ -18,7 +18,7 @@ class AdministradoresController extends AppController
 			prx($this->Administrador->validationErrors);
 		}
 		
-	}
+	}*/
 
 	public function admin_login()
 	{
@@ -61,8 +61,24 @@ class AdministradoresController extends AppController
 				 * Verificamos que exista el usuario en la DB y esté activo
 				 */
 				$administrador			= $this->Administrador->find('first', array(
-					'conditions'			=> array('Administrador.email' => $this->request->data['Administrador']['email'])
+					'conditions'			=> array(
+						'Administrador.email' => $this->request->data['Administrador']['email'],
+						'Administrador.activo' => 1)
 				));
+
+				if (empty($administrador)) {
+					# Enviamos mensaje de porque la redirección
+					$this->Session->setFlash('Su cuenta ha sido desactivada.', null, array(), 'danger');
+
+					# Elimina la sesión de google
+					$this->Session->delete('Google.token');
+
+					# Eliminamos la sesión tienda
+					$this->Session->delete('Tienda');
+					
+					# Deslogeamos
+					$this->admin_logout();
+				}
 
 				$this->Administrador->id = $administrador['Administrador']['id'];
 				$this->Administrador->saveField('ultimo_acceso', date('Y-m-d H:i:s'));
@@ -71,7 +87,7 @@ class AdministradoresController extends AppController
 			}
 			else
 			{
-				$this->Session->setFlash('Nombre de usuario y/o clave incorrectos.', null, array(), 'danger');
+				$this->Session->setFlash('Nombre de usuario y/o contraseña incorrectos.', null, array(), 'danger');
 			}
 		}
 
@@ -85,7 +101,7 @@ class AdministradoresController extends AppController
 			 */
 			if ( $this->Auth->user() )
 			{
-				$this->redirect('/');
+				$this->redirect('/admin');
 			}
 
 			/**
@@ -129,7 +145,9 @@ class AdministradoresController extends AppController
 					 * Verificamos que exista el usuario en la DB y esté activo
 					 */
 					$administrador			= $this->Administrador->find('first', array(
-						'conditions'			=> array('Administrador.email' => $emails[0]->value)
+						'conditions'			=> array(
+							'Administrador.email' => $emails[0]->value,
+							'Administrador.activo' => 1)
 					));
 
 					if ( ! $administrador || ! $administrador['Administrador']['activo'] )
@@ -188,7 +206,8 @@ class AdministradoresController extends AppController
 						 * Logea al usuario y lo redirecciona
 						 */
 						$this->Auth->login($administrador);
-						$this->Administrador->id = $administrador['Administrador']['id'];
+						$this->Administrador->id = $administrador['id'];
+						
 						$this->Administrador->saveField('ultimo_acceso', date('Y-m-d H:i:s'));
 						$this->redirect($this->Auth->redirectUrl());
 					}
