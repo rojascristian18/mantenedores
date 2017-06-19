@@ -2,21 +2,21 @@
 <div class="page-title">                    
     <h2><span class="fa fa-cogs"></span> Mi Perfil</h2>
 </div>
-<? if ( empty($cuenta) ) : ?>
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="alert alert-danger">
-                <a class="close" data-dismiss="alert">&times;</a>
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;&nbsp;Para recibir pagos usted debe agregar una cuenta bancaria en su perfil. 
-            </div>
-        </div>
-    </div>
-    <? endif; ?>
 <!-- END PAGE TITLE -->                     
 <?= $this->Form->create('Usuario', array('class' => 'form-horizontal validate', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
 <?= $this->Form->input('id');?>
 <!-- PAGE CONTENT WRAPPER -->
 <div class="page-content-wrap">
+    <? if ( empty($cuenta) ) : ?>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="alert alert-danger">
+                    <a class="close" data-dismiss="alert">&times;</a>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;&nbsp;Para recibir pagos usted debe agregar una cuenta bancaria en su perfil. 
+                </div>
+            </div>
+        </div>
+    <? endif; ?>
     <div class="row">                        
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="panel panel-default">                                
@@ -30,10 +30,7 @@
                 <div class="panel-body form-group-separated">
                     <div class="form-group">
                             <div class="col-md-12">
-                                <a class="file-input-wrapper btn btn-default  fileinput btn-info btn-block">
-                                    <span>Elije una nueva foto <small>(max 1MB)</small></span>
-                                    <?= $this->Form->input('imagen', array('class' => 'fileinput btn-info', 'data-filename-placement' => 'inside', 'type' => 'file')); ?>
-                                </a>
+                                <?= $this->Form->input('imagen', array('class' => 'fileinput btn-info btn-block', 'data-filename-placement' => 'inside', 'type' => 'file', 'title' => 'Elija una foto (max 2 MB)')); ?>
                             </div>                            
                     </div>
                     <div class="form-group">
