@@ -68,8 +68,8 @@ class PalabraclavesController extends AppController
 			}
 		}
 		$productos	= $this->Palabraclave->Producto->find('list');
-		$tareas	= $this->Palabraclave->Tarea->find('list');
-		$this->set(compact('productos', 'tareas'));
+		//$tareas	= $this->Palabraclave->Tarea->find('list');
+		$this->set(compact('productos'));
 	}
 
 	public function admin_edit($id = null)
@@ -99,8 +99,8 @@ class PalabraclavesController extends AppController
 			));
 		}
 		$productos	= $this->Palabraclave->Producto->find('list');
-		$tareas	= $this->Palabraclave->Tarea->find('list');
-		$this->set(compact('productos', 'tareas'));
+		#$tareas	= $this->Palabraclave->Tarea->find('list');
+		$this->set(compact('productos'));
 	}
 
 	public function admin_delete($id = null)
