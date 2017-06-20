@@ -21,10 +21,10 @@
 				<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" class="active"><a href="#informacion" aria-controls="informacion" role="tab" data-toggle="tab"><i class="fa fa-info"></i> Información</a></li>
-						<li role="presentation"><a href="#precio" aria-controls="precio" role="tab" data-toggle="tab"><i class="fa fa-dollar"></i> Precio</a></li>
+						
 						<li role="presentation"><a href="#dimensiones" aria-controls="dimensiones" role="tab" data-toggle="tab"><i class="fa fa-crop"></i> Dimensiones</a></li>
 						<li role="presentation"><a href="#caracteristicas" aria-controls="caracteristicas" role="tab" data-toggle="tab"><i class="fa fa-object-group"></i> Características</a></li>
-						<li role="presentation"><a href="#proveedor" aria-controls="proveedor" role="tab" data-toggle="tab"><i class="fa fa-truck"></i> Proveedor</a></li>
+						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante</a></li>
 						<li role="presentation"><a href="#imagenes" aria-controls="imagenes" role="tab" data-toggle="tab"><i class="fa fa-picture-o"></i> Imágenes</a></li>
 					</ul>
 
@@ -43,7 +43,7 @@
 									</tr>
 									<tr>
 										<td><b><?= __('Marca seleccionada'); ?></b></td>
-										<td><?= $this->request->data['Fabricante']['name']; ?></td>
+										<td><?= $this->request->data['Marca']['nombre']; ?></td>
 									</tr>
 									<tr>
 										<td><b><?= __('Nombre final compuesto'); ?></b></td>
@@ -116,10 +116,10 @@
 								</table>
 							</div>
 						</div>
-						<div role="tabpanel" class="tab-pane" id="proveedor">
+						<div role="tabpanel" class="tab-pane" id="fabricante">
 							<div class="form-group col-xs-12">
-								<label class="btn-block"><?= __('Proveedor'); ?></label>
-								<?=$this->request->data['Proveedor']['name'];?>
+								<label class="btn-block"><?= __('Fabricante'); ?></label>
+								<?=$this->request->data['Fabricante']['name'];?>
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="imagenes">

@@ -5,7 +5,10 @@ class MarcasController extends AppController
 	public function admin_index()
 	{
 		$this->paginate		= array(
-			'recursive'			=> 0
+			'recursive'			=> 0,
+			'conditions' => array(
+				'Marca.tienda_id' => $this->Session->read('Tienda.id')
+				)
 		);
 		$marcas	= $this->paginate();
 		$this->set(compact('marcas'));

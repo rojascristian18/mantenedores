@@ -44,15 +44,38 @@
 			</div>
 		<? endif; ?>
 	</div>
+	<? if ($permisos['agregar']): ?>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-plus" aria-hidden="true"></i> Agregar nuevo</h3>
+				</div>
+				<div class="panel-body">
+					<?= $this->Form->create('Palabraclave', array('action' => 'add'), array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+					<div class="col-sm-8 col-xs-12">
+						<div class="form-group">
+							<?= $this->Form->label('nombre', 'Nombre'); ?>
+							<?= $this->Form->input('nombre', array('class' => 'form-control', 'div' => false, 'label' => false)); ?>
+						</div>
+					</div>
+					<div class="col-sm-4 col-xs-12">
+						<div class="form-group">
+							<?= $this->Form->button('<i class="fa fa-plus" aria-hidden="true"></i> Agregar', array('type' => 'submit', 'escape' => false, 'class' => 'btn btn-buscar btn-success btn-block')); ?>
+						</div>
+					</div>
+					<?= $this->Form->end(); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<? endif;?>
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Listado de Palabras claves</h3>
 					<div class="btn-group pull-right">
-					<? if ($permisos['agregar']): ?>
-						<?= $this->Html->link('<i class="fa fa-plus"></i> Nueva Palabra clave', array('action' => 'add'), array('class' => 'btn btn-success', 'escape' => false)); ?>
-					<? endif;?>
 					<? if ($permisos['exportar']): ?>
 						<?= $this->Html->link('<i class="fa fa-file-excel-o"></i> Exportar a Excel', array('action' => 'exportar'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
 					<? endif; ?>

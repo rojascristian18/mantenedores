@@ -135,6 +135,19 @@ class Tienda extends AppModel
 			'exclusive'				=> '',
 			'finderQuery'			=> '',
 			'counterQuery'			=> ''
+		),
+		'Marca' => array(
+			'className'				=> 'Marca',
+			'foreignKey'			=> 'tienda_id',
+			'dependent'				=> false,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'exclusive'				=> '',
+			'finderQuery'			=> '',
+			'counterQuery'			=> ''
 		)
 	);
 }

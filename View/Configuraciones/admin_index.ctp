@@ -54,6 +54,11 @@
 							<th><?= $this->Form->label('imagen_alto_max',_('Alto máximo de la imagen de los productos (pixeles)'));?></th>
 							<td><?= $this->Form->input('imagen_alto_max'); ?></td>
 						</tr>
+						<tr>
+							<th><?= $this->Form->label('imagen_peso',_('Peso máximo de la imagen (MB)'));?></th>
+							<td><div class="input-group"><?= $this->Form->input('imagen_peso'); ?><span class="input-group-addon">Megabyte</span>
+	                            </div></td>
+						</tr>
 					</table>
 				</div>
 			</div>

@@ -166,6 +166,8 @@
 									<thead>
 										<th>Característica</th>
 										<th>Valor (*)</th>
+										<th>Unidad de medida</th>
+										<th>Ejemplo</th>
 									</thead>
 									<tbody class="js-add">
 										
@@ -183,6 +185,7 @@
 						<div role="tabpanel" class="tab-pane" id="imagenes">
 							<div class="alert alert-info" role="alert">
 					            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					            El peso máximo de la imagen debe ser de <?= configuracion('imagen_peso'); ?> MB.<br>
 					            Las medidas de las imágenes deben estar dentro de los siguientes rangos:
 					            <ul>
 					            	<li><b>Ancho:</b> mínimo <?= configuracion('imagen_ancho_min'); ?>px y máximo de <?= configuracion('imagen_ancho_max')?>px</li>

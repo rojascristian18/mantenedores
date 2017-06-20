@@ -116,6 +116,22 @@ class Grupocaracteristica extends AppModel
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
 		),
+		'UnidadMedida' => array(
+			'className'				=> 'UnidadMedida',
+			'joinTable'				=> 'grupocaracteristicas_especificaciones',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'unidad_medida_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaEspecificacion',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
+		),
 		'Categoria' => array(
 			'className'				=> 'Categoria',
 			'joinTable'				=> 'grupocaracteristicas_categorias',
@@ -160,21 +176,6 @@ class Grupocaracteristica extends AppModel
 			'limit'					=> '',
 			'offset'				=> '',
 			'with'					=> 'GrupocaracteristicaTarea',
-			'finderQuery'			=> '',
-			'deleteQuery'			=> '',
-			'insertQuery'			=> ''
-		),
-		'Marca' => array(
-			'className'				=> 'Marca',
-			'joinTable'				=> 'grupocaracteristicas_marca',
-			'foreignKey'			=> 'grupocaracteristica_id',
-			'associationForeignKey'	=> 'marca_id',
-			'unique'				=> true,
-			'conditions'			=> '',
-			'fields'				=> '',
-			'order'					=> '',
-			'limit'					=> '',
-			'offset'				=> '',
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''

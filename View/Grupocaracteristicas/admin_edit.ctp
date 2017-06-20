@@ -61,13 +61,21 @@
 							<thead>
 								<th>Id</th>
 								<th>Características</th>
+								<th>Unidad de medida</th>
 								<th>Acción</th>
 							</thead>
 							<tbody>
 							<? foreach ($this->request->data['Especificacion'] as $indice => $atributo) : ?>
 								<tr>
-									<td><?= $this->Form->input(sprintf('Especificacion.%d.id_feature', $atributo['Especificacion']['id_feature']), array('type' => 'hidden', 'value' => $atributo['Especificacion']['id_feature'])); echo $atributo['Especificacion']['id_feature']; ?></td>
+									<td><?= $this->Form->input(sprintf('Especificacion.%d.id_feature', $indice), array('type' => 'hidden', 'value' => $atributo['Especificacion']['id_feature'])); echo $atributo['Especificacion']['id_feature']; ?></td>
 									<td><?= $atributo['Idioma'][0]['EspecificacionIdioma']['name']; ?></td>
+									<td>
+									<? if (!empty($atributo['UnidadMedida'])) : ?>
+										<?= $this->Form->select(sprintf('Especificacion.%d.unidad_medida_id', $indice), $atributo['UnidadMedidaLista'], array('class' => 'form-control', 'value' => $atributo['UnidadMedida'][0]['id'], 'empty' => 'Texto libre')); ?>
+									<? else : ?>
+										<?= $this->Form->select(sprintf('Especificacion.%d.unidad_medida_id', $indice), $atributo['UnidadMedidaLista'], array('class' => 'form-control', 'empty' => 'Texto libre')); ?>
+									<? endif; ?>
+									</td>
 									<td><button class="quitar btn btn-danger">Quitar</button></td>
 								</tr>
 							<? endforeach; ?>

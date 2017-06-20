@@ -60,6 +60,7 @@
 							<thead>
 								<th>Id</th>
 								<th>Características</th>
+								<th>Undad de medida</th>
 								<th>Acción</th>
 							</thead>
 							<tbody>

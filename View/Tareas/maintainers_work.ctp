@@ -222,7 +222,7 @@
 									<td class="<?= $aceptado = ($producto['aceptado']) ? 'aceptado' : 'rechazado' ; ?>"><?= $estado = ($producto['aceptado'] ? '<i class="fa fa-check"></i>' : '<i class="fa fa-remove"></i>'); ?>&nbsp;</td>
 									<td><?= $referencia = (!empty($producto['referencia'])) ? $producto['referencia'] : 'No agregado' ; ?></td>
 									<td><?= $nombre = (!empty($producto['nombre_final'])) ? $producto['nombre_final'] : 'No agregado' ; ?></td>
-									<td><?= $precio = (!empty($producto['precio'])) ? CakeNumber::currency($producto['precio'], 'CLP') : 'No agregado' ; ?></td>
+									<!--<td><?= $precio = (!empty($producto['precio'])) ? CakeNumber::currency($producto['precio'], 'CLP') : 'No agregado' ; ?></td>-->
 									<td><?= $grupo = (!empty($producto['grupocaracteristica_id'])) ? $producto['Grupocaracteristica']['nombre'] : 'No agregado' ; ?></td>
 									<!--<td><?= $proveedor = (!empty($producto['proveedor_id'])) ? $producto['Proveedor']['name'] : 'No agregado' ; ?></td>-->
 									<td><?= $marca = (!empty($producto['marca_id'])) ? $producto['Marca']['nombre'] : 'No agregado' ; ?></td>

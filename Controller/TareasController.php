@@ -850,7 +850,8 @@ class TareasController extends AppController
 					'Marca',
 					'Grupocaracteristica' => array(
 						'Palabraclave',
-						'Categoria'
+						'Categoria',
+						'UnidadMedida'
 						),
 					'Especificacion' => array(
 						'Idioma'
@@ -864,7 +865,7 @@ class TareasController extends AppController
 				'Shop'
 				)
 		));
-
+		
 		/**
 		* Para armar el excell necesitamos
 		* Nombre
@@ -1001,7 +1002,14 @@ class TareasController extends AppController
 				foreach ($producto['Especificacion'] as $ix => $especificacion) {
 					foreach ($especificacion['Idioma'] as $ln => $idioma) {
 						if ($idioma['id_lang'] == $datos['Tarea']['idioma_id'] && !empty($especificacion['EspecificacionesProducto']['valor'])) {
-							$especificaciones[$ix] = sprintf('%s:%s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $especificacion['EspecificacionesProducto']['id']);		
+
+							if ( isset($producto['Grupocaracteristica']['UnidadMedida'][0]) 
+							&& $producto['Grupocaracteristica']['id'] == $producto['Grupocaracteristica']['UnidadMedida'][0]['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] 
+							&&  $especificacion['id_feature'] == $producto['Grupocaracteristica']['UnidadMedida'][0]['GrupocaracteristicaEspecificacion']['id_feature']) {
+								$especificaciones[$ix] = sprintf('%s:%s %s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $producto['Grupocaracteristica']['UnidadMedida'][0]['nombre'], $especificacion['EspecificacionesProducto']['id']);	
+							}else{
+								$especificaciones[$ix] = sprintf('%s:%s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $especificacion['EspecificacionesProducto']['id']);
+							}		
 						}else{
 							$this->Session->setFlash('Error al generar el excel. La tarea no tiene configurado el idioma o existe un problema de idiomas en el comercio.', null, array(), 'danger');
 							$this->redirect(array('action' => 'view', $id));
@@ -1018,7 +1026,7 @@ class TareasController extends AppController
 			if ( isset($datos['Tarea']['shop_id']) ) {
 				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('ID / Name of shop' => $datos['Tarea']['shop_id'] ));
 			}
-
+			
 		}
 		
 		$campos			= array_keys($this->getExcelExportFormat($this->request->data['Tarea']['version']));

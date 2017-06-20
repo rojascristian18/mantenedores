@@ -76,4 +76,25 @@ class Marca extends AppModel
 			'counterQuery'			=> ''
 		)
 	);
+
+	public $belongsTo = array(
+		'Tienda' => array(
+			'className'				=> 'Tienda',
+			'foreignKey'			=> 'tienda_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Modulo')
+		)
+	);
+
+
+	public function beforeSave( $options = array() ) {
+		if ( SessionComponent::check('Tienda') ) {
+			$this->data[$this->alias]['tienda_id'] = SessionComponent::read('Tienda.id');
+		}else{
+			return false;
+		}
+	}
 }

@@ -72,6 +72,22 @@ Class Especificacion extends AppModel {
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
 		),
+		'UnidadMedida' => array(
+			'className'				=> 'UnidadMedida',
+			'joinTable'				=> 'grupocaracteristicas_especificaciones',
+			'foreignKey'			=> 'id_feature',
+			'associationForeignKey'	=> 'unidad_medida_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaEspecificacion',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
+		),
 		'Producto' => array(
 			'className'				=> 'Producto',
 			'joinTable'				=> 'especificaciones_productos',

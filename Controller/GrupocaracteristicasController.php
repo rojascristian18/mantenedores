@@ -28,7 +28,7 @@ class GrupocaracteristicasController extends AppController
 			if ( empty($this->request->data['Palabraclave'])) {
 				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
 			}
-
+			
 			$this->Grupocaracteristica->create();
 			if ( $this->Grupocaracteristica->save($this->request->data) )
 			{
@@ -129,7 +129,7 @@ class GrupocaracteristicasController extends AppController
 				'conditions' => array(
 					'GrupocaracteristicaEspecificacion.grupocaracteristica_id' => $id
 					),
-				'fields' => array('id_feature')
+				'fields' => array('id_feature', 'unidad_medida_id')
 				));
 
 			# Declaramos el indice Especificacion como un arreglo vacio
@@ -146,7 +146,8 @@ class GrupocaracteristicasController extends AppController
 				);
 
 				$options['contain'] = array(
-					'Idioma'
+					'Idioma',
+					'UnidadMedida'
 				);
 
 				if ( count($listaIdCaracteristicas) == 1 ) {
@@ -157,11 +158,22 @@ class GrupocaracteristicasController extends AppController
 
 
 				$caracteristicasGrupo = $this->Grupocaracteristica->Especificacion->find('all', $options);
-				
+
+				$medidas = $this->Grupocaracteristica->UnidadMedida->find('list', array(
+					'conditions' => array(
+						'UnidadMedida.activo' => 1
+						)
+					));
+
+				if (!empty($medidas)) {
+					foreach ($caracteristicasGrupo as $key => $value) {
+						$caracteristicasGrupo[$key]['UnidadMedidaLista'] = $medidas;	
+					}
+				}
+
 				$this->request->data['Especificacion'] = $caracteristicasGrupo;
 
 			}
-
 
 			# Buscamos las categorias del grupo
 			# Se obtiene el listado de categorias que tiene este registro
@@ -194,7 +206,6 @@ class GrupocaracteristicasController extends AppController
 						'Categoria.id_category' => $listaIdCategorias
 						);
 				}
-
 
 				$categoriasGrupo = $this->Grupocaracteristica->Categoria->find('all', $optionsCat);
 				
@@ -321,7 +332,8 @@ class GrupocaracteristicasController extends AppController
 				'GrupocaracteristicaEspecificacion.grupocaracteristica_id' => $idGrupo
 				),
 			'fields' => array(
-				'GrupocaracteristicaEspecificacion.id_feature'
+				'GrupocaracteristicaEspecificacion.id_feature',
+				'GrupocaracteristicaEspecificacion.unidad_medida_id'
 				)
 			));
 
@@ -331,6 +343,11 @@ class GrupocaracteristicasController extends AppController
 				'EspecificacionIdioma.name LIKE "%' . $palabra . '%"',
 				'EspecificacionIdioma.id_feature LIKE "%' . $palabra . '%"' 
 				)
+			);
+
+		# Conditciones para las unidades de medidas
+		$optionsMedidas['conditions'] = array(
+			'UnidadMedida.activo' => 1
 			);
 
 		# Consulta con grupo de características definido
@@ -348,9 +365,32 @@ class GrupocaracteristicasController extends AppController
 
 		# Buscamos los atributos que no este asociados a este grupo
 		$atributos  = $this->Grupocaracteristica->Especificacion->EspecificacionIdioma->find('all', $options);
-		
+
+		# Unidades de medias
+		$unidades = $this->Grupocaracteristica->UnidadMedida->find('all', $optionsMedidas);
+
 		$arrayAtributos = array();
-		
+
+		# Creamos el selector de medidas
+		$selectorOpciones = '';
+
+		if ( !empty($unidades) ) {
+			foreach ($unidades as $index => $medida) {
+				if (in_array($medida['UnidadMedida']['id'], Hash::extract($caracteristicasDelGrupo, '{n}.GrupocaracteristicaEspecificacion.unidad_medida_id'))) {
+					foreach ($caracteristicasDelGrupo as $k => $caracteristica) {
+						if ( ! empty($caracteristica['GrupocaracteristicaEspecificacion']['unidad_medida_id'])) {
+		    				if ( $medida['UnidadMedida']['id'] == $caracteristica['GrupocaracteristicaEspecificacion']['unidad_medida_id'] 
+		    					&& $caracteristica['GrupocaracteristicaEspecificacion']['id_feature'] == $caracteristica['GrupocaracteristicaEspecificacion']['id_feature']) {
+		    					$selectorOpciones .= '<option value="' . $medida['UnidadMedida']['id'] . '" selected>' . $medida['UnidadMedida']['nombre'] . '</option>';
+		    				}	
+		    			}
+					}	
+				}else{
+					$selectorOpciones .= '<option value="' . $medida['UnidadMedida']['id'] . '">' . $medida['UnidadMedida']['nombre'] . '</option>';	
+				}			
+			}
+		}
+
 		# Creamos la lista de atributos
 		foreach ($atributos as $indice => $valor) {
 
@@ -361,16 +401,22 @@ class GrupocaracteristicasController extends AppController
 			$tabla = '<tr>';
 	    	$tabla .= '<td><input type="hidden" name="data[Especificacion][[*ID*]][id_feature]" value="[*ID*]" class="js-input-id_feature">[*ID*]</td>';
 	    	$tabla .= '<td>[*NOMBRE*]</td>';
+		    $tabla .= '<td><select name="data[Especificacion][[*ID*]][unidad_medida_id]" class="form-control">';
+		    $tabla .= '<option value="">Text libre</option>';
+		    $tabla .= '[*OPCIONES*]';
+		    $tabla .= '</select></td>';
+
+
 	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
 	    	$tabla .= '</tr>';
 
 	    	// Armamos la tabla
 			$tabla = str_replace('[*ID*]', $valor['EspecificacionIdioma']['id_feature'] , $tabla);
 			$tabla = str_replace('[*NOMBRE*]', $valor['EspecificacionIdioma']['name'] , $tabla);
-
+			$tabla = str_replace('[*OPCIONES*]', $selectorOpciones, $tabla);
 			$arrayAtributos[$indice]['todo'] = $tabla;
 		}
-
+		
 		echo json_encode($arrayAtributos);
 		exit;
 

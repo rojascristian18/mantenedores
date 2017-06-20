@@ -295,7 +295,7 @@ class Producto extends AppModel
 		if ( ! empty($this->data[$this->alias]['nombre']) && ! empty($this->data[$this->alias]['grupocaracteristica_id']) && ! empty($this->data[$this->alias]['fabricante_id']) ) {
 
 			# Slug
-			$this->data[$this->alias]['slug'] = Inflector::slug(strtolower($this->data[$this->alias]['nombre_final']));
+			$this->data[$this->alias]['slug'] = strtolower(Inflector::slug($this->data[$this->alias]['nombre_final'], '-'));
 
 			# cantidad de productos default
 			$this->data[$this->alias]['cantidad'] = configuracion('stock_minimo');
@@ -304,9 +304,9 @@ class Producto extends AppModel
 			$this->data[$this->alias]['meta_titulo'] = $this->data[$this->alias]['nombre_final'];
 
 			# meta descripción
-			$this->data[$this->alias]['meta_descripcion'] = CakeText::truncate($this->data[$this->alias]['descripcion_corta'], 155);
+			$this->data[$this->alias]['meta_descripcion'] = CakeText::truncate($this->data[$this->alias]['descripcion_corta'], 165);
 		}
-
+		
 		# Comrpobamos que no se ingresen más productos de los permitidos en la tarea
 		if ( !empty($this->data[$this->alias]['tarea_id']) ) {
 			$cantPermitida = ClassRegistry::init('Tarea')->find('first', array(
@@ -333,6 +333,14 @@ class Producto extends AppModel
 		
 	}
 
+	public function MBToKB($imageSize = 0) {
+		return ($imageSize * 1024 * 1024);
+	}
+
+	public function KBToMB($imageSize = 0) {
+		return round( ($imageSize / 1024 / 1024), 2);
+	}
+
 
 	public function validarTamanoImagenes($data = array())
 	{	
@@ -345,6 +353,8 @@ class Producto extends AppModel
 				if (isset($imagen['imagen'])) {
 					# Información de la imagen
 					list($ancho, $alto, $tipo, $atributos) = getimagesize($imagen['imagen']['tmp_name']);
+					
+					$errores[$k] = '';
 
 					# Verificamos que el tamaño esté dentro de la configuración
 					if ( $ancho < configuracion('imagen_ancho_min') 
@@ -352,13 +362,21 @@ class Producto extends AppModel
 						|| $alto < configuracion('imagen_alto_min')
 						|| $alto > configuracion('imagen_alto_max') ) {
 
-						$errores[$k] = 'La imagen ' . $imagen['imagen']['name'] . ' no tiene las dimensiones correctas. <br>';
+						$errores[$k] .= 'La imagen ' . $imagen['imagen']['name'] . ' no tiene las dimensiones correctas. <br>';
 						$errores[$k] .= 'Dimensión de la imagen:';
 						$errores[$k] .= '<ul><li>Ancho: ' . $ancho . 'px</li><li>Alto: ' . $alto . 'px</li></ul><br/>';
+					}
+
+					if ( $imagen['imagen']['size'] > $this->MBToKB(configuracion('imagen_peso') ) )
+					{
+						$errores[$k] .= 'El peso de la imagen supera el permitido. La imagen pesa <b>' . $this->KBToMB($imagen['imagen']['size']) . ' MB</b>.';		
 					}	
 				}
 			}
-
+		}
+		
+		if (empty($errores['999'])) {
+			$errores = array();
 		}
 
 		return $errores;

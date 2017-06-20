@@ -36,6 +36,7 @@ class ProductosController extends AppController
 				'Fabricante',
 				'Imagen',
 				'Tarea',
+				'Marca',
 				'Grupocaracteristica'
 				)
 			)
@@ -358,7 +359,10 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
-		$marcas = $this->Producto->Marca->find('list', array('conditions' => array('activo' => 1)));
+		$marcas = $this->Producto->Marca->find('list', array('conditions' => array(
+			'activo' => 1, 
+			'tienda_id' => $miTarea['Tarea']['tienda_id']
+			)));
 
 		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
@@ -478,7 +482,10 @@ class ProductosController extends AppController
 
 		$proveedores = $this->Producto->Proveedor->find('list');
 		$fabricantes = $this->Producto->Fabricante->find('list');
-		$marcas = $this->Producto->Marca->find('list', array('conditions' => array('activo' => 1)));
+		$marcas = $this->Producto->Marca->find('list', array('conditions' => array(
+			'activo' => 1, 
+			'tienda_id' => $miTarea['Tarea']['tienda_id']
+			)));
 
 		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
@@ -570,7 +577,8 @@ class ProductosController extends AppController
 
 		$options['contain'] = array(
 			'Especificacion' => array(
-				'Idioma'
+				'Idioma',
+				'UnidadMedida'
 				)
 			);
 
@@ -590,6 +598,7 @@ class ProductosController extends AppController
 				$options['contain'] = array(
 					'Especificacion' => array(
 						'Idioma',
+						'UnidadMedida',
 						'Producto' => array(
 							'conditions' => array(
 								'Producto.id' => $producto['Producto']['id']
@@ -621,9 +630,33 @@ class ProductosController extends AppController
 			$tabla .= '<td>';
 			$tabla .= '<input type="hidden" name="data[Especificacion][' . $key . '][id_feature]" value="' . $value['id_feature'] . '">';
 			if ( isset($value['Producto'][0]['EspecificacionesProducto']) && $value['Producto'][0]['EspecificacionesProducto']['id_feature'] == $value['id_feature']) {
-				$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+				if (!empty($value['UnidadMedida'])) {
+					$tabla .= '<input type="' . $value['UnidadMedida'][0]['tipo_campo'] . '" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+				}else{
+					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+				}
 			}else{
-				$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+				if (!empty($value['UnidadMedida'])) {
+					$tabla .= '<input type="' . $value['UnidadMedida'][0]['tipo_campo'] . '" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+				}else{
+					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+				}
+			}
+			$tabla .= '</td>';
+			$tabla .= '<td>';
+			
+			if (!empty($value['UnidadMedida'])) {
+				$tabla .= '<label class="label-form label label-info">' . $value['UnidadMedida'][0]['nombre'] . '</label>';	
+			}else{
+				$tabla .= '<label class="label-form label label-info">Texto libre</label>';
+			}
+
+			$tabla .= '</td>';
+			$tabla .= '<td>';
+			if (!empty($value['UnidadMedida'])) {
+				$tabla .= '<b>Ejemplo:</b> ' . $value['UnidadMedida'][0]['ejemplo'];	
+			}else{
+				$tabla .= '<b>Ejemplo:</b> 9-3/8 PULGADAS X 8-5/16 PULGADAS X 6-5/8 PULGADAS';
 			}
 			$tabla .= '</td>';
 
