@@ -631,15 +631,35 @@ class ProductosController extends AppController
 			$tabla .= '<input type="hidden" name="data[Especificacion][' . $key . '][id_feature]" value="' . $value['id_feature'] . '">';
 			if ( isset($value['Producto'][0]['EspecificacionesProducto']) && $value['Producto'][0]['EspecificacionesProducto']['id_feature'] == $value['id_feature']) {
 				if (!empty($value['UnidadMedida'])) {
-					$tabla .= '<input type="' . $value['UnidadMedida'][0]['tipo_campo'] . '" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+					$tabla .= '<div class="input-group">';
+                    $tabla .= '<span class="input-group-addon">';
+                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
+                    $tabla .= '</span>';
+                    $tabla .= '<input type="text" class="form-control not-blank js-' . $value['UnidadMedida'][0]['tipo_campo'] . '" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+                    $tabla .= '</div>';                                         
 				}else{
-					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+					$tabla .= '<div class="input-group">';
+                    $tabla .= '<span class="input-group-addon">';
+                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
+                    $tabla .= '</span>';
+                    $tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+                    $tabla .= '</div>';
 				}
 			}else{
 				if (!empty($value['UnidadMedida'])) {
-					$tabla .= '<input type="' . $value['UnidadMedida'][0]['tipo_campo'] . '" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+					$tabla .= '<div class="input-group">';
+                    $tabla .= '<span class="input-group-addon">';
+                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
+                    $tabla .= '</span>';
+                    $tabla .= '<input type="text" class="form-control not-blank js-' . $value['UnidadMedida'][0]['tipo_campo'] . '" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+                    $tabla .= '</div>';
 				}else{
-					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+					$tabla .= '<div class="input-group">';
+                    $tabla .= '<span class="input-group-addon">';
+                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
+                    $tabla .= '</span>';
+                    $tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+                    $tabla .= '</div>';
 				}
 			}
 			$tabla .= '</td>';
@@ -654,9 +674,9 @@ class ProductosController extends AppController
 			$tabla .= '</td>';
 			$tabla .= '<td>';
 			if (!empty($value['UnidadMedida'])) {
-				$tabla .= '<b>Ejemplo:</b> ' . $value['UnidadMedida'][0]['ejemplo'];	
+				$tabla .= $value['UnidadMedida'][0]['ejemplo'];	
 			}else{
-				$tabla .= '<b>Ejemplo:</b> 9-3/8 PULGADAS X 8-5/16 PULGADAS X 6-5/8 PULGADAS';
+				$tabla .= '9-3/8 PULGADAS';
 			}
 			$tabla .= '</td>';
 

@@ -248,6 +248,7 @@ jQuery(document).ready(function($)
 	/**
 	 * Validate product
 	 */
+
 	if ( $('.validate-product').length ) {
 		$('.validate-product').validate({
 			rules: {
@@ -288,9 +289,6 @@ jQuery(document).ready(function($)
 					required: true,
 				},
 				'data[Producto][peso]': {
-					required: true,
-				},
-				'.not-blank': {
 					required: true,
 				}
 
@@ -334,11 +332,19 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][peso]': {
 					required: 'Requerido',
-				},
-				'.not-blank': {
-					required: 'Requerido',
 				}
 			}
+		});
+
+		$.validator.messages.number = 'Ingrese solo números';
+		$.validator.messages.required = 'Requerido';
+
+		$.validator.addClassRules('js-number', {
+			number: true  	
+		});
+
+		$.validator.addClassRules('not-blank', {
+			required: true  	
 		});
 	}
 
@@ -496,6 +502,29 @@ jQuery(document).ready(function($)
     	$campo.val( $('.string_nombre_final').text() );
     }
 
+    // No aplica
+
+   	function noAplica() {
+   		$('.js-no-aplica').on('click', function(){
+
+   			var $input = $(this).parent().siblings('input');
+
+			if ($(this).prop('checked')) {
+
+				if ( ! $input.prop('disabled')) {
+					$input.val('No aplica');
+					$input.attr('disabled', 'disabled');
+				}
+			}else{
+								
+				if ( $input.prop('disabled')) {
+					$input.val('');
+					$input.removeAttr('disabled');
+				}
+			}
+		});
+   	}
+
 
     function obtenerTablaCaracteristicas(grupo) {
     	var $contexto 	= $('#caracteristicas'),
@@ -504,6 +533,7 @@ jQuery(document).ready(function($)
     	if (typeof(grupo) != 'undefined' && typeof($producto) == 'undefined') {
     		$.get( webroot + 'maintainers/productos/obtenerEspecificaciones/' + grupo, function(respuesta){
 				$contexto.find('.js-add').eq(0).html(respuesta);
+				noAplica();
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-add').eq(0).html(respuesta);
@@ -513,6 +543,7 @@ jQuery(document).ready(function($)
     	if (typeof(grupo) != 'undefined' && typeof($producto) != 'undefined') {
     		$.get( webroot + 'maintainers/productos/obtenerEspecificaciones/' + grupo + '/' + $producto, function(respuesta){
     			$contexto.find('.js-add').eq(0).html(respuesta);
+    			noAplica();
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-add').eq(0).html(respuesta);
