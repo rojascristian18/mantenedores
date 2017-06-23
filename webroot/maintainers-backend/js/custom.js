@@ -510,17 +510,9 @@ jQuery(document).ready(function($)
    			var $input = $(this).parent().siblings('input');
 
 			if ($(this).prop('checked')) {
-
-				if ( ! $input.prop('disabled')) {
-					$input.val('No aplica');
-					$input.attr('disabled', 'disabled');
-				}
+				$input.val('No aplica');
 			}else{
-								
-				if ( $input.prop('disabled')) {
-					$input.val('');
-					$input.removeAttr('disabled');
-				}
+				$input.val('');	
 			}
 		});
    	}

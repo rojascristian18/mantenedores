@@ -18,6 +18,65 @@
 	        </div>
 		</div>
 	</div>
+	<div class="row">                        
+        <div class="col-md-12">
+        	<div class="panel-group accordion accordion-dc">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a href="#materiales"><i class="fa fa-tasks"></i> Detalles de la tarea</a>
+                        </h4>
+                    </div>                                
+                    <div class="panel-body" id="materiales">
+                    	<h4>Descripción de la tarea</h4>
+                    	<div>
+                    		<?= $miTarea['Tarea']['descripcion']; ?>
+                    	</div>
+                    	<br>
+                    	<br>
+                    	<h4>Materiales de la tarea</h4>
+                       	<? if ( !empty($miTarea['Adjunto']) ) : ?>
+                       	<div class="table-responsive">
+                       		<table class="table table-bordered">
+                       			<thead>
+                       				<th>Nombre</th>
+                       				<th>Descripción</th>
+                       				<th>Acción</th>
+                       			</thead>
+                       			<tbody>
+	                       	<? foreach($miTarea['Adjunto'] as $i => $material) : ?>
+	                       		<tr>
+	                       			<td><?= h($material['nombre']);?></td>
+	                       			<td><?= h($material['descripcion']);?></td>
+	                       			<td>
+	                       				<? if (!empty($material['url_archivo'])) : ?>
+											<?= $this->Html->link(
+												'<i class="fa fa-eye"></i> Ver',
+												sprintf('/img/Adjunto/%d/%s', $material['id'], $material['url_archivo']),
+												array(
+													'class' => 'btn btn-info btn-xs btn-block', 
+													'target' => '_blank', 
+													'fullbase' => true,
+													'escape' => false) 
+												); ?>
+												
+										<? else : ?>
+											<small>Sin archivo agregado</small>
+										<? endif; ?>
+	                       			</td>
+	                       		</tr>
+	                       	<? endforeach; ?>
+	                       		</tbody>
+                       		</table>
+                       	</div>
+                       	<? else : ?>
+                       	<p>Esta tarea no tiene materiales adjuntos.</p>	
+                   		<? endif; ?>
+                    </div>                                
+                </div>
+            </div>
+        </div>
+    </div>
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-default tabs">
