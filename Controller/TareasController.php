@@ -960,7 +960,7 @@ class TareasController extends AppController
 
 			# Descripción corta
 			if (isset($producto['descripcion_corta'])) {
-				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Short description' => $producto['descripcion_corta'] ));
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Short description' => '<p>' . $producto['descripcion_corta'] . '</p>' ));
 			}
 
 			# Descripción

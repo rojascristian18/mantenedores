@@ -155,8 +155,7 @@
 									<p><small>Describa brevemente el producto, destacando sus cualidades, materiales o especificaciones.</small></p>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<p><b>Puede agregar formato al texto.</b></p>
-									<?= $this->Form->input('descripcion_corta', array('placeholder' => 'Ingrese una descripción corta del producto', 'class' => 'summernote-small')); ?>
+									<?= $this->Form->input('descripcion_corta', array('placeholder' => 'Ingrese una descripción corta del producto')); ?>
 								</div>
 							</div>
 							<div class="divisor-sm"></div>

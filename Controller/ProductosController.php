@@ -297,27 +297,53 @@ class ProductosController extends AppController
 
 		if ( $this->request->is('post') )
 		{	
-			# Validar imagenes y campos
-			if( ! $this->validarCampos() || ! $this->validarImagenes()) {
-				$this->Session->setFlash('Error al guardar el producto. No completó los campos obligatorios.', null, array(), 'danger');
-				$this->redirect(array('action' => 'add', $this->request->data['Producto']['tarea_id']));
+			$errorValidacion = array();
+
+			# Validar campos
+			if( ! $this->validarCampos()) {
+				$errorValidacion[] = 'Debe completar todos los campos.';
+			}
+
+			# Validar imágenes
+			if ( ! $this->validarImagenes() ) {
+				$this->limpiarImagenes();
+				$errorValidacion[] = 'No agregó una imagen al producto. Recuerde que este campo es obligatorio.';
 			}
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
 				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
 			}
-
+			
 			# Validar tamaño de imagenes
-			if ( !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
-				$this->Session->setFlash(implode(' ', $this->Producto->validarTamanoImagenes($this->request->data)), null, array(), 'danger');
-				$this->redirect(array('action' => 'add', $this->request->data['Producto']['tarea_id']));
+			if ( !empty($this->request->data['Imagen']) && !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
+				$errorValidacion[] = implode(' ', $this->Producto->validarTamanoImagenes($this->request->data));
 			}
 
 			$this->Producto->create();
 			if ( $this->Producto->saveAll($this->request->data) )
-			{
+			{	
 				$this->Session->setFlash('Producto agregado correctamente.', null, array(), 'success');
+
+				# si existen errores actualizamos el producto y direccionamos a su misma edición, para que corrija los errores.
+				if (!empty($errorValidacion)) {
+
+					$errores = '<ul>';
+					foreach ($errorValidacion as $key => $error) {
+						$errores .= '<li>' . $error . '</li>'; 
+					}
+					$errores .= '</ul>';
+
+					# Obtenemos el id del producto recien agregado
+					$ultimoRegistro = $this->Producto->find('first', array('order' => array('created' => 'DESC'), 'fields' => array('id')));
+
+					#Mensaje de errores
+					$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
+
+					# Redireccionamos a la edición del producto
+					$this->redirect(array('action' => 'edit', $ultimoRegistro['Producto']['id'], $this->request->data['Producto']['tarea_id']));
+				}
+
 				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
 			}
 			else
@@ -388,7 +414,6 @@ class ProductosController extends AppController
 
 		if ( $this->request->is('post') || $this->request->is('put') )
 		{	
-
 			# Se eliminan las imagenes
 			if ( !empty($this->request->data['Producto']['ElementosEliminados']) ) {
 				$this->quitarElementos($this->request->data['Producto']['ElementosEliminados'], 'Imagen');
@@ -396,22 +421,31 @@ class ProductosController extends AppController
 				unset($this->request->data['Producto']['ElementosEliminados']);
 			}
 
+			$errorValidacion = array();
+
+			# Validar campos
 			if( ! $this->validarCampos()) {
-				$this->Session->setFlash('Error al guardar el producto. No completó los campos obligatorios.', null, array(), 'danger');
-				$this->redirect(array('action' => 'edit', $id ,$this->request->data['Producto']['tarea_id']));
+				$errorValidacion[] = 'Debe completar todos los campos.';
+			}
+
+			# Validar imágenes
+			if ( ! $this->validarImagenes() ) {
+				$this->limpiarImagenes();
+				$errorValidacion[] = 'No agregó una imagen al producto. Recuerde que este campo es obligatorio.';
+			}
+
+			# Quitar puntos a precio
+			if (isset($this->request->data['Producto']['precio'])) {
+				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
+			}
+			
+			# Validar tamaño de imagenes
+			if ( !empty($this->request->data['Imagen']) && !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
+				$errorValidacion[] = implode(' ', $this->Producto->validarTamanoImagenes($this->request->data));
 			}
 		
 			// Limpiamos las especificaciones
 			$this->Producto->EspecificacionesProducto->deleteAll(array('producto_id' => $id));
-
-			# Limpiar imagenes vacias
-			$this->limpiarImagenes();
-
-			# Validar tamaño de imagenes
-			if ( !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
-				$this->Session->setFlash(implode(' ', $this->Producto->validarTamanoImagenes($this->request->data)), null, array(), 'danger');
-				$this->redirect(array('action' => 'edit', $id ,$this->request->data['Producto']['tarea_id']));
-			}
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
@@ -419,8 +453,25 @@ class ProductosController extends AppController
 			}
 
 			if ( $this->Producto->saveAll($this->request->data) )
-			{
+			{	
 				$this->Session->setFlash('Producto editado correctamente.', null, array(), 'success');
+
+				# si existen errores actualizamos el producto y direccionamos a su misma edición, para que corrija los errores.
+				if (!empty($errorValidacion)) {
+
+					$errores = '<ul>';
+					foreach ($errorValidacion as $key => $error) {
+						$errores .= '<li>' . $error . '</li>'; 
+					}
+					$errores .= '</ul>';
+					
+					# Mensaje de error
+					$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
+
+					# redireccionamos a editar el producto
+					$this->redirect(array('action' => 'edit', $id, $this->request->data['Producto']['tarea_id']));
+				}
+				
 				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
 			}
 			else
