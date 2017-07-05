@@ -337,11 +337,8 @@ jQuery(document).ready(function($)
 		});
 
 		$.validator.messages.number = 'Ingrese solo números';
+		$.validator.messages.pattern = 'Carácteres no válidos';
 		$.validator.messages.required = 'Requerido';
-
-		$.validator.addClassRules('js-number', {
-			number: true  	
-		});
 
 		$.validator.addClassRules('not-blank', {
 			required: true  	
@@ -502,18 +499,34 @@ jQuery(document).ready(function($)
     	$campo.val( $('.string_nombre_final').text() );
     }
 
-    // No aplica
+    function doNoAplica(element) {
+    	var $input = element.parent().siblings('input');
 
+    	if (element.prop('checked')) {
+
+			// Guarda el pattern en un atributo data para restaurarlo si es necesario
+			// y se remueve para que no valide el campo para cuando se agregue el texto No aplica
+			$input.attr('data-pattern', $input.attr('pattern'));
+			$input.removeAttr('pattern');
+			$input.val('No aplica');
+		}else{
+
+			// Se recetea el input agregandole nuevamente la validación pattern
+			if($input.data('pattern').length) {
+				$input.attr('pattern', $input.data('pattern'));
+			}
+			$input.val('');	
+		}
+    }
+
+    // No aplica
    	function noAplica() {
    		$('.js-no-aplica').on('click', function(){
+   			doNoAplica($(this));
+		});
 
-   			var $input = $(this).parent().siblings('input');
-
-			if ($(this).prop('checked')) {
-				$input.val('No aplica');
-			}else{
-				$input.val('');	
-			}
+		$('.js-no-aplica').each(function(){
+			doNoAplica($(this));
 		});
    	}
 
@@ -621,8 +634,6 @@ jQuery(document).ready(function($)
 	if($(".owl-carousel").length > 0){
         $(".owl-carousel").owlCarousel({mouseDrag: true, touchDrag: true, slideSpeed: 300, paginationSpeed: 400, singleItem: true, navigation: false,autoPlay: true});
     }
-
-    // TOUR
     
 });
 //]]>

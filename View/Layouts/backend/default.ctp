@@ -33,6 +33,7 @@
 			'/backend/js/plugins/summernote/summernote',
 			'/backend/js/plugins/summernote/summernote_espanol',
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
+			'/backend/js/plugins/tagsinput/jquery.tagsinput.min',
 			
 			//'/backend/js/plugins',
 			'/backend/js/custom',

@@ -10,14 +10,14 @@
 					<h3 class="panel-title"><i class="fa fa-plus" aria-hidden="true"></i> Agregar nuevo</h3>
 				</div>
 				<div class="panel-body">
-					<?= $this->Form->create('UnidadMedida', array('controller' => 'unidadMedidas', 'action' => 'add'), array('class' => 'form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
-					<div class="col-sm-3 col-xs-12">
+					<?= $this->Form->create('UnidadMedida', array('controller' => 'unidadMedidas', 'action' => 'add'), array('class' => 'row form-horizontal', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+					<div class="col-sm-2 col-xs-12">
 						<div class="form-group">
 							<?= $this->Form->label('nombre', 'Nombre'); ?>
 							<?= $this->Form->input('nombre', array('class' => 'form-control', 'div' => false, 'label' => false)); ?>
 						</div>
 					</div>
-					<div class="col-sm-3 col-xs-12">
+					<div class="col-sm-2 col-xs-12">
 						<div class="form-group">
 							<?= $this->Form->label('tipo_campo', 'Tipo de campo'); ?>
 							<?= $this->Form->select('tipo_campo', array(
@@ -28,8 +28,14 @@
 					</div>
 					<div class="col-sm-4 col-xs-12">
 						<div class="form-group">
-							<?= $this->Form->label('ejemplo', 'Ejemplo para mantenedor'); ?>
-							<?= $this->Form->input('ejemplo', array('class' => 'form-control', 'div' => false, 'label' => false)); ?>
+							<?= $this->Form->label('permitidos', '<small>Carácteres permitidos adicionales</small>'); ?>
+							<?= $this->Form->input('permitidos', array('class' => 'tagsinput', 'div' => false, 'label' => false)); ?>
+						</div>
+					</div>
+					<div class="col-sm-2 col-xs-12">
+						<div class="form-group">
+							<?= $this->Form->label('ejemplo', '<small>Ejemplo para mantenedor</small>'); ?>
+							<?= $this->Form->input('ejemplo', array('class' => 'form-control', 'div' => false, 'label' => false, 'placeholder' => 'EJ: 355 mm')); ?>
 						</div>
 					</div>
 					<div class="col-sm-2 col-xs-12">

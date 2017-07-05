@@ -881,5 +881,20 @@ jQuery(document).ready(function($)
 			evento.preventDefault();
 		});
 	}
+
+	// Tags input
+    if($(".tagsinput").length > 0){
+
+        $(".tagsinput").each(function(){
+
+            if($(this).data("placeholder") != ''){
+                var dt = $(this).data("placeholder");
+            }else
+                var dt = 'agregar símbolo';
+
+            $(this).tagsInput({width: '100%',height:'auto',defaultText: dt});
+        });
+
+    }
 });
 //]]>

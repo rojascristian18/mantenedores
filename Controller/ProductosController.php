@@ -41,7 +41,7 @@ class ProductosController extends AppController
 				)
 			)
 		);
-
+		
 		BreadcrumbComponent::add('Producto #' . $id);
 	}
 
@@ -583,7 +583,7 @@ class ProductosController extends AppController
 		$this->redirect(array('controller' => 'tareas', 'action' => 'work', $tarea));
 	}
 
-
+	
 	public function maintainers_delete($id = null, $tarea = null)
 	{	
 		$this->cambiarDatasource(array('Fabricante', 'Proveedor', 'Especificacion', 'EspecificacionIdioma', 'Idioma'));
@@ -611,6 +611,22 @@ class ProductosController extends AppController
 	}
 
 
+	private function normalizarExpR($values = array()) {
+		foreach ($values as $k => $v) {
+    		$values[$k] = str_replace('/', '\/', $v);
+    	}
+    	return $values;
+	}
+
+
+
+	/**
+	 * Función que permite obtener el html de las especificaciones de un producto.
+	 *
+	 * @param 	$idGrupo 	int 	Identificador del grupo al que corresponde el producto agregado
+	 * @param 	$idProducto int 	Identificador del producto (opcional)
+	 * @return 	$tabla 		string 	Filas de tabla con las especificacion/caracteristicas permitidas para el producto.
+	 */
 	public function maintainers_obtenerEspecificaciones($idGrupo = null, $idProducto = null) {
 		if(empty($idGrupo)) {
 			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
@@ -681,36 +697,69 @@ class ProductosController extends AppController
 			$tabla .= '<td>';
 			$tabla .= '<input type="hidden" name="data[Especificacion][' . $key . '][id_feature]" value="' . $value['id_feature'] . '">';
 			if ( isset($value['Producto'][0]['EspecificacionesProducto']) && $value['Producto'][0]['EspecificacionesProducto']['id_feature'] == $value['id_feature']) {
-				if (!empty($value['UnidadMedida'])) {
-					$tabla .= '<div class="input-group">';
-                    $tabla .= '<span class="input-group-addon">';
-                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
-                    $tabla .= '</span>';
-                    $tabla .= '<input type="text" class="form-control not-blank js-' . $value['UnidadMedida'][0]['tipo_campo'] . '" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
-                    $tabla .= '</div>';                                         
+				$tabla .= '<div class="input-group">';
+                $tabla .= '<span class="input-group-addon">';
+                $tabla .= ($value['Producto'][0]['EspecificacionesProducto']['no_aplica']) ? '<input type="checkbox" class="js-no-aplica" name="data[Especificacion][' . $key . '][no_aplica]" checked> <small>No aplica</small>' : '<input type="checkbox" class="js-no-aplica" name="data[Especificacion][' . $key . '][no_aplica]"> <small>No aplica</small>' ;
+                $tabla .= '</span>';
+                if (!empty($value['UnidadMedida'])) {
+					$pattern = '';
+
+                    /**
+                     * Se agrega la validación por patrón para los campos de solo números
+                     * añadiendole símbolos adicionales que aceptará el campo
+                     */
+                    if (!empty($value['UnidadMedida'][0]['permitidos'])) {
+
+                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $value['UnidadMedida'][0]['permitidos']));
+
+                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
+                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+                    	}
+
+                    }else{
+                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
+                    		$pattern = "^[0-9.,]+$";
+                    	}
+                    }
+
+                    $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+                                         
 				}else{
-					$tabla .= '<div class="input-group">';
-                    $tabla .= '<span class="input-group-addon">';
-                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
-                    $tabla .= '</span>';
-                    $tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
-                    $tabla .= '</div>';
+					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
 				}
+                
+                $tabla .= '</div>';
+				
 			}else{
-				if (!empty($value['UnidadMedida'])) {
-					$tabla .= '<div class="input-group">';
-                    $tabla .= '<span class="input-group-addon">';
-                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
-                    $tabla .= '</span>';
-                    $tabla .= '<input type="text" class="form-control not-blank js-' . $value['UnidadMedida'][0]['tipo_campo'] . '" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
-                    $tabla .= '</div>';
+				$tabla .= '<div class="input-group">';
+                $tabla .= '<span class="input-group-addon">';
+                $tabla .= '<input type="checkbox" class="js-no-aplica" name="data[Especificacion][' . $key . '][no_aplica]"> <small>No aplica</small>';
+                $tabla .= '</span>';
+                if (!empty($value['UnidadMedida'])) {
+					$pattern = '';
+
+                    /**
+                     * Se agrega la validación por patrón para los campos de solo números
+                     * añadiendole símbolos adicionales que aceptará el campo
+                     */
+                    if (!empty($value['UnidadMedida'][0]['permitidos'])) {
+
+                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $value['UnidadMedida'][0]['permitidos']));
+
+                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
+                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+                    	}
+                    	
+                    }else{
+                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
+                    		$pattern = "^[0-9.,]+$";
+                    	}
+                    }
+
+                    $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
+                                         
 				}else{
-					$tabla .= '<div class="input-group">';
-                    $tabla .= '<span class="input-group-addon">';
-                    $tabla .= '<input type="checkbox" class="js-no-aplica"> <small>No aplica</small>';
-                    $tabla .= '</span>';
-                    $tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
-                    $tabla .= '</div>';
+					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
 				}
 			}
 			$tabla .= '</td>';

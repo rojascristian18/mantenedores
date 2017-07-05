@@ -25,6 +25,10 @@
 							) , array('class' => 'form-control', 'div' => false, 'label' => false, 'empty' => false)); ?></td>
 							</tr>
 							<tr>
+								<th><?= $this->Form->label('permitidos', 'Carácteres permitidos adicionales'); ?></th>
+								<td><?= $this->Form->input('permitidos', array('class' => 'tagsinput')); ?></td>
+							</tr>
+							<tr>
 								<th><?= $this->Form->label('ejemplo', 'Ejemplo para mantenedor'); ?></th>
 								<td><?= $this->Form->input('ejemplo'); ?></td>
 							</tr>

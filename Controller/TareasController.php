@@ -15,9 +15,15 @@ class TareasController extends AppController
 
 		$paginate['conditions'] = array(
 			'Tarea.tienda_id' => $this->Session->read('Tienda.id'),
-			'Tarea.parent_id' => null,
-			'Tarea.administrador_id' => $this->Session->read('Auth.Administrador.id')
+			'Tarea.parent_id' => null
 			);
+
+		// No es super administrador
+		if ($this->Session->read('Auth.Administrador.rol_id') != 1) {
+			$paginate['conditions'] = array_replace_recursive(array(
+				'Tarea.administrador_id' => $this->Session->read('Auth.Administrador.id')
+				), $paginate['conditions']);
+		}
 
     	$total = 0;
     	$totalMostrados = 0;
@@ -850,11 +856,11 @@ class TareasController extends AppController
 					'Marca',
 					'Grupocaracteristica' => array(
 						'Palabraclave',
-						'Categoria',
-						'UnidadMedida'
+						'Categoria'
 						),
 					'Especificacion' => array(
-						'Idioma'
+						'Idioma',
+						'UnidadMedida'
 						),
 					'Imagen'
 					),
@@ -866,8 +872,9 @@ class TareasController extends AppController
 				)
 		));
 		
+		
 		/**
-		* Para armar el excell necesitamos
+		* Para armar el excel necesitamos
 		* Nombre
 		* Categorias (x,y,z...) ids
 		* Precio con IVA
@@ -934,7 +941,7 @@ class TareasController extends AppController
 			}
 
 			# Largo
-			if (isset($producto['largo'])) {
+			if (isset($producto['largo']) ) {
 				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Width' => $producto['largo']));
 			}
 
@@ -999,24 +1006,44 @@ class TareasController extends AppController
 			# Características
 			if ( isset($producto['Especificacion']) ) {
 				$especificaciones = array();
-				foreach ($producto['Especificacion'] as $ix => $especificacion) {
-					foreach ($especificacion['Idioma'] as $ln => $idioma) {
-						if ($idioma['id_lang'] == $datos['Tarea']['idioma_id'] && !empty($especificacion['EspecificacionesProducto']['valor'])) {
 
-							if ( isset($producto['Grupocaracteristica']['UnidadMedida'][0]) 
-							&& $producto['Grupocaracteristica']['id'] == $producto['Grupocaracteristica']['UnidadMedida'][0]['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] 
-							&&  $especificacion['id_feature'] == $producto['Grupocaracteristica']['UnidadMedida'][0]['GrupocaracteristicaEspecificacion']['id_feature']) {
-								$especificaciones[$ix] = sprintf('%s:%s %s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $producto['Grupocaracteristica']['UnidadMedida'][0]['nombre'], $especificacion['EspecificacionesProducto']['id']);	
-							}else{
-								$especificaciones[$ix] = sprintf('%s:%s:%d', $idioma['EspecificacionIdioma']['name'], $especificacion['EspecificacionesProducto']['valor'], $especificacion['EspecificacionesProducto']['id']);
-							}		
+				# Especificaciones del producto
+				foreach ($producto['Especificacion'] as $ix => $especificacion) {
+
+					# Obtenemos el nombre de la especificacion segun el idioma de la tarea
+					foreach ($especificacion['Idioma'] as $ln => $idioma) {
+						
+						# Si el el id del idioma del comercio es igual al de la tarea se agrega
+						if ($idioma['id_lang'] == $datos['Tarea']['idioma_id']) {
+
+							# Almacenamos la extensión definida por el administrador o "unidad de medida"
+							$exten = '';
+							foreach ($especificacion['UnidadMedida'] as $ind => $v) {
+
+								# La especificacion pertenece a este tipo de producto y su valor pertenece a este producto
+								if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $producto['Grupocaracteristica']['id']
+									&& $v['GrupocaracteristicaEspecificacion']['id_feature'] == $especificacion['id_feature'] 
+									&& !$especificacion['EspecificacionesProducto']['no_aplica']) {
+
+									# Se agrega un extensión reemplazando las comas (,) por puntos (.)
+									$exten = str_replace(',', '.', $v['nombre']);
+								}
+							}
+
+							# Si el valor de la especificacion viene vaica se setea agregandole --
+							if (empty($especificacion['EspecificacionesProducto']['valor'])) {
+								$especificacion['EspecificacionesProducto']['valor'] = '--';
+							}
+
+							$especificaciones[$ix] = sprintf('%s:%s%s:%d', str_replace(',', '.', $idioma['EspecificacionIdioma']['name']), str_replace(',', '.', $especificacion['EspecificacionesProducto']['valor']), $exten, $especificacion['EspecificacionesProducto']['id']);
+								
 						}else{
 							$this->Session->setFlash('Error al generar el excel. La tarea no tiene configurado el idioma o existe un problema de idiomas en el comercio.', null, array(), 'danger');
 							$this->redirect(array('action' => 'view', $id));
 						}
 					}
 				}
-
+				# Se agregan las especificaciones ordenadas al producto
 				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
 					'Feature(Name:Value:Position)' => implode(',', $especificaciones) ) );
 
@@ -1031,7 +1058,7 @@ class TareasController extends AppController
 		
 		$campos			= array_keys($this->getExcelExportFormat($this->request->data['Tarea']['version']));
 		$modelo			= $this->Tarea->alias;
-
+		
 		$this->set(compact('dataProducto', 'campos', 'modelo'));
 	}
 

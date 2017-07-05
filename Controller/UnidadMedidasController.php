@@ -57,6 +57,9 @@ class UnidadMedidasController extends AppController
 				'conditions'	=> array('UnidadMedida.id' => $id)
 			));
 		}
+
+		//$especiales = explode('||', $this->request->data['UnidadMedida']['permitidos']);
+		
 	}
 
 	public function admin_delete($id = null)

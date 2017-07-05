@@ -5,7 +5,7 @@
 <?= $this->Form->input('tienda_id', array('type' => 'hidden', 'value' => $this->Session->read('Tienda.id')) ); ?>
 <div class="page-content-wrap">
 	<div class="row">
-		<div class="col-xs-6">
+		<div class="col-xs-12 col-sm-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Nuevo Grupo de Caracaterísticas</h3>
@@ -36,7 +36,7 @@
 				</div>
 			</div>
 		</div> <!-- end col -->
-		<div class="col-xs-6">
+		<div class="col-xs-12 col-sm-8">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Agregar Características al Grupo</h3>
@@ -78,7 +78,7 @@
 		</div> <!-- end col -->
 	</div> <!-- end row -->
 	<div class="row">
-		<div class="col-xs-6">
+		<div class="col-xs-12 col-sm-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Agregar Categorías al Grupo</h3>
@@ -117,7 +117,7 @@
 				</div>
 			</div>
 		</div> <!-- end col -->
-		<div class="col-xs-6">
+		<div class="col-xs-12 col-sm-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Agregar Palabras Claves al Grupo</h3>
