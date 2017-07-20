@@ -499,7 +499,7 @@ jQuery(document).ready(function($)
     	$campo.val( $('.string_nombre_final').text() );
     }
 
-    function doNoAplica(element) {
+    function doNoAplica(element, agregar_texto) {
     	var $input = element.parent().siblings('input');
 
     	if (element.prop('checked')) {
@@ -508,7 +508,10 @@ jQuery(document).ready(function($)
 			// y se remueve para que no valide el campo para cuando se agregue el texto No aplica
 			$input.attr('data-pattern', $input.attr('pattern'));
 			$input.removeAttr('pattern');
-			$input.val('No aplica');
+
+			if (typeof(agregar_texto) != 'undefined') {
+				$input.val('Ingrese texto');
+			}
 		}else{
 
 			// Se recetea el input agregandole nuevamente la validación pattern
@@ -522,7 +525,7 @@ jQuery(document).ready(function($)
     // No aplica
    	function noAplica() {
    		$('.js-no-aplica').on('click', function(){
-   			doNoAplica($(this));
+   			doNoAplica($(this), true);
 		});
 
 		$('.js-no-aplica').each(function(){
