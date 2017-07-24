@@ -71,7 +71,11 @@
 									<td><?= $atributo['Idioma'][0]['EspecificacionIdioma']['name']; ?></td>
 									<td>
 									<? if (!empty($atributo['UnidadMedida'])) : ?>
-										<?= $this->Form->select(sprintf('Especificacion.%d.unidad_medida_id', $indice), $atributo['UnidadMedidaLista'], array('class' => 'form-control', 'value' => $atributo['UnidadMedida'][0]['id'], 'empty' => 'Texto libre')); ?>
+									<? foreach ($atributo['UnidadMedida'] as $ix => $medida) : ?>
+									<? if ($medida['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $this->request->data['Grupocaracteristica']['id']) : ?>
+										<?= $this->Form->select(sprintf('Especificacion.%d.unidad_medida_id', $indice), $atributo['UnidadMedidaLista'], array('class' => 'form-control', 'value' => $medida['id'], 'empty' => 'Texto libre')); ?>
+									<? endif; ?>
+									<? endforeach; ?>
 									<? else : ?>
 										<?= $this->Form->select(sprintf('Especificacion.%d.unidad_medida_id', $indice), $atributo['UnidadMedidaLista'], array('class' => 'form-control', 'empty' => 'Texto libre')); ?>
 									<? endif; ?>

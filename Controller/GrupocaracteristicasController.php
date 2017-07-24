@@ -172,7 +172,7 @@ class GrupocaracteristicasController extends AppController
 				}
 
 				$this->request->data['Especificacion'] = $caracteristicasGrupo;
-
+				
 			}
 
 			# Buscamos las categorias del grupo

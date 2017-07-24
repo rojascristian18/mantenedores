@@ -8,6 +8,7 @@ class AppController extends Controller
 		'Session', 'Html', 'Form', 'PhpExcel'
 		//, 'Facebook.Facebook'
 	);
+
 	public $components	= array(
 		'Session',
 		'Cookie',
@@ -30,6 +31,7 @@ class AppController extends Controller
 			'scopes'				=> array('profile', 'email')
 		),
 		'DebugKit.Toolbar',
+		'TinyPng.Tiny',
 		'Breadcrumb' => array(
 			'crumbs'		=> array(
 				array('Inicio', ''),
@@ -41,7 +43,6 @@ class AppController extends Controller
 
 	public function beforeFilter()
 	{	
-
 		/**
 		 * Layout y permisos públicos
 		 */

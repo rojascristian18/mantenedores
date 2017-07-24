@@ -333,58 +333,38 @@ class Producto extends AppModel
 		
 	}
 
+
+	/**
+	 * Método que convierte de MB a KB
+	 * @param 	$imageSize 		double 		Peso del archivo en MB
+	 * @return 	Valor convertido a KB. 	
+	 */
 	public function MBToKB($imageSize = 0) {
 		return ($imageSize * 1024 * 1024);
 	}
 
+
+	/**
+	 * Método que convierte de KB a MB
+	 * @param 	$imageSize 		double 		Peso del archivo en KB
+	 * @return 	Valor convertido a MB redondeado  con 2 decimales. 	
+	 */
 	public function KBToMB($imageSize = 0) {
 		return round( ($imageSize / 1024 / 1024), 2);
 	}
 
 
-	public function validarTamanoImagenes($data = array())
-	{	
-		$errores = array();
-		# Procesamos imágenes
-		if (isset($data['Imagen']) && count($data['Imagen']) > 0 ) {
-			
-			# Verificamos que las medidas de la imagen esten dentro del rango configurado
-			foreach ($data['Imagen'] as $k => $imagen) {
-				if (isset($imagen['imagen'])) {
-					# Información de la imagen
-					list($ancho, $alto, $tipo, $atributos) = getimagesize($imagen['imagen']['tmp_name']);
-					
-					$errores[$k] = '';
-
-					# Verificamos que el tamaño esté dentro de la configuración
-					if ( $ancho < configuracion('imagen_ancho_min') 
-						|| $ancho > configuracion('imagen_ancho_max')
-						|| $alto < configuracion('imagen_alto_min')
-						|| $alto > configuracion('imagen_alto_max') ) {
-
-						$errores[$k] .= 'La imagen ' . $imagen['imagen']['name'] . ' no tiene las dimensiones correctas. <br>';
-						$errores[$k] .= 'Dimensión de la imagen:';
-						$errores[$k] .= '<ul><li>Ancho: ' . $ancho . 'px</li><li>Alto: ' . $alto . 'px</li></ul><br/>';
-					}
-
-					if ( $imagen['imagen']['size'] > $this->MBToKB(configuracion('imagen_peso') ) )
-					{
-						$errores[$k] .= 'El peso de la imagen supera el permitido. La imagen pesa <b>' . $this->KBToMB($imagen['imagen']['size']) . ' MB</b>.';		
-					}	
-				}
-			}
-		}
-		
-		if (empty($errores['999'])) {
-			$errores = array();
-		}
-
-		return $errores;
-	}
-
+	/**
+	 * Método que calcula un porcentaje segun los datos de entrada
+	 * @param 	$cantPermitidos 	int 	100% del univaerso
+	 * @param 	$cantProductos 		int 	cantidad de elementos
+	 * @return 	(int) porcentaje
+	 */
 	public function calcularPorcentajeTarea($cantPermitidos = 0, $cantProductos = 0) {
 		return round(( $cantProductos * 100 ) / $cantPermitidos );
 	}
+
+
 
 	public function guardarPorcentajeTarea($id_tarea = null)
 	{

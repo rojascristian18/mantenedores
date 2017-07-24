@@ -59,6 +59,17 @@
 							<td><div class="input-group"><?= $this->Form->input('imagen_peso'); ?><span class="input-group-addon">Megabyte</span>
 	                            </div></td>
 						</tr>
+						<tr>
+							<th colspan="2"><h5>Optimizador de imágenes (TinyPNG)</h5></th>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('comprimir_imagenes',_('Comprimir imágenes automáticamente'));?></th>
+							<td><?= $this->Form->input('comprimir_imagenes', array('class' => 'icheckbox')); ?></td>
+						</tr>
+						<tr>
+							<th><?= $this->Form->label('tiny_api_key',_('API KEY de TinyPNG <br><a href="https://tinypng.com/dashboard/developers" target="_blank">Obtener API KEY</a>'));?></th>
+							<td><?= $this->Form->input('tiny_api_key'); ?></td>
+						</tr>
 					</table>
 				</div>
 			</div>

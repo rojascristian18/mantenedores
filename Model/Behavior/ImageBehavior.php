@@ -265,9 +265,10 @@ class ImageBehavior extends ModelBehavior
 	 */
 	private function __isUploadFile($file)
 	{
-		if ( ! isset($file['tmp_name']) || ( isset($file['error']) && $file['error'] > 0 ) || ! is_uploaded_file($file['tmp_name']) )
+		#if ( ! isset($file['tmp_name']) || ( isset($file['error']) && $file['error'] > 0 ) || ! is_uploaded_file($file['tmp_name']) )
+		#	return false;
+		if ( ! isset($file['tmp_name']) || ( isset($file['error']) && $file['error'] > 0 ) )
 			return false;
-
 		return file_exists($file['tmp_name']);
 	}
 

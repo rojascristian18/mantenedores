@@ -868,7 +868,7 @@ class TareasController extends AppController
 					'ImpuestoRegla'
 					),
 				'Idioma',
-				'Shop'
+				'Shop',
 				)
 		));
 		
@@ -1019,23 +1019,30 @@ class TareasController extends AppController
 							# Almacenamos la extensión definida por el administrador o "unidad de medida"
 							$exten = '';
 							foreach ($especificacion['UnidadMedida'] as $ind => $v) {
-
-								# La especificacion pertenece a este tipo de producto y su valor pertenece a este producto
-								if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $producto['Grupocaracteristica']['id']
+								
+								# La especificacion pertenece a este tipo de producto,
+								# su valor pertenece a este producto,
+								# el semaforo no_aplica esta apagado
+								# el valor no está vacio
+								if ( $v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $producto['grupocaracteristica_id']
 									&& $v['GrupocaracteristicaEspecificacion']['id_feature'] == $especificacion['id_feature'] 
-									&& !$especificacion['EspecificacionesProducto']['no_aplica']) {
+									&& $especificacion['EspecificacionesProducto']['producto_id'] == $producto['id']
+									&& !$especificacion['EspecificacionesProducto']['no_aplica']
+									&& !empty($especificacion['EspecificacionesProducto']['valor']) ) {
 
 									# Se agrega un extensión reemplazando las comas (,) por puntos (.)
 									$exten = str_replace(',', '.', $v['nombre']);
+								
 								}
 							}
 
-							# Si el valor de la especificacion viene vaica se setea agregandole --
+							# Si el valor de la especificacion viene vacia se setea agregandole --
 							if (empty($especificacion['EspecificacionesProducto']['valor'])) {
 								$especificacion['EspecificacionesProducto']['valor'] = '--';
+								$exten = '';
 							}
-
-							$especificaciones[$ix] = sprintf('%s:%s%s:%d', str_replace(',', '.', $idioma['EspecificacionIdioma']['name']), str_replace(',', '.', $especificacion['EspecificacionesProducto']['valor']), $exten, $especificacion['EspecificacionesProducto']['id']);
+							
+							$especificaciones[$ix] = sprintf('%s:%s %s:%d', str_replace(',', '.', $idioma['EspecificacionIdioma']['name']), str_replace(',', '.', $especificacion['EspecificacionesProducto']['valor']), $exten, $especificacion['EspecificacionesProducto']['id']);
 								
 						}else{
 							$this->Session->setFlash('Error al generar el excel. La tarea no tiene configurado el idioma o existe un problema de idiomas en el comercio.', null, array(), 'danger');
@@ -1043,6 +1050,7 @@ class TareasController extends AppController
 						}
 					}
 				}
+				
 				# Se agregan las especificaciones ordenadas al producto
 				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array(
 					'Feature(Name:Value:Position)' => implode(',', $especificaciones) ) );

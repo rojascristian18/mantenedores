@@ -264,6 +264,58 @@ class ProductosController extends AppController
 	}
 
 
+	/**
+	 * Método que valida un arreglo de imágenes según la configuración del sistema
+	 * @param $data 		array 	Arreglo de imágenes
+	 * @return $errores 	array 	Arreglo con la información del error si es que existe
+	 */
+	public function validarTamanoImagenes($set = null)
+	{	
+		$errores = array();
+		# Procesamos imágenes
+		if (isset($this->request->data['Imagen']) && count($this->request->data['Imagen']) > 0 ) {
+			
+			# Verificamos que las medidas de la imagen esten dentro del rango configurado
+			foreach ($this->request->data['Imagen'] as $k => $imagen) {
+				if (isset($imagen['imagen'])) {
+					# Información de la imagen
+					list($ancho, $alto, $tipo, $atributos) = getimagesize($imagen['imagen']['tmp_name']);
+					
+					$errores[$k] = '';
+
+					# Verificamos que el tamaño esté dentro de la configuración
+					if ( $ancho < configuracion('imagen_ancho_min') 
+						|| $ancho > configuracion('imagen_ancho_max')
+						|| $alto < configuracion('imagen_alto_min')
+						|| $alto > configuracion('imagen_alto_max') ) {
+
+						$errores[$k] .= 'La imagen ' . $imagen['imagen']['name'] . ' no tiene las dimensiones correctas. <br>';
+						$errores[$k] .= 'Dimensión de la imagen:';
+						$errores[$k] .= '<ul><li>Ancho: ' . $ancho . 'px</li><li>Alto: ' . $alto . 'px</li></ul><br/>';
+					}
+
+					# Verificamos el peso de la imagen
+					if ( $imagen['imagen']['size'] > $this->Producto->MBToKB(configuracion('imagen_peso') ) )
+					{
+						$errores[$k] .= 'El peso de la imagen supera el permitido. La imagen pesa <b>' . $this->Producto->KBToMB($imagen['imagen']['size']) . ' MB</b>.';		
+					}	
+				}
+
+				# eliminamos de arreglo la imagen solo cuando necesitemos
+				if (!empty($errores) && !empty($set)) {
+					unset($this->request->data['Imagen'][$k]);
+				}
+			}
+		}
+		
+		if (empty($errores['999'])) {
+			$errores = array();
+		}
+
+		return $errores;
+	}
+
+
 	public function validarImagenes() {
 		if ( !empty($this->request->data['Imagen']) ) {
 			foreach ($this->request->data['Imagen'] as $key => $imagen) {
@@ -307,17 +359,21 @@ class ProductosController extends AppController
 			# Validar imágenes
 			if ( ! $this->validarImagenes() ) {
 				$this->limpiarImagenes();
-				$errorValidacion[] = 'No agregó una imagen al producto. Recuerde que este campo es obligatorio.';
 			}
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
 				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
 			}
+
+			# Comprimimos imágenes si está activada la configuración
+			if (configuracion('comprimir_imagenes') && !empty(configuracion('tiny_api_key'))) {
+				$this->request->data['Imagen'] = $this->Tiny->comprimir_imagen($this->request->data['Imagen']);
+			}
 			
 			# Validar tamaño de imagenes
-			if ( !empty($this->request->data['Imagen']) && !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
-				$errorValidacion[] = implode(' ', $this->Producto->validarTamanoImagenes($this->request->data));
+			if ( !empty($this->request->data['Imagen']) && !empty($this->validarTamanoImagenes()) ) {
+				$errorValidacion[] = implode(' ', $this->validarTamanoImagenes('set'));
 			}
 
 			$this->Producto->create();
@@ -431,19 +487,23 @@ class ProductosController extends AppController
 			# Validar imágenes
 			if ( ! $this->validarImagenes() ) {
 				$this->limpiarImagenes();
-				$errorValidacion[] = 'No agregó una imagen al producto. Recuerde que este campo es obligatorio.';
 			}
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
 				$this->request->data['Producto']['precio'] = str_replace('.', '', $this->request->data['Producto']['precio']);
 			}
+
+			# Comprimimos imágenes si está activada la configuración
+			if (configuracion('comprimir_imagenes') && !empty(configuracion('tiny_api_key'))) {
+				$this->request->data['Imagen'] = $this->Tiny->comprimir_imagen($this->request->data['Imagen']);
+			}
 			
 			# Validar tamaño de imagenes
-			if ( !empty($this->request->data['Imagen']) && !empty($this->Producto->validarTamanoImagenes($this->request->data)) ) {
-				$errorValidacion[] = implode(' ', $this->Producto->validarTamanoImagenes($this->request->data));
+			if ( !empty($this->request->data['Imagen']) && !empty($this->validarTamanoImagenes()) ) {
+				$errorValidacion[] = implode(' ', $this->validarTamanoImagenes('set'));
 			}
-		
+			
 			// Limpiamos las especificaciones
 			$this->Producto->EspecificacionesProducto->deleteAll(array('producto_id' => $id));
 
@@ -454,8 +514,6 @@ class ProductosController extends AppController
 
 			if ( $this->Producto->saveAll($this->request->data) )
 			{	
-				$this->Session->setFlash('Producto editado correctamente.', null, array(), 'success');
-
 				# si existen errores actualizamos el producto y direccionamos a su misma edición, para que corrija los errores.
 				if (!empty($errorValidacion)) {
 
@@ -466,10 +524,12 @@ class ProductosController extends AppController
 					$errores .= '</ul>';
 					
 					# Mensaje de error
-					$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
+					$this->Session->setFlash('Producto editado con errores. <br>Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
 
 					# redireccionamos a editar el producto
 					$this->redirect(array('action' => 'edit', $id, $this->request->data['Producto']['tarea_id']));
+				}else{
+					$this->Session->setFlash('Producto editado correctamente.', null, array(), 'success');
 				}
 				
 				$this->redirect(array('controller' => 'tareas', 'action' => 'work', $this->request->data['Producto']['tarea_id']));
@@ -703,24 +763,29 @@ class ProductosController extends AppController
                 $tabla .= '</span>';
                 if (!empty($value['UnidadMedida'])) {
 					$pattern = '';
+					foreach ($value['UnidadMedida'] as $k => $v) {
+						if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $value['GrupocaracteristicaEspecificacion']['grupocaracteristica_id']) {
+							
+							/**
+		                     * Se agrega la validación por patrón para los campos de solo números
+		                     * añadiendole símbolos adicionales que aceptará el campo
+		                     */
+		                    if (!empty($v['permitidos'])) {
 
-                    /**
-                     * Se agrega la validación por patrón para los campos de solo números
-                     * añadiendole símbolos adicionales que aceptará el campo
-                     */
-                    if (!empty($value['UnidadMedida'][0]['permitidos'])) {
+		                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $v['permitidos']));
 
-                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $value['UnidadMedida'][0]['permitidos']));
+		                    	if ($v['tipo_campo'] == 'number') {
+		                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+		                    	}
 
-                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
-                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
-                    	}
+		                    }else{
+		                    	if ($v['tipo_campo'] == 'number') {
+		                    		$pattern = "^[0-9.,]+$";
+		                    	}
+		                    }
 
-                    }else{
-                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
-                    		$pattern = "^[0-9.,]+$";
-                    	}
-                    }
+						}
+					}
 
                     $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
                                          
@@ -737,24 +802,28 @@ class ProductosController extends AppController
                 $tabla .= '</span>';
                 if (!empty($value['UnidadMedida'])) {
 					$pattern = '';
+					foreach ($value['UnidadMedida'] as $k => $v) {
+						if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $value['GrupocaracteristicaEspecificacion']['grupocaracteristica_id']) {
+							
+							 /**
+		                     * Se agrega la validación por patrón para los campos de solo números
+		                     * añadiendole símbolos adicionales que aceptará el campo
+		                     */
+		                    if (!empty($v['permitidos'])) {
 
-                    /**
-                     * Se agrega la validación por patrón para los campos de solo números
-                     * añadiendole símbolos adicionales que aceptará el campo
-                     */
-                    if (!empty($value['UnidadMedida'][0]['permitidos'])) {
+		                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $v['permitidos']));
 
-                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $value['UnidadMedida'][0]['permitidos']));
+		                    	if ($v['tipo_campo'] == 'number') {
+		                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+		                    	}
 
-                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
-                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
-                    	}
-                    	
-                    }else{
-                    	if ($value['UnidadMedida'][0]['tipo_campo'] == 'number') {
-                    		$pattern = "^[0-9.,]+$";
-                    	}
-                    }
+		                    }else{
+		                    	if ($v['tipo_campo'] == 'number') {
+		                    		$pattern = "^[0-9.,]+$";
+		                    	}
+		                    }
+						}
+					}
 
                     $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" required>';
                                          
@@ -766,7 +835,12 @@ class ProductosController extends AppController
 			$tabla .= '<td>';
 			
 			if (!empty($value['UnidadMedida'])) {
-				$tabla .= '<label class="label-form label label-info">' . $value['UnidadMedida'][0]['nombre'] . '</label>';	
+				foreach ($value['UnidadMedida'] as $k => $v) {
+					if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $value['GrupocaracteristicaEspecificacion']['grupocaracteristica_id']) {
+						
+						$tabla .= '<label class="label-form label label-info">' . $v['nombre'] . '</label>';
+					}
+				}	
 			}else{
 				$tabla .= '<label class="label-form label label-info">Texto libre</label>';
 			}
@@ -774,7 +848,13 @@ class ProductosController extends AppController
 			$tabla .= '</td>';
 			$tabla .= '<td>';
 			if (!empty($value['UnidadMedida'])) {
-				$tabla .= $value['UnidadMedida'][0]['ejemplo'];	
+				foreach ($value['UnidadMedida'] as $k => $v) {
+					if ($v['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] == $value['GrupocaracteristicaEspecificacion']['grupocaracteristica_id']) {
+						
+						$tabla .= $v['ejemplo'];	
+					}
+				}
+				
 			}else{
 				$tabla .= '9-3/8 PULGADAS';
 			}
