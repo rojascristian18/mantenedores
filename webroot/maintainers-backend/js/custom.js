@@ -265,7 +265,7 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][referencia]': {
 					required: true,
-					minlength: 5,
+					minlength: 3,
                     maxlength: 32
 				},
 				'data[Producto][descripcion_corta]': {
@@ -302,7 +302,7 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][nombre]': {
 					required: 'Requerido',
-					minlength: '5 carácteres mínimo',
+					minlength: '3 carácteres mínimo',
                     maxlength: '50 carácteres máximo'
 				},
 				'data[Producto][referencia]': {
