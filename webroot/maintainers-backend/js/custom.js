@@ -260,12 +260,12 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][nombre]': {
 					required: true,
-					minlength: 5,
-                    maxlength: 50
+					minlength: 1,
+                    maxlength: 70
 				},
 				'data[Producto][referencia]': {
 					required: true,
-					minlength: 3,
+					minlength: 2,
                     maxlength: 32
 				},
 				'data[Producto][descripcion_corta]': {
@@ -302,12 +302,12 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][nombre]': {
 					required: 'Requerido',
-					minlength: '3 carácteres mínimo',
-                    maxlength: '50 carácteres máximo'
+					minlength: '1 carácteres mínimo',
+                    maxlength: '70 carácteres máximo'
 				},
 				'data[Producto][referencia]': {
 					required: 'Requerido',
-					minlength: '5 carácteres mínimo',
+					minlength: '2 carácteres mínimo',
                     maxlength: '32 carácteres máximo'
 				},
 				'data[Producto][descripcion_corta]': {
