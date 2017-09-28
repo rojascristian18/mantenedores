@@ -77,8 +77,8 @@ class Producto extends AppModel
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 			'between' => array(
-                'rule' => array('lengthBetween', 5, 50),
-                'message' => 'Campo caracteristicas debe tener un largo entre 5 y 60 carácteres.'
+                'rule' => array('lengthBetween', 2, 70),
+                'message' => 'Campo caracteristicas debe tener un largo entre 2 y 70 carácteres.'
             )
 		),
 		'nombre_final' => array(
@@ -103,8 +103,8 @@ class Producto extends AppModel
 		),
 		'descripcion_corta' => array(
 			'between' => array(
-                'rule' => array('lengthBetween', 50, 800),
-                'message' => 'La descripción corta debe tener un largo entre 50 y 800 carácteres.'
+                'rule' => array('lengthBetween', 30, 800),
+                'message' => 'La descripción corta debe tener un largo entre 30 y 800 carácteres.'
             )
 		),
 		/*'precio' => array(
