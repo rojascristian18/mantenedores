@@ -185,6 +185,9 @@
                                         <? if ($tarea['Tarea']['iniciado'] && $tarea['Tarea']['en_progreso'] ) : ?>
 											<?= $this->Html->link('<i class="fa fa-play"></i> Continuar trabajando', array('action' => 'work', $tarea['Tarea']['id']), array('class' => 'btn btn-success btn-xs', 'rel' => 'tooltip', 'title' => 'Trabajar en esta tarea', 'escape' => false)); ?>
 										<? endif;?>
+										<? if (!$tarea['Tarea']['iniciado'] && $tarea['Tarea']['en_progreso'] ) : ?>
+											<?= $this->Html->link('<i class="fa fa-hourglass-start"></i> Iniciar tarea', array('action' => 'start', $tarea['Tarea']['id']), array('class' => 'btn btn-success btn-xs', 'rel' => 'tooltip', 'title' => 'Iniciar esta tarea', 'escape' => false)); ?>
+										<? endif;?>
 										<? if ($tarea['Tarea']['iniciado'] && $tarea['Tarea']['rechazado'] ) : ?>
 											<?= $this->Html->link('<i class="fa fa-play"></i> Volver a trabajar', array('action' => 'work', $tarea['Tarea']['id']), array('class' => 'btn btn-success btn-xs', 'rel' => 'tooltip', 'title' => 'Trabajar en esta tarea', 'escape' => false)); ?>
 										<? endif;?>
