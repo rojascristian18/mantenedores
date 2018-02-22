@@ -39,7 +39,7 @@
 		<div class="col-xs-12 col-sm-8">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Agregar Características al Grupo</h3>
+					<h3 class="panel-title">Agregar Ficha técnica al Grupo</h3>
 				</div>
 				<div class="panel-body">
 					<div class="col-xs-12">
@@ -47,11 +47,12 @@
 							<div class="form-group">
 								<label>Ingrese el ID o nombre de la característica <label class="label label-form label-success">(<?=$totalAtributos?>) disponibles</label></label>
 							</div>
-							<div class="form-group">
+							<div class="form-group" style="width: 50%;">
 								<input class="form-control input-caracteristicas-buscar" placeholder="1001, Potencia, Motor, etc" type="text"  style="min-width: 350px;">
 							</div>
-							<div class="form-group">
+							<div class="form-group" style="width: 49%;">
 								<button class="btn btn-primary button-caracteristicas-buscar"><span class="fa fa-plus"></span> Agregar</button>
+								<button class="btn btn-default button-unidad-agregar"><span class="fa fa-plus"></span> Crear unidad de medida</button>
 							</div>
 						</div>
 					</div>
@@ -125,14 +126,15 @@
 				<div class="panel-body">
 					<div class="col-xs-12">
 						<div class="form-inline form-palabraclave">
-							<div class="form-group">
+							<div class="form-group" style="width: 100%;">
 								<label>Ingrese el ID o nombre de la palabra clave</label>
 							</div>
-							<div class="form-group">
-								<input class="form-control input-palabraclave-buscar" placeholder="Taladros, Accesorios, etc." type="text"  style="min-width: 350px;">
+							<div class="form-group" style="width: 50%;">
+								<input class="form-control input-palabraclave-buscar" placeholder="Taladros, Accesorios, etc." type="text"  style="width: 100%;">
 							</div>
-							<div class="form-group">
+							<div class="form-group" style="width: 49%;">
 								<button class="btn btn-primary button-palabraclave-buscar"><span class="fa fa-plus"></span> Agregar</button>
+								<button class="btn btn-default button-palabraclave-agregar"><span class="fa fa-plus"></span> Crear</button>
 							</div>
 						</div>
 					</div>
@@ -158,3 +160,6 @@
 	</div>
 </div>
 <?= $this->Form->end(); ?>
+
+
+<?= $this->element('admin_grupocaracteristicamodal'); ?>

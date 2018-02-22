@@ -457,7 +457,12 @@ class UsuariosController extends AppController
 		{
 			$this->request->data	= $this->Usuario->find('first', array(
 				'conditions'	=> array('Usuario.id' => $id),
-				'contain' => array('Cuenta', 'Calificacion', 'Codigopaise', 'Pago')
+				'contain' => array('Cuenta', 'Calificacion', 'Codigopaise', 
+					'Pago' => array(
+						'Tienda',
+						'conditions' => array('Pago.monto_pagado = Pago.monto_a_pagar'),
+						'limit' => 10
+					))
 			));
 		}
 		
@@ -479,6 +484,8 @@ class UsuariosController extends AppController
 		}
 
 		BreadcrumbComponent::add('Mis Perfil ');
+
+		
 
 		$this->set(compact('bancos', 'tipoCuentas', 'codigopaises', 'tareas'));
 	}

@@ -17,7 +17,8 @@ jQuery(document).ready(function($)
 		$inputVal 	= '',
 		$inputPago 	= '',
 		ids 		= '',
-		pagado 		= 0;
+		pagado 		= 0,
+		cargandoIntervalo;
 
 	/**
 	* Copy icons
@@ -363,15 +364,210 @@ jQuery(document).ready(function($)
 	}
 
 
+	function cargando($padre)
+	{	
+		var $contenedorBarra = $padre.find('.progress');
+
+		if ($contenedorBarra.hasClass('hide')) {
+			$contenedorBarra.removeClass('hide');
+		}
+
+		var $barra 	= $contenedorBarra.find('.progress-bar');
+		var inicio 	= 0;
+		var final 	= 100;
+
+		$barra.css({'width': inicio});
+
+		cargandoIntervalo= setInterval(function(){
+
+			inicio = inicio + 5;
+
+			$barra.css({'width': inicio + '%'});
+			$barra.text(inicio + '%');
+
+			if (inicio == final) {
+				clearInterval(cargandoIntervalo);
+			}
+
+			}, 50);
+	}
+
+
+	function detenerCargando($contenedor)
+	{
+		clearInterval(cargandoIntervalo);
+
+		var contenedorBarra = $contenedor.find('.progress');
+
+		if (!contenedorBarra.hasClass('hide')) {
+			contenedorBarra.addClass('hide');
+		}
+
+		$contenedor.modal('hide');
+	}
+
+
+	function modalPalabraClave()
+	{
+		// Agregamos la plabara al modal
+		$('#palabraclavenocreada').text($('.input-palabraclave-buscar').val());
+
+		// Levantamos el modal
+		$('#modalpalabraclave').modal('show');
+	}
+
+
+	function limpiarModalUnidadesMedida()
+	{
+		$('#nombreunidadmedia').val('');
+		$('#tipounidadmedia').val('text');
+		$('#permitidosunidadmedia').val('');
+		$('#ejemplounidadmedia').val('');
+	}
+
+
+	function refrescarSelectUnidadMedida($obj)
+	{			
+		var selects = $('#tablaCaracteristicas select');
+
+		$.each(selects, function(indice, valor){
+			var $select = $(this);
+
+			$.each( $obj, function( id, nombre ) {
+			  	$select.append($('<option></option>').attr('value', id).text(nombre));
+			});
+		});
+
+	}
+
+
+	if ($('#modalunidadmedida').length) {
+
+		limpiarModalUnidadesMedida();
+		
+		$('.button-unidad-agregar').on('click', function(event) {
+			event.preventDefault();
+			$('#modalunidadmedida').modal('show');
+		});
+
+		// Procesar el los datos
+		$('#crearunidadmedida').on('click', function(event) {
+			event.preventDefault();
+			
+			// Cargando
+			cargando($('#modalunidadmedida'));
+
+			// Campos
+			var nombreUnidad     = $('#nombreunidadmedia').val();
+			var tipoUnidad       = $('#tipounidadmedia').val();
+			var permitidosUnidad = $('#permitidosunidadmedia').val();
+			var ejemploUnidad    = $('#ejemplounidadmedia').val();
+			var data = {
+				'nombre' 		: nombreUnidad,
+				'tipo_campo' 	: tipoUnidad,
+				'permitidos' 	: permitidosUnidad,
+				'ejemplo' 		: ejemploUnidad
+			}
+
+
+			$.post( webroot + 'admin/grupocaracteristicas/crearUnidadmedidas', data, function(respuesta){
+				var response = $.parseJSON(respuesta);
+
+				if (typeof(response) == 'object') {
+					if (response.code == 200) {
+						noty({text: response.message, layout: 'topRight', type: 'success'});
+						
+						limpiarModalUnidadesMedida();
+
+						refrescarSelectUnidadMedida(response.lista);
+
+						detenerCargando($('#modalunidadmedida'));
+						
+
+					}else{
+						noty({text:  response.message, layout: 'topRight', type: 'error'});
+					}
+				}
+
+	      	})
+	      	.fail(function(){
+
+				noty({text: 'Ocurrió un error al guardar la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
+
+				setTimeout(function(){
+					$.noty.closeAll();
+				}, 10000);
+			});
+
+		});
+	}
+
+
+
+	if ($('#modalpalabraclave').length) {
+
+		$('.button-palabraclave-agregar').on('click', function(event) {
+			event.preventDefault();
+			modalPalabraClave($('#modalpalabraclave'));
+		});
+
+		$('#crearpalabraclave').on('click', function(event) {
+			event.preventDefault();
+
+			// Cargando
+			cargando($('#modalpalabraclave'));
+
+			var grupoId = 0,
+				palabra = '';
+
+			if ( $('#GrupocaracteristicaId').length > 0 ) {
+				grupoId = $('#GrupocaracteristicaId').val();
+			}
+
+			palabra = $('.input-palabraclave-buscar').val();
+
+			var data = {
+				'palabra' 		: palabra
+			}
+			
+			$.post( webroot + 'admin/grupocaracteristicas/crearPalabraclaves', data, function(respuesta){
+				var response = $.parseJSON(respuesta);
+				
+				detenerCargando($('#modalpalabraclave'));
+				
+				if (typeof(response) == 'object') {
+					if (response.code == 200) {
+						noty({text: response.message, layout: 'topRight', type: 'success'});
+
+						$('#tablaPalabraclave tbody').append(response.todo);
+
+					}else{
+						noty({text:  response.message, layout: 'topRight', type: 'error'});
+					}
+				}
+
+	      	})
+	      	.fail(function(){
+
+				noty({text: 'Ocurrió un error al guardar la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
+
+				setTimeout(function(){
+					$.noty.closeAll();
+				}, 10000);
+			});
+
+		});
+	}
+
 	if ($('.input-palabraclave-buscar').length > 0) {
-		var crear = true;
     	
     	// Se limpia el campo
     	$('.input-palabraclave-buscar').val('');
 
     	$('.input-palabraclave-buscar').each(function(){
 			var $esto 	= $(this),
-				grupoId = 0;
+				grupoId = 0,
+				res = '';
 
 			if ( $('#GrupocaracteristicaId').length > 0 ) {
 				grupoId = $('#GrupocaracteristicaId').val();
@@ -382,7 +578,12 @@ jQuery(document).ready(function($)
 			   	source: function(request, response) {
 			      	$.get( webroot + 'admin/grupocaracteristicas/buscarPalabraclaves/' + request.term + '/' + grupoId, function(respuesta){
 						response( $.parseJSON(respuesta) );
-						crear = true;
+						res = $.parseJSON(respuesta);
+						
+						if (res[0].id == '' && request.term != '') {
+							modalPalabraClave(request.term);
+						}
+
 			      	})
 			      	.fail(function(){
 
@@ -396,7 +597,6 @@ jQuery(document).ready(function($)
 			    select: function( event, ui ) {
 			        console.log("Seleccionado: " + ui.item.value + " id " + ui.item.id);
 			        todo = ui.item.todo;
-			        crear = false;
 			    }
 			   
 			});
@@ -415,25 +615,6 @@ jQuery(document).ready(function($)
 			event.preventDefault();
 			$(this).parents('tr').eq(0).remove();
 		});
-
-		// Botón crear y agregar al listado
-		/*$('.button-palabraclave-crear').on('click', function(event){
-			event.preventDefault();
-			if ( crear ) {
-				var $tabla = '<tr>';
-				$tabla += '<td>';
-				$tabla += '<label class="label label-info">Crear</label>';
-				$tabla += '</td>';
-				$tabla += '<td><input type="hidden" name="data[Palabraclave][][nombre]" value="'+$('.input-palabraclave-buscar').val()+'">';
-				$tabla += $('.input-palabraclave-buscar').val();
-				$tabla += '</td>';
-				$tabla += '<td>';
-				$tabla += '<button class="quitar btn btn-danger">Quitar</button>';
-				$tabla += '</td>';
-				$tabla += '</tr>';
-				$('#tablaPalabraclave tbody').append($tabla);
-			}
-		});*/
 	}
 
 	/**

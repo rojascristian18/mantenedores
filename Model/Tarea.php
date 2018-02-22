@@ -409,14 +409,14 @@ class Tarea extends AppModel
 
 
 	public function contadorTareas()
-	{
+	{	
 		# Obtenemos Información completa de la tarea
-		$tarea = ClassRegistry::init('Tarea')->find('count',
+		$tarea = ClassRegistry::init('Tarea')->find('first',
 			array(
 				'conditions' => array(
-					'Tarea.usuario_id' => $this->data['Tarea']['usuario_id'],
+					'Tarea.id' => $this->data['Tarea']['id'],
 					'Tarea.finalizado' => 1
-				)	 
+				) 
 			)
 		);
 		
@@ -424,8 +424,24 @@ class Tarea extends AppModel
 			return;
 		}
 
-		ClassRegistry::init('Usuario')->id = $this->data['Tarea']['usuario_id'];
-		ClassRegistry::init('Usuario')->saveField('count_tareas_terminadas', $tarea);
+		$usuario = ClassRegistry::init('Usuario')->find('first', array(
+			'conditions' => array(
+				'Usuario.id' => $tarea['Tarea']['usuario_id']
+			),
+			'contain' => array(
+				'Tarea' => array(
+					'conditions' => array(
+						'Tarea.finalizado' => 1
+					),
+					'fields' => array(
+						'Tarea.id'
+					)
+				)
+			)
+		));
+
+		ClassRegistry::init('Usuario')->id = $usuario['Usuario']['id'];
+		ClassRegistry::init('Usuario')->saveField('count_tareas_terminadas', count($usuario['Tarea']));
 		return;
 	}
 

@@ -407,7 +407,7 @@ class GrupocaracteristicasController extends AppController
 		    $tabla .= '</select></td>';
 
 
-	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
 	    	$tabla .= '</tr>';
 
 	    	// Armamos la tabla
@@ -478,7 +478,7 @@ class GrupocaracteristicasController extends AppController
 			$tabla = '<tr>';
 	    	$tabla .= '<td><input type="hidden" name="data[Categoria][[*ID*]][id_category]" value="[*ID*]" class="js-input-id_category">[*ID*]</td>';
 	    	$tabla .= '<td>[*NOMBRE*]</td>';
-	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
 	    	$tabla .= '</tr>';
 
 	    	// Armamos la tabla
@@ -548,9 +548,8 @@ class GrupocaracteristicasController extends AppController
 
 			# Tabla todo
 			$tabla = '<tr>';
-	    	$tabla .= '<td><input type="hidden" name="data[Palabraclave][Palabraclave][[*ID*]]" value="[*ID*]" class="js-input-id_palabraclave">[*ID*]</td>';
-	    	$tabla .= '<td>[*NOMBRE*]</td>';
-	    	$tabla .= '<td><button class="quitar btn btn-danger">Quitar</button></td>';
+	    	$tabla .= '<td><input type="hidden" name="data[Palabraclave][Palabraclave][[*ID*]]" value="[*ID*]" class="js-input-id_palabraclave">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
 	    	$tabla .= '</tr>';
 
 	    	// Armamos la tabla
@@ -561,6 +560,178 @@ class GrupocaracteristicasController extends AppController
 		}
 
 		echo json_encode($arrayPalabraclaves);
+		exit;
+
+	}
+
+	public function admin_crearPalabraclaves()
+	{	
+		$res = array();
+
+		if (!$this->request->is('post')) {
+			$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear la palabra clave'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		if (empty($this->request->data['palabra'])) {
+			$res = array(
+				'code' => 500,
+				'message' => 'No se permite campo vacio'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'Palabraclave.nombre LIKE "' . $this->request->data['palabra'] . '"' 
+				)
+			);
+
+		# Buscamos las categorias que no este asociados a este grupo
+		$palabraclave  = $this->Grupocaracteristica->Palabraclave->find('first', $options);
+
+		if (!empty($palabraclave)) {
+			$res = array(
+				'code' => 500,
+				'message' => sprintf('<i class="fa fa-close" aria-hidden="true"></i> Palabra <b>%s</b> ya existe', $this->request->data['palabra'])
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		$this->Grupocaracteristica->Palabraclave->create();
+		if(!$this->Grupocaracteristica->Palabraclave->save(array('Palabraclave' => array('nombre' => $this->request->data['palabra'])))) {
+    		$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear la plabra clave'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		// Nuevas unidades de medida
+		$lista = $this->Grupocaracteristica->Palabraclave->find('all', array(
+			'conditions' => array('activo' => 1),
+			'order'      => array('id' => 'DESC'),
+			'limit'      => 1
+			)
+		);
+
+		$arrayPalabraclaves = array();
+		
+		# Creamos la lista de atributos
+		foreach ($lista as $indice => $valor) {
+
+			$arrayPalabraclaves[$indice]['id'] = $valor['Palabraclave']['id'];
+			$arrayPalabraclaves[$indice]['value'] = sprintf('%s - %s', $valor['Palabraclave']['id'], $valor['Palabraclave']['nombre']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Palabraclave][Palabraclave][[*ID*]]" value="[*ID*]" class="js-input-id_palabraclave">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Palabraclave']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Palabraclave']['nombre'] , $tabla);
+
+			$arrayPalabraclaves = $tabla;
+		}
+
+		$res = array(
+			'code' => 200,
+			'message' => sprintf('<i class="fa fa-check" aria-hidden="true"></i> Palabra <b>%s</b> creada con éxito', $this->request->data['palabra']),
+			'todo' => $arrayPalabraclaves
+		);
+
+		echo json_encode($res);
+		exit;
+
+	}
+
+	public function admin_crearUnidadmedidas()
+	{	
+		$res = array();
+		
+		if (!$this->request->is('post')) {
+			$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear la unidad de medida'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		if (empty($this->request->data['nombre']) || empty($this->request->data['tipo_campo'])) {
+			$res = array(
+				'code' => 500,
+				'message' => 'No se permite campo vacio'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'UnidadMedida.nombre LIKE "' . $this->request->data['nombre'] . '"' 
+				)
+			);
+
+		
+		$unidamedida  = $this->Grupocaracteristica->UnidadMedida->find('first', $options);
+
+		if (!empty($unidamedida)) {
+			$res = array(
+				'code' => 202,
+				'message' => sprintf('<i class="fa fa-close" aria-hidden="true"></i> Unidad de medida <b>%s</b> ya existe. ¿Desea modificarla?', $this->request->data['nombre']),
+				'data' => $unidamedida
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		$data = array(
+			'UnidadMedida' => array(
+				'nombre'     => $this->request->data['nombre'],
+				'tipo_campo' => $this->request->data['tipo_campo'],
+				'permitidos' => $this->request->data['permitidos'],
+				'ejemplo'    => $this->request->data['ejemplo']
+			)
+		);
+
+		$this->Grupocaracteristica->UnidadMedida->create();
+		if(!$this->Grupocaracteristica->UnidadMedida->save($data)) {
+    		$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear la unidad de medida'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		// Nuevas unidades de medida
+		$lista = $this->Grupocaracteristica->UnidadMedida->find('list', array(
+			'conditions' => array('activo' => 1),
+			'order'      => array('id' => 'DESC'),
+			'limit'      => 1
+			)
+		);
+
+
+		$res = array(
+			'code' => 200,
+			'message' => sprintf('<i class="fa fa-check" aria-hidden="true"></i> Unidad de medida <b>%s</b> creada con éxito', $this->request->data['nombre']),
+			'lista' => $lista
+		);
+
+		echo json_encode($res);
 		exit;
 
 	}
@@ -615,5 +786,164 @@ class GrupocaracteristicasController extends AppController
 		echo json_encode($arrayGrupos);
 		exit;
 
+	}
+
+
+	public function admin_clonar($id = null)
+	{
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Especificacion', 'EspecificacionIdioma', 'Idioma', 'Categoria', 'CategoriaIdioma'));
+
+		if ( ! $this->Grupocaracteristica->exists($id) )
+		{
+			$this->Session->setFlash('Registro inválido.', null, array(), 'danger');
+			$this->redirect(array('action' => 'index'));
+		}
+
+		if ( $this->request->is('post') || $this->request->is('put') )
+		{	
+			if ( empty($this->request->data['Especificacion']) ) {
+				$this->request->data['Grupocaracteristica']['count_caracteristicas'] = 0;
+			}
+			
+			if ( empty($this->request->data['Categoria']) ) {
+				$this->request->data['Grupocaracteristica']['count_categorias'] = 0;
+			}
+
+			if ( empty($this->request->data['Palabraclave'])) {
+				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
+			}
+			
+			$this->Grupocaracteristica->create();
+			if ( $this->Grupocaracteristica->save($this->request->data) )
+			{
+				$this->Session->setFlash('Registro agregado correctamente.', null, array(), 'success');
+				$this->redirect(array('action' => 'index'));
+			}
+			else
+			{
+				$this->Session->setFlash('Error al guardar el registro. Por favor intenta nuevamente.', null, array(), 'danger');
+			}
+		}
+		else
+		{
+			$this->request->data	= $this->Grupocaracteristica->find('first', array(
+				'conditions'	=> array('Grupocaracteristica.id' => $id),
+				'contain' => array('Palabraclave')
+			));
+
+			# Se obtiene el listado de caracteristicas que tiene este registro
+			$caracteristicas = $this->Grupocaracteristica->GrupocaracteristicaEspecificacion->find('all', array(
+				'conditions' => array(
+					'GrupocaracteristicaEspecificacion.grupocaracteristica_id' => $id
+					),
+				'fields' => array('id_feature', 'unidad_medida_id')
+				));
+
+			# Declaramos el indice Especificacion como un arreglo vacio
+			$this->request->data['Especificacion'] = array();
+			$caracteristicasGrupo = array();
+
+			# Sí no viene vacia buscamos
+			if ( ! empty($caracteristicas) ) {
+
+				$listaIdCaracteristicas = Hash::extract($caracteristicas, '{n}.GrupocaracteristicaEspecificacion.id_feature');
+
+				$options['conditions'] = array(
+					'Especificacion.id_feature IN' => $listaIdCaracteristicas
+				);
+
+				$options['contain'] = array(
+					'Idioma',
+					'UnidadMedida'
+				);
+
+				if ( count($listaIdCaracteristicas) == 1 ) {
+					$options['conditions'] = array(
+						'Especificacion.id_feature' => $listaIdCaracteristicas
+						);
+				}
+
+
+				$caracteristicasGrupo = $this->Grupocaracteristica->Especificacion->find('all', $options);
+
+				$medidas = $this->Grupocaracteristica->UnidadMedida->find('list', array(
+					'conditions' => array(
+						'UnidadMedida.activo' => 1
+						)
+					));
+
+				if (!empty($medidas)) {
+					foreach ($caracteristicasGrupo as $key => $value) {
+						$caracteristicasGrupo[$key]['UnidadMedidaLista'] = $medidas;	
+					}
+				}
+
+				$this->request->data['Especificacion'] = $caracteristicasGrupo;
+				
+			}
+
+			# Buscamos las categorias del grupo
+			# Se obtiene el listado de categorias que tiene este registro
+			$categorias = $this->Grupocaracteristica->GrupocaracteristicaCategoria->find('all', array(
+				'conditions' => array(
+					'GrupocaracteristicaCategoria.grupocaracteristica_id' => $id
+					),
+				'fields' => array('id_category')
+				));
+
+			# Declaramos el indice Categoria como un arreglo vacio
+			$this->request->data['Categoria'] = array();
+			$categoriasGrupo = array();
+
+			# Sí no viene vacia buscamos
+			if ( ! empty($categorias) ) {
+
+				$listaIdCategorias = Hash::extract($categorias, '{n}.GrupocaracteristicaCategoria.id_category');
+
+				$optionsCat['conditions'] = array(
+					'Categoria.id_category' => $listaIdCategorias
+				);
+
+				$optionsCat['contain'] = array(
+					'Idioma'
+				);
+
+				if ( count($listaIdCategorias) == 1 ) {
+					$optionsCat['conditions'] = array(
+						'Categoria.id_category' => $listaIdCategorias
+						);
+				}
+
+				$categoriasGrupo = $this->Grupocaracteristica->Categoria->find('all', $optionsCat);
+				
+				$this->request->data['Categoria'] = $categoriasGrupo;
+
+			}
+
+		}
+
+		# Cambiamos el datasource de los modelos que necesitamos externos
+		$this->cambiarDatasource(array('Especificacion', 'EspecificacionIdioma', 'Idioma'));
+		
+		$atributos  = $this->Grupocaracteristica->Especificacion->find('all', array(
+			'contain' => array(
+				'Idioma',
+				)
+			));
+
+		$atributosList = array();
+		
+		# Creamos la lista de atributos
+		foreach ($atributos as $indice => $valor) {
+			# Agregamos el índice 0 para obtener el primer idioma del sitio externo
+			if( isset($valor['Idioma'][0]['EspecificacionIdioma']) ) {
+				$atributosList[$valor['Especificacion']['id_feature']] = sprintf('%d - %s', $valor['Especificacion']['id_feature'], $valor['Idioma'][0]['EspecificacionIdioma']['name']);
+			}
+		}
+		# Total de atributos disponibles
+		$totalAtributos = count($atributosList);
+
+		$this->set(compact('atributosList', 'totalAtributos'));
 	}
 }

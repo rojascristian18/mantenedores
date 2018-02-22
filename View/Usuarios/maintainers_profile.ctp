@@ -167,13 +167,13 @@
                         <? foreach ($this->request->data['Pago'] as $indice => $pago) : ?>                                                                      
                         <div class="list-group list-group-contacts border-bottom">
                             <?= $this->Html->link(
-                                '<span class="contacts-title">#' . $tarea['Tarea']['id'] .'</span> ' . 
-                                '<span class="contacts-title">[' . $tarea['Tienda']['nombre'] . '] ' . $tarea['Tarea']['nombre'] . '</span>' .
-                                '<p>Finalizada el ' . $tarea['Tarea']['fecha_finalizado'] . '</p>' . 
+                                '<span class="contacts-title">#' . $pago['id'] .'</span> ' . 
+                                '<span class="contacts-title">[' . $pago['Tienda']['nombre'] . '] ' . $pago['nombre_tarea'] . '</span>' .
+                                '<p>Porcentaje realizado ' . $pago['porcentaje_realizado'] . '% de 100%</p>' . 
                                 '<div class="list-group-controls">
-                                    <label class="label label-form label-info">Valor ' . CakeNumber::currency($tarea['Tarea']['precio'], 'CLP') . '</label>
+                                    <label class="label label-form label-info">Monto ' . CakeNumber::currency($pago['monto_a_pagar'], 'CLP') . '</label>
                                 </div>',
-                                array('controller' => 'tareas', 'action' => 'view', $tarea['Tarea']['id']),
+                                array('controller' => 'pagos', 'action' => 'detail', $pago['id']),
                                 array('class' => 'list-group-item', 'escape' => false)
                                 ); ?>                                                                                        
                         </div>
