@@ -3,14 +3,54 @@ App::uses('AppController', 'Controller');
 class GrupocaracteristicasController extends AppController
 {
 	public function admin_index()
-	{
-		$this->paginate		= array(
+	{	
+		$paginate = array(
 			'recursive'			=> 0,
 			'order' => array('Grupocaracteristica.modified' => 'DESC'),
-			'conditions' => array('Grupocaracteristica.tienda_id' => $this->Session->read('Tienda.id')) 
+			'conditions' =>  array('Grupocaracteristica.tienda_id' => $this->Session->read('Tienda.id'))
 		);
+
+    	$total = 0;
+    	$totalMostrados = 0;
+
+    	$textoBuscar = null;
+
+    	// Filtrado de productos por formulario
+		if ( $this->request->is('post') ) {
+			if ( empty($this->request->data['Filtro']['palabra']) ) {
+				$this->Session->setFlash('Ingrese alguna coincidencia' , null, array(), 'danger');
+				$this->redirect(array('action' => 'index'));
+			}
+			if ( ! empty($this->request->data['Filtro']['palabra']) ) {
+				$this->redirect(array('controller' => 'grupocaracteristicas', 'action' => 'index', 'palabra' => $this->request->data['Filtro']['palabra']));
+			}
+		}
+
+		/**
+		* Buscar por
+		*/
+		if ( ! empty($this->request->params['named']['palabra']) ) {
+			$paginate		= array_replace_recursive($paginate, array(
+				'conditions'	=> array(
+					'Grupocaracteristica.nombre LIKE "%' . trim($this->request->params['named']['palabra']) . '%"'
+				)
+			));
+
+			// Texto ingresado en el campo buscar
+			$textoBuscar = $this->request->params['named']['palabra'];
+			
+		}else if ( ! empty($this->request->params['named']['palabra'])) {
+			$this->Session->setFlash('No se aceptan campos vacios.' ,  null, array(), 'danger');
+		}
+
+		$total = $this->Grupocaracteristica->find('count');
+
+		$this->paginate		= $paginate;
+
 		$grupocaracteristicas	= $this->paginate();
-		$this->set(compact('grupocaracteristicas'));
+		$totalMostrados = count($grupocaracteristicas);
+
+		$this->set(compact('grupocaracteristicas', 'totalMostrados', 'total', 'textoBuscar'));
 	}
 
 	public function admin_add()

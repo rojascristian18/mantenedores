@@ -5,6 +5,47 @@
 <div class="page-content-wrap">
 	<div class="row">
 		<div class="col-xs-12">
+			<?= $this->Form->create('Filtro', array('url' => array('controller' => 'grupocaracteristicas', 'action' => 'index'), 'inputDefaults' => array('div' => false, 'label' => false))); ?>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-search" aria-hidden="true"></i> Filtro de busqueda</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-8 col-xs-12">
+						<div class="form-group">
+							<label>Coincidencia</label>
+							<? if ( ! empty($this->request->params['named']['palabra']) ) : ?>
+								<?=$this->Form->input('palabra', array('class' => 'form-control', 'placeholder' => 'Ingrese nombre del grupo', 'value' => $this->request->params['named']['palabra']));?>
+							<? else : ?>
+								<?=$this->Form->input('palabra', array('class' => 'form-control', 'placeholder' => 'Ingrese nombre del grupo'));?>
+							<? endif; ?>
+                            
+						</div>
+					</div>
+					<div class="col-sm-2 col-xs-12">
+						<div class="form-group">
+							<?= $this->Form->button('<i class="fa fa-search" aria-hidden="true"></i> Buscar', array('type' => 'submit', 'escape' => false, 'class' => 'btn btn-buscar btn-success btn-block')); ?>
+						</div>
+					</div>
+					<?= $this->Form->end(); ?>
+					<div class="col-sm-2 col-xs-12">
+						<div class="form-group">
+							<?= $this->Html->link('<i class="fa fa-ban" aria-hidden="true"></i> Limpiar filtro', array('action' => 'index'), array('class' => 'btn btn-buscar btn-primary btn-block', 'escape' => false)); ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<? if ( !empty($textoBuscar) ) : ?>
+			<div class="col-xs-12">
+				<p><?=sprintf('<b>%d resultado encontrados para "%s"</b>  ', $totalMostrados, $textoBuscar)?></p>
+			</div>
+		<? endif; ?>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Listado de grupos de características</h3>
