@@ -15,8 +15,9 @@
 	<li class="xn-icon-button pull-right">
         <?=$this->element('maintainers_tareas'); ?>
     </li>
-    <li class="xn-icon-button pull-right">
-        <?=$this->element('maintainers_comentarios'); ?>
+    <li class="pull-right">
+    	<a href="#" class="sidebar-toggle"><i class="fa fa-comments"></i></a>
+    	<div id="count_mensajes" class="informer informer-danger"><?=$comentariosNotificacion; ?></div>
     </li>
 </ul>
 

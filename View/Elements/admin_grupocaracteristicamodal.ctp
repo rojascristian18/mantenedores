@@ -25,6 +25,50 @@
 </div>
 
 
+<div class="modal" id="modalcompetidor" tabindex="-1" role="dialog" aria-labelledby="competidorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="competidorLabel"><span class="fa fa-flag-checkered"></span> Crear Competidor</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="">Nombre del competidor</label>
+                        <input class="form-control" type="text" id="nombrecompetidor" placeholder="Competidor ejemplo">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <br>
+                        <label for=""><small>URL</small></label>
+                        <input class="form-control" type="text" id="urlcompetidor" placeholder="EJ: www.competior.cl">
+                    </div>
+                </div>
+                <!--<div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="">Instrucciones</label>
+                        <textarea class="form-control" id="descripcioncompetidor" placeholder="La URL del competidor es www.competidor.com"></textarea>
+                    </div>
+                </div>-->
+            </div>
+            <div class="modal-body">
+                <div class="progress hide">
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="crearcompetidor">Sí, crear competidor</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No crear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="modal" id="modalunidadmedida" tabindex="-1" role="dialog" aria-labelledby="headUnidadmedia" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

@@ -375,3 +375,7 @@ td.rechazado{
 	width: 100%;
 	margin: 20px 0;
 }
+
+.x-navigation .informer {
+	top: 5px;
+}

@@ -32,6 +32,7 @@ class AppController extends Controller
 		),
 		'DebugKit.Toolbar',
 		'TinyPng.Tiny',
+		'Prisync',
 		'Breadcrumb' => array(
 			'crumbs'		=> array(
 				array('Inicio', ''),
@@ -43,6 +44,34 @@ class AppController extends Controller
 
 	public function beforeFilter()
 	{	
+		/*$errors = array();
+		$productos = array();
+		try {
+			$productos = $this->Prisync->obtenerProductos();
+		} catch (Exception $e) {
+			$errors['Productos'][] = $e->getMessage();
+		}
+
+		if (isset($productos['results'])) {
+			foreach ($productos['results'] as $ip => $producto) {
+	
+				$productoDetalle = $this->Prisync->obtenerProductoPorId($producto['id']);
+				$urls = array();
+				if (!empty($productoDetalle['urls'])){
+					foreach ($productoDetalle['urls'] as $ipu => $urlId) {
+						$urls[] = $this->Prisync->obtenerCompetidoresPorProducto($urlId);
+					}
+				}
+
+				$productos['results'][$ip]['urls'] = $urls;
+			}
+			prx($productos);
+		}else{
+			prx($errors);
+		}*/
+
+		
+		#prx($this->Prisync->obtenerCompetidoresPorProducto(1906453));
 		/**
 		 * Layout y permisos públicos
 		 */
@@ -162,11 +191,11 @@ class AppController extends Controller
 
 		$this->cambioTienda();
 		
-		if ($this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_edit', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
+		if (isset($this->request->params['prefix']) && $this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_edit', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
 			$this->forzarCambioTienda();
 		}
 
-		if ($this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_work', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
+		if (isset($this->request->params['prefix']) && $this->request->params['controller'] == 'tareas' && $this->request->params['action'] == sprintf('%s_work', $this->request->params['prefix']) && ! empty($this->request->params['pass']) ) {
 			$this->forzarCambioTienda();
 		}
 		
@@ -235,7 +264,13 @@ class AppController extends Controller
 			}
 
 
-			$this->set(compact('permisos', 'modulosDisponibles', 'tiendasList', 'tareasNotificacion', 'comentariosNotificacion'));
+			/**
+			 * Mis tareas
+			 */
+			$misTareas = $this->misTareas();
+
+
+			$this->set(compact('permisos', 'modulosDisponibles', 'tiendasList', 'tareasNotificacion', 'comentariosNotificacion', 'misTareas'));
 		}
 
 		if ( ! empty($this->request->params['maintainers']) ) {
@@ -275,8 +310,13 @@ class AppController extends Controller
 				'conditions' => array('usuario_id' => $this->Auth->user('id')),
 				'contain' => array('Banco', 'TipoCuenta')
 				));
+
+			/**
+			 * Mis tareas
+			 */
+			$misTareas = $this->misTareas();
 			
-			$this->set(compact('tiendasList', 'miAcumuladoMesActual', 'miAcumuladoTotal', 'cuenta', 'tareasNotificacion', 'comentariosNotificacion'));
+			$this->set(compact('tiendasList', 'miAcumuladoMesActual', 'miAcumuladoTotal', 'cuenta', 'tareasNotificacion', 'comentariosNotificacion', 'misTareas'));
 		}
 
 
@@ -469,9 +509,47 @@ class AppController extends Controller
 		return $misTareas;
 	}
 
-	/***		
-		INCOMPLETO
-	**/
+
+	public function misTareas()
+	{
+		$options = array();
+
+		if ($this->request->params['prefix'] == 'admin') {
+			$options['conditions'] = array(
+				'Tarea.administrador_id' => $this->Auth->user('id'),
+				'Tarea.finalizado' => 0
+			);
+
+			$options['contain'] = array(
+				'Usuario'
+			);
+		}
+
+		if ($this->request->params['prefix'] == 'maintainers') {
+			$options['conditions'] = array(
+				'Tarea.usuario_id' => $this->Auth->user('id'),
+				'Tarea.finalizado' => 0
+			);
+		}
+
+		$tareas = ClassRegistry::init('Tarea')->find('all', $options);
+
+		$listaTareas =  array();
+		foreach ($tareas as $it => $tarea) {
+			if (isset($tarea['Usuario']) && !empty($tarea['Usuario'])) {
+
+				$groupLabel = sprintf('%s - %s', $tarea['Usuario']['nombre'], $tarea['Usuario']['email']); 
+				$listaTareas[$groupLabel][$tarea['Tarea']['id']] = $tarea['Tarea']['nombre']; 
+			}else{
+				$listaTareas[$tarea['Tarea']['id']] = $tarea['Tarea']['nombre'];
+			}
+		}
+
+		return $listaTareas;
+	}
+	
+
+
 	public function	tareasComentarios() {
 
 		if ( isset($this->request->params['admin']) ) {
@@ -480,7 +558,7 @@ class AppController extends Controller
 				'Comentario.administrador_id' => '',
 			);
 
-			$options['contain'] = array('Tarea' => array('Tienda'), 'Usuario');
+			$options['contain'] = array('Tarea');
 		}
 
 
@@ -490,11 +568,9 @@ class AppController extends Controller
 				'Comentario.usuario_id' => '',
 			);
 
-			$options['contain'] = array('Tarea' => array('Tienda'), 'Administrador');
+			$options['contain'] = array('Tarea');
 		}
 
-		$options['limit'] = 50;
-		$options['order'] = array('Comentario.created' => 'DESC');
 
 		
 		$comentarios = ClassRegistry::init('Comentario')->find('all', $options);
@@ -508,8 +584,9 @@ class AppController extends Controller
 			
 		}
 		
-		return $comentarios;
+		return count($comentarios);
 	}
+
 
 	public function visualizarComentarios($id = null) {
 
@@ -889,5 +966,50 @@ class AppController extends Controller
 
 
 		return $pagos;
+	}
+
+
+	/**
+	* Calular IVA
+	* @param 	$precio 	num 	Valor del producto
+	* @param 	$iva 		bool 	Valor del IVA
+	* @return 	Integer 	Valor calculado
+	*/
+	public function precio($precio = null, $iva = null) {
+		if ( !empty($precio) && !empty($iva)) {
+			// Se quitan los 00
+			$iva = intval($iva);
+
+			//Calculamos valor con IVA
+			$precio = ($precio + round( ( ($precio*$iva) / 100) ) );
+
+			return round($precio);
+		}
+	}
+
+
+	public function precio_neto($precio = null, $iva = 19)
+	{
+		if (!is_null($precio)) {
+
+			$iva = ($iva / 100) +1;
+
+			return round( $precio / $iva );
+		}
+
+		return;
+	}
+
+
+	public function precio_bruto($precio = null, $iva = 19)
+	{
+		if (!is_null($precio)) {
+
+			$iva = ($iva / 100) +1;
+
+			return round( $precio * $iva );
+		}
+		
+		return;
 	}
 }

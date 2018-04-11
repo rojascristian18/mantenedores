@@ -124,6 +124,38 @@ class Comentario extends AppModel
 	);
 
 	public function beforeSave($options = array()) {
-		#prx($this->data);
+		
+		$this->data[$this->alias]['guardar_email'] = false;
+
+		if (isset($this->data['Comentario']['tarea_id'])) {
+
+			// notificar comentario al administrador
+			if ( isset($this->data['Comentario']['notificar_comentario_administrador']) ) {
+				$this->data['Comentario']['notificar_comentario_administrador'] = true;
+				$this->data[$this->alias]['guardar_email'] = true;
+			}
+
+			// notificar comentario al mantenedor
+			if ( isset($this->data['Comentario']['notificar_comentario_mantenedor']) ) {
+				$this->data['Comentario']['notificar_comentario_mantenedor'] = true;
+				$this->data[$this->alias]['guardar_email'] = true;
+			}
+		}
+	}
+
+	public function afterSave($created, $options = array() ) {
+		
+		parent::afterSave($created, $options);
+
+		/**
+		 * Dispara eventos al guardar email (envio correos)
+		 */
+		if ( !empty($this->data[$this->alias]) && $this->data[$this->alias]['guardar_email'] ) {
+
+			$evento			= new CakeEvent('Model.Comentario.afterSave', $this, $this->data);
+
+			$this->getEventManager()->dispatch($evento);
+
+		}
 	}
 }

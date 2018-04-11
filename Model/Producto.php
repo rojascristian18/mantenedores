@@ -286,6 +286,22 @@ class Producto extends AppModel
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Competidor' => array(
+			'className'				=> 'Competidor',
+			'joinTable'				=> 'competidores_productos',
+			'foreignKey'			=> 'producto_id',
+			'associationForeignKey'	=> 'competidor_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'CompetidoresProducto',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 

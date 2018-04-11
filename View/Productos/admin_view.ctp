@@ -1,7 +1,7 @@
 <div class="page-title">
 	<h2><span class="fa fa-shopping-bag"></span> Revisar producto <?= $aceptado = ( $this->request->data['Producto']['aceptado'] ) ? '<small>(Validado)</small>' : '<small>(Rechazado)</small>' ; ?></h2>
 </div>
-<div class="page-content-wrap">
+<div class="page-content-wrap" id="tarea_container" data-tarea="<?=$this->request->data['Tarea']['id'];?>">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-default tabs">
@@ -137,6 +137,24 @@
 											</tr>
 										<? endforeach; ?>
 										<? endif; ?>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="competencias">
+							<div class="table-responsive">
+								<table class="table table.stripped">
+									<thead>
+										<th>Competencia</th>
+										<th style="width: 90%;">URL del producto</th>
+									</thead>
+									<tbody>
+										<? foreach($this->request->data['Competidor'] as $ic => $competidor) : ?>
+										<tr>
+											<td><b><?=$competidor['nombre'];?></b></td>
+											<td><?=$competidor['CompetidoresProducto']['url'];?></td>
+										</tr>
+									<? endforeach;?>
 									</tbody>
 								</table>
 							</div>

@@ -393,7 +393,7 @@ jQuery(document).ready(function($)
 	}
 
 
-	function detenerCargando($contenedor)
+	function detenerCargando($contenedor, $hide)
 	{
 		clearInterval(cargandoIntervalo);
 
@@ -403,7 +403,8 @@ jQuery(document).ready(function($)
 			contenedorBarra.addClass('hide');
 		}
 
-		$contenedor.modal('hide');
+		if ($hide)
+			$contenedor.modal('hide');
 	}
 
 
@@ -417,12 +418,30 @@ jQuery(document).ready(function($)
 	}
 
 
+	function modalCompetidor()
+	{
+		// Agregamos la plabara al modal
+		$('#nombrecompetidor').val($('.input-competidor-buscar').val());
+
+		// Levantamos el modal
+		$('#modalcompetidor').modal('show');
+	}
+
+
 	function limpiarModalUnidadesMedida()
 	{
 		$('#nombreunidadmedia').val('');
 		$('#tipounidadmedia').val('text');
 		$('#permitidosunidadmedia').val('');
 		$('#ejemplounidadmedia').val('');
+	}
+
+
+	function limpiarModalCompetidores()
+	{
+		$('#nombrecompetidor').val('');
+		$('#descripcioncompetidor').val('');
+		$('#urlcompetidor').val('');
 	}
 
 
@@ -481,17 +500,119 @@ jQuery(document).ready(function($)
 
 						refrescarSelectUnidadMedida(response.lista);
 
-						detenerCargando($('#modalunidadmedida'));
+						detenerCargando($('#modalunidadmedida'), true);
 						
 
+					}else if(response.code == 202){
+						noty({
+							text : response.message,
+							layout: 'topRight',
+							buttons : [
+                                {addClass: 'btn btn-success btn-clean', text: 'Editar', onClick: function($noty) {
+                                    $noty.close();
+                                    window.open(response.urlEdit);
+                                }
+                                },
+                                {addClass: 'btn btn-danger btn-clean', text: 'Cancelar', onClick: function($noty) {
+                                    $noty.close();
+                                    }
+                                }
+                            ]
+						});
+						detenerCargando($('#modalunidadmedida'), false);
+						limpiarModalUnidadesMedida();
 					}else{
 						noty({text:  response.message, layout: 'topRight', type: 'error'});
+						detenerCargando($('#modalunidadmedida'), false);
+						limpiarModalUnidadesMedida();
+
 					}
 				}
 
 	      	})
 	      	.fail(function(){
+	      		detenerCargando($('#modalunidadmedida'), false);
+				
+				
+				noty({text: 'Ocurrió un error al guardar la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
 
+				setTimeout(function(){
+					$.noty.closeAll();
+				}, 10000);
+			});
+
+		});
+	}
+
+
+
+	if ($('#modalcompetidor').length) {
+
+		limpiarModalCompetidores();
+		
+		$('.button-competidor-agregar').on('click', function(event) {
+			event.preventDefault();
+			$('#modalcompetidor').modal('show');
+		});
+
+		// Procesar el los datos
+		$('#crearcompetidor').on('click', function(event) {
+			event.preventDefault();
+			
+			// Cargando
+			cargando($('#modalcompetidor'));
+
+			// Campos
+			var nombreCompetidor     = $('#nombrecompetidor').val();
+			var urlcompetidor    = $('#urlcompetidor').val();
+			var data = {
+				'nombre' 		: nombreCompetidor,
+				'url' 			: urlcompetidor
+			}
+
+
+			$.post( webroot + 'admin/grupocaracteristicas/crearCompetidor', data, function(respuesta){
+				var response = $.parseJSON(respuesta);
+
+				if (typeof(response) == 'object') {
+					if (response.code == 200) {
+						noty({text: response.message, layout: 'topRight', type: 'success'});
+						
+						limpiarModalCompetidores();
+
+						detenerCargando($('#modalcompetidor'), true);
+						
+						$('#tablaCompetidores tbody').append(response.todo);
+
+					}else if(response.code == 202){
+						noty({
+							text : response.message,
+							layout: 'topRight',
+							buttons : [
+                                {addClass: 'btn btn-success btn-clean', text: 'Editar', onClick: function($noty) {
+                                    $noty.close();
+                                    window.open(response.urlEdit);
+                                }
+                                },
+                                {addClass: 'btn btn-danger btn-clean', text: 'Cancelar', onClick: function($noty) {
+                                    $noty.close();
+                                    }
+                                }
+                            ]
+						});
+						detenerCargando($('#modalcompetidor'), false);
+						limpiarModalCompetidores();
+					}else{
+						noty({text:  response.message, layout: 'topRight', type: 'error'});
+						detenerCargando($('#modalcompetidor'), false);
+						limpiarModalCompetidores();
+					}
+				}
+
+	      	})
+	      	.fail(function(){
+	      		detenerCargando($('#modalcompetidor'), false);
+						limpiarModalUnidadesMedida();
 				noty({text: 'Ocurrió un error al guardar la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
 
 				setTimeout(function(){
@@ -533,22 +654,25 @@ jQuery(document).ready(function($)
 			$.post( webroot + 'admin/grupocaracteristicas/crearPalabraclaves', data, function(respuesta){
 				var response = $.parseJSON(respuesta);
 				
-				detenerCargando($('#modalpalabraclave'));
+				
 				
 				if (typeof(response) == 'object') {
 					if (response.code == 200) {
+						
 						noty({text: response.message, layout: 'topRight', type: 'success'});
+						detenerCargando($('#modalpalabraclave'), true);
 
 						$('#tablaPalabraclave tbody').append(response.todo);
 
 					}else{
 						noty({text:  response.message, layout: 'topRight', type: 'error'});
+						detenerCargando($('#modalpalabraclave'), false);
 					}
 				}
 
 	      	})
 	      	.fail(function(){
-
+	      		detenerCargando($('#modalpalabraclave'), false);
 				noty({text: 'Ocurrió un error al guardar la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
 
 				setTimeout(function(){
@@ -608,6 +732,65 @@ jQuery(document).ready(function($)
 
 			$('#tablaPalabraclave tbody').append(todo);
 			$('.input-palabraclave-buscar').val('');
+		});
+
+		// Botón quitar característica de la lista
+		$(document).on('click', '.quitar', function(event){
+			event.preventDefault();
+			$(this).parents('tr').eq(0).remove();
+		});
+	}
+
+
+	if ($('.input-competidor-buscar').length > 0) {
+    	
+    	// Se limpia el campo
+    	$('.input-competidor-buscar').val('');
+
+    	$('.input-competidor-buscar').each(function(){
+			var $esto 	= $(this),
+				grupoId = 0,
+				res = '';
+
+			if ( $('#GrupocaracteristicaId').length > 0 ) {
+				grupoId = $('#GrupocaracteristicaId').val();
+			}
+			
+			// Se buscan las características
+			$esto.autocomplete({
+			   	source: function(request, response) {
+			      	$.get( webroot + 'admin/grupocaracteristicas/buscarCompetidores/' + request.term + '/' + grupoId, function(respuesta){
+						response( $.parseJSON(respuesta) );
+						res = $.parseJSON(respuesta);
+						
+						if (res[0].id == '' && request.term != '') {
+							modalCompetidor(request.term);
+						}
+
+			      	})
+			      	.fail(function(){
+
+						noty({text: 'Ocurrió un error al obtener la información. Intente nuevamente.', layout: 'topRight', type: 'error'});
+
+						setTimeout(function(){
+							$.noty.closeAll();
+						}, 10000);
+					});
+			    },
+			    select: function( event, ui ) {
+			        console.log("Seleccionado: " + ui.item.value + " id " + ui.item.id);
+			        todo = ui.item.todo;
+			    }
+			   
+			});
+	    });
+
+	    // Botón agregar característica a la lista
+		$('.button-competidor-buscar').on('click', function(event) {
+			event.preventDefault();
+
+			$('#tablaCompetidores tbody').append(todo);
+			$('.input-competidor-buscar').val('');
 		});
 
 		// Botón quitar característica de la lista
@@ -1077,5 +1260,82 @@ jQuery(document).ready(function($)
         });
 
     }
+
+
+    // Prisync
+    if ($('#precio_manual').length) {
+    	$('#precio_manual').on('click', function(e){
+    		e.preventDefault();
+
+    		$(this).parents('.input-group').eq(0).find('.form-control').toggleClass('hide');
+    		$(this).find('span').toggleClass('hide');
+
+    		if ( $('#ProductoCostAuto').hasClass('hide') ) {
+    			$('#ProductoCostAuto').attr('disabled', 'disabled');
+    		}else{
+    			$('#ProductoCostAuto').removeAttr('disabled');
+    		}
+
+    		if ( $('#ProductoCostText').hasClass('hide') ) {
+    			$('#ProductoCostText').attr('disabled', 'disabled');
+    		}else{
+    			$('#ProductoCostText').removeAttr('disabled');
+    		}
+    	});
+    }
+
+    if ($('#AgregarProductoPrisync').length){
+    	$('#AgregarProductoPrisync').validate({
+			rules: {
+				'data[Producto][name]': {
+					required: true
+				},
+				'data[Producto][brand]': {
+					required: true
+				},
+				'data[Producto][category]': {
+					required: true
+				},
+				'data[Producto][product_code_reference]': {
+					required: true
+				},
+				'data[Tarea][impuesto_default_id]': {
+					required: true
+				},
+				'data[Producto][cost]': {
+					required: true
+				}
+			},
+			messages: {
+				'data[Producto][name]': {
+					required: 'Requerido'
+				},
+				'data[Producto][brand]': {
+					required: 'Requerido'
+				},
+				'data[Producto][category]': {
+					required: 'Requerido'
+				},
+				'data[Producto][product_code_reference]': {
+					required: 'Requerido'
+				},
+				'data[Tarea][impuesto_default_id]': {
+					required: 'Requerido'
+				},
+				'data[Producto][cost]': {
+					required: 'Requerido'
+				}
+			}
+		});
+
+    	$(document).on('ready', function(){
+    		$('#Competidor00Url').trigger('change');
+    	});
+
+		$(document).on('change', '#Competidor00Url', function(){
+			$(this).parents('tr').eq(0).find('a').attr('href', $(this).val());
+		});
+    }
+
 });
 //]]>

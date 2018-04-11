@@ -4,8 +4,8 @@ class EmailConfig
 	public $gmail	= array(
 		'host'				=> 'ssl://smtp.gmail.com',
 		'port'				=> 465,
-		'username'			=> 'leads@brandon.cl',
-		'password'			=> 'agencia:brandon',
+		'username'			=> 'cristian.rojas@nodriza.cl',
+		'password'			=> 'cristian18',
 		'transport'			=> 'Smtp'
 	);
 }

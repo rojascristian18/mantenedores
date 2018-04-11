@@ -18,6 +18,10 @@
 								<td><?= $this->Form->input('nombre'); ?></td>
 							</tr>
 							<tr>
+								<th><?= $this->Form->label('protocolo', 'Protocolo URL'); ?></th>
+								<td><?= $this->Form->select('protocolo', array('http://' => 'HTTP', 'https://' => 'HTTPS'), array('empty' => false, 'class' => 'form-control')); ?></td>
+							</tr>
+							<tr>
 								<th><?= $this->Form->label('url', 'URL'); ?></th>
 								<td><?= $this->Form->input('url'); ?></td>
 							</tr>

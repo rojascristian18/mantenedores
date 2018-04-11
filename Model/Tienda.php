@@ -150,4 +150,21 @@ class Tienda extends AppModel
 			'counterQuery'			=> ''
 		)
 	);
+
+
+	public function beforeSave($options = array()) {
+		parent::beforeSave();
+
+		// Normalizamos
+		$this->data[$this->alias]['url'] = trim(strtolower($this->data[$this->alias]['url']));
+		
+		if (strstr($this->data[$this->alias]['url'], 'http')) {
+			$this->data[$this->alias]['url'] = str_replace('http://', '', $this->data[$this->alias]['url']);
+		}
+
+		if (strstr($this->data[$this->alias]['url'], 'https')) {
+			$this->data[$this->alias]['url'] = str_replace('https://', '', $this->data[$this->alias]['url']);
+		}
+
+	}
 }

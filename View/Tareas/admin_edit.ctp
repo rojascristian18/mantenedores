@@ -18,7 +18,7 @@
 <?=	$this->Form->input('id');?>
 <?= $this->Form->input('administrador_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Administrador.id'))); ?>
 <?= $this->Form->input('ElementosEliminados', array('type' => 'hidden', 'id' => 'ElementosEliminados')); ?>
-<div class="page-content-wrap">
+<div class="page-content-wrap" id="tarea_container" data-tarea="<?=$this->request->data['Tarea']['id'];?>">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
@@ -365,7 +365,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
+	<!--<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
@@ -454,4 +454,5 @@
 			</div>
 		</div>
 	</div>
+	-->
 </div>

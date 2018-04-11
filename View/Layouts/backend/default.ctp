@@ -9,6 +9,7 @@
 		<?= $this->Html->css(array(
 			sprintf('/backend/css/theme-%s', $this->Session->read('Tienda.tema')),
 			'/backend/css/custom',
+			'/css/comentarios',
 			/*
 			'/backend/css/ion/ion.rangeSlider',
 			'/backend/css/ion/ion.rangeSlider.skinFlat',
@@ -34,9 +35,10 @@
 			'/backend/js/plugins/summernote/summernote_espanol',
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
 			'/backend/js/plugins/tagsinput/jquery.tagsinput.min',
-			
+			'/backend/js/plugins/bootstrap/bootstrap-file-input.js',
 			//'/backend/js/plugins',
 			'/backend/js/custom',
+			'/js/comentarios',
 			/*
 			'/backend/js/plugins/bootstrap/bootstrap-datepicker',
 
@@ -74,6 +76,9 @@
 				<?= $this->fetch('content'); ?>
 			</div>
 		</div>
+
+		<?= $this->element($this->request->params['prefix'] . '_sidebar'); ?>
+
         <audio id="audio-alert" src="<?= $this->Html->url('/backend/audio/alert.mp3'); ?>" preload="auto"></audio>
         <audio id="audio-fail" src="<?= $this->Html->url('/backend/audio/fail.mp3'); ?>" preload="auto"></audio>
 		<?= $this->Html->script(array('/backend/js/actions')); ?>

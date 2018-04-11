@@ -8,7 +8,7 @@
 		<? endif; ?>
 	</div>
 </div>
-<div class="page-content-wrap">
+<div class="page-content-wrap" id="tarea_container" data-tarea="<?=$this->request->data['Tarea']['id'];?>">
 	<div class="row">
 		<div class="col-xs-12">
 			<p>Usted está revisando un producto de la tarea <b>identificador #<?=$this->request->data['Tarea']['id'];?></b>.</p>
@@ -24,8 +24,9 @@
 						
 						<li role="presentation"><a href="#dimensiones" aria-controls="dimensiones" role="tab" data-toggle="tab"><i class="fa fa-crop"></i> Dimensiones</a></li>
 						<li role="presentation"><a href="#caracteristicas" aria-controls="caracteristicas" role="tab" data-toggle="tab"><i class="fa fa-object-group"></i> Características</a></li>
-						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante</a></li>
+						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante & Proveedor</a></li>
 						<li role="presentation"><a href="#imagenes" aria-controls="imagenes" role="tab" data-toggle="tab"><i class="fa fa-picture-o"></i> Imágenes</a></li>
+						<li role="presentation"><a href="#competencias" aria-controls="competencias" role="tab" data-toggle="tab"><i class="fa fa-flag-checkered"></i> Competencias</a></li>
 					</ul>
 
 					<!-- Tab panes -->
@@ -121,6 +122,10 @@
 								<label class="btn-block"><?= __('Fabricante'); ?></label>
 								<?=$this->request->data['Fabricante']['name'];?>
 							</div>
+							<div class="form-group col-xs-12">
+								<label class="btn-block"><?= __('Referencia proveedor'); ?></label>
+								<?=$this->request->data['Producto']['referencia_proveedor'];?>
+							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="imagenes">
 							<div class="table-responsive">
@@ -150,6 +155,24 @@
 											</tr>
 										<? endforeach; ?>
 										<? endif; ?>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="competencias">
+							<div class="table-responsive">
+								<table class="table table.stripped">
+									<thead>
+										<th>Competencia</th>
+										<th style="width: 90%;">URL del producto</th>
+									</thead>
+									<tbody>
+										<? foreach($this->request->data['Competidor'] as $ic => $competidor) : ?>
+										<tr>
+											<td><b><?=$competidor['nombre'];?></b></td>
+											<td><?=$competidor['CompetidoresProducto']['url'];?></td>
+										</tr>
+									<? endforeach;?>
 									</tbody>
 								</table>
 							</div>

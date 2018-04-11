@@ -244,6 +244,15 @@ class Tarea extends AppModel
 			'counterCache'			=> true,
 			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
 		),
+		'TipoTarea' => array(
+			'className'				=> 'TipoTarea',
+			'foreignKey'			=> 'tipo_tarea_id',
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'counterCache'			=> true,
+			//'counterScope'			=> array('Asociado.modelo' => 'Tienda')
+		),
 	);
 	public $hasMany = array(
 		'Adjunto' => array(

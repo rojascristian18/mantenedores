@@ -54,7 +54,7 @@
 
 	setTimeout(function(){
 		$('.modal').modal('hide');		
-	}, 3500);	
+	}, 5500);	
 </script>
 <? endif; ?>
 

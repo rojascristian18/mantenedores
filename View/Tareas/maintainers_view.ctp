@@ -165,7 +165,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
+	<!--<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
@@ -240,7 +240,7 @@
 				<? endif; ?>
 			</div>
 		</div>
-	</div>
+	</div>-->
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="pull-right guardar-botones">

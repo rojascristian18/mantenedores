@@ -179,6 +179,22 @@ class Grupocaracteristica extends AppModel
 			'finderQuery'			=> '',
 			'deleteQuery'			=> '',
 			'insertQuery'			=> ''
+		),
+		'Competidor' => array(
+			'className'				=> 'Competidor',
+			'joinTable'				=> 'grupocaracteristicas_competidores',
+			'foreignKey'			=> 'grupocaracteristica_id',
+			'associationForeignKey'	=> 'competidor_id',
+			'unique'				=> true,
+			'conditions'			=> '',
+			'fields'				=> '',
+			'order'					=> '',
+			'limit'					=> '',
+			'offset'				=> '',
+			'with'					=> 'GrupocaracteristicaCompetidor',
+			'finderQuery'			=> '',
+			'deleteQuery'			=> '',
+			'insertQuery'			=> ''
 		)
 	);
 

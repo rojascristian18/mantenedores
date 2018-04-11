@@ -4,6 +4,8 @@ class ProductosController extends AppController
 {
 	public function admin_index()
 	{	
+		$this->redirect(array('controller' => 'tareas', 'action' => 'index'));
+
 		# Cambiamos el datasource de los modelos que necesitamos externos
 		$this->cambiarDatasource(array('Fabricante', 'Proveedor'));
 
@@ -37,7 +39,8 @@ class ProductosController extends AppController
 				'Imagen',
 				'Tarea',
 				'Marca',
-				'Grupocaracteristica'
+				'Grupocaracteristica',
+				'Competidor'
 				)
 			)
 		);
@@ -69,7 +72,8 @@ class ProductosController extends AppController
 				'Imagen',
 				'Marca',
 				'Tarea',
-				'Grupocaracteristica'
+				'Grupocaracteristica',
+				'Competidor'
 				)
 			)
 		);
@@ -376,6 +380,7 @@ class ProductosController extends AppController
 				$errorValidacion[] = implode(' ', $this->validarTamanoImagenes('set'));
 			}
 
+
 			$this->Producto->create();
 			if ( $this->Producto->saveAll($this->request->data) )
 			{	
@@ -506,6 +511,9 @@ class ProductosController extends AppController
 			
 			// Limpiamos las especificaciones
 			$this->Producto->EspecificacionesProducto->deleteAll(array('producto_id' => $id));
+
+			// Limpiamos los competidores
+			$this->Producto->CompetidoresProducto->deleteAll(array('producto_id' => $id));
 
 			# Quitar puntos a precio
 			if (isset($this->request->data['Producto']['precio'])) {
@@ -676,6 +684,99 @@ class ProductosController extends AppController
     		$values[$k] = str_replace('/', '\/', $v);
     	}
     	return $values;
+	}
+
+
+	public function maintainers_obtenerCompetidores($idGrupo = null, $idProducto = null) {
+		if(empty($idGrupo)) {
+			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
+			exit;
+		}
+
+		# Obtenemos el grupo con sus pespecificaciones
+		
+		$options['conditions'] = array(
+			'Grupocaracteristica.id' => $idGrupo
+			);
+
+		$options['contain'] = array(
+			'Competidor'
+			);
+
+		# Si existe un producto buscamos los competidores de este para descartarlas de la busqueda
+		if (!empty($idProducto)) {
+			$producto = $this->Producto->find('first', array(
+				'conditions' => array(
+					'Producto.id' => $idProducto
+					),
+				'contain' => array(
+					'Competidor'
+					)
+				));
+
+			if (!empty($producto)) {
+
+				$options['contain'] = array(
+					'Competidor' => array(
+						'Producto' => array(
+							'conditions' => array(
+								'Producto.id' => $producto['Producto']['id']
+								),
+							
+							)
+						)
+					);
+			}
+
+		}	
+
+		$grupo = ClassRegistry::init('Grupocaracteristica')->find('first', $options);
+		
+		# Vemos si tiene especificaciones asociadas
+		if (empty($grupo['Competidor'])) {
+			
+			exit;
+		}
+		
+		$tabla = '';
+		# Armamos tabla de Competidores
+		foreach ($grupo['Competidor'] as $key => $value) {
+
+			$tabla .= '<tr>';
+			$tabla .= '<td>';
+			$tabla .= $value['nombre'];
+			$tabla .= '</td>';
+			$tabla .= '<td>';
+			$tabla .= '<input type="hidden" name="data[Competidor][' . $key . '][competidor_id]" value="' . $value['id'] . '">';
+
+			if ( isset($value['Producto'][0]['CompetidoresProducto']) && $value['Producto'][0]['CompetidoresProducto']['competidor_id'] == $value['id']) {
+				$tabla .= '<input url="url" type="text"  class="form-control js-url not-blank" name="data[Competidor][' . $key . '][url]" value="' . $value['Producto'][0]['CompetidoresProducto']['url'] . '" placeholder="Agregue url de la competencia">';
+			}else{
+				$tabla .= '<input url="url" type="text"  class="form-control js-url not-blank" name="data[Competidor][' . $key . '][url]" placeholder="Agregue url de la competencia" required>';
+			}
+
+			
+			$tabla .= '</td>';
+			$tabla .= '<td>';
+			if (!empty($value['url'])) {
+				
+				$tabla .= '<button type="button" class="btn btn-info popover-dismiss" title="Ayuda" data-content="' . $value['url'] . '"><i class="fa fa-info"></i> Ayuda</button>';
+				
+			}
+			$tabla .= '</td>';
+			/*$tabla .= '<td>';
+			if (!empty($value['ejemplo'])) {
+				
+				$tabla .= '<p>' . $value['ejemplo'] . '</p>';
+				
+			}
+			$tabla .= '</td>';*/
+			$tabla .= '</tr>';
+
+		}
+
+		echo $tabla;
+		exit;
 	}
 
 

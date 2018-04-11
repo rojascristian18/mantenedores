@@ -10,7 +10,7 @@
 		<?= $this->Html->link('Cancelar y volver', array('controller' => 'tareas', 'action' => 'work', $miTarea['Tarea']['id']), array('class' => 'btn btn-danger')); ?>
 	</div>
 </div>
-<div class="page-content-wrap">
+<div class="page-content-wrap" id="tarea_container" data-tarea="<?=$miTarea['Tarea']['id'];?>">
 	<div class="row">
 		<div class="col-xs-12">
 			<p>Usted está creando un producto para la tarea <b>identificador #<?=$miTarea['Tarea']['id'];?></b>.</p>
@@ -88,8 +88,9 @@
 						<!--<li role="presentation"><a href="#precio" aria-controls="precio" role="tab" data-toggle="tab"><i class="fa fa-dollar"></i> Precio</a></li>-->
 						<li role="presentation"><a href="#dimensiones" aria-controls="dimensiones" role="tab" data-toggle="tab"><i class="fa fa-crop"></i> Dimensiones</a></li>
 						<li role="presentation"><a href="#caracteristicas" aria-controls="caracteristicas" role="tab" data-toggle="tab"><i class="fa fa-object-group"></i> Características</a></li>
-						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante</a></li>
+						<li role="presentation"><a href="#fabricante" aria-controls="fabricante" role="tab" data-toggle="tab"><i class="fa fa-industry"></i> Fabricante & Proveedor</a></li>
 						<li role="presentation"><a href="#imagenes" aria-controls="imagenes" role="tab" data-toggle="tab"><i class="fa fa-picture-o"></i> Imágenes</a></li>
+						<li role="presentation"><a href="#competencias" aria-controls="competencias" role="tab" data-toggle="tab"><i class="fa fa-flag-checkered"></i> Competencias</a></li>
 					</ul>
 
 					<!-- Tab panes -->
@@ -241,6 +242,11 @@
 								<p>Seleccione a un fabricante de la lista (*)</p>
 								<?= $this->Form->input('fabricante_id'); ?>
 							</div>
+							<div class="form-group col-xs-12">
+								<?= $this->Form->label('referencia_proveedor', 'Referencia del proveedor'); ?>
+								<p>Ingrese la referencia del proveedor (*)</p>
+								<?= $this->Form->input('referencia_proveedor'); ?>
+							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="imagenes">
 							<div class="alert alert-info" role="alert">
@@ -297,6 +303,25 @@
 											<td><a href="#" class="btn btn-xs btn-success js-clon-agregar"><i class="fa fa-plus"></i> Agregar imagen</a></td>
 										</tr>
 									</tfoot>
+								</table>
+							</div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="competencias">
+							<div class="alert alert-info" role="alert">
+					            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					            Agregue la url del producto correspondiente.
+					        </div>
+							<div class="table">
+								<table class="table table.stripped">
+									<thead>
+										<th>Competencia</th>
+										<th style="width: 80%;">URL del producto</th>
+										<th>Detalle</th>
+										<!--<th>Ejemplo</th>-->
+									</thead>
+									<tbody class="js-competidor-add">
+										
+									</tbody>
 								</table>
 							</div>
 						</div>

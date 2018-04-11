@@ -1,4 +1,7 @@
 <?php
+
+set_time_limit(0);
+
 App::uses('AppController', 'Controller');
 class TareasController extends AppController
 {	
@@ -365,7 +368,7 @@ class TareasController extends AppController
 		else
 		{	
 			# Actualizamos los comentarios no visualizados a visualizado
-			$this->visualizarComentarios($id);
+			#$this->visualizarComentarios($id);
 			
 			$this->request->data	= $this->Tarea->find('first', array(
 				'conditions'	=> array('Tarea.id' => $id),
@@ -431,7 +434,7 @@ class TareasController extends AppController
 		else
 		{	
 			# Actualizamos los comentarios no visualizados a visualizado
-			$this->visualizarComentarios($id);
+			#$this->visualizarComentarios($id);
 
 			$this->request->data	= $this->Tarea->find('first', array(
 				'conditions'	=> array('Tarea.id' => $id),
@@ -927,7 +930,7 @@ class TareasController extends AppController
 			# Referencia
 			if (isset($producto['referencia'])) {
 				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Reference #' => $producto['referencia']));
-				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Supplier reference #' => $producto['referencia']));
+				$dataProducto[$key]['Producto'] = array_replace_recursive($dataProducto[$key]['Producto'], array('Supplier reference #' => $producto['referencia_proveedor']));
 			}
 
 			# Proveedor
@@ -1265,7 +1268,7 @@ class TareasController extends AppController
 		else
 		{	
 			# Actualizamos los comentarios no visualizados a visualizado
-			$this->visualizarComentarios($id);
+			#$this->visualizarComentarios($id);
 
 			# Cambiamos el estado a en prgreso
 			if ( ! $this->cambiarEstadoTarea($id, 'en_progreso') ) {

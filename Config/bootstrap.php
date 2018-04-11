@@ -169,3 +169,14 @@ function configuracion($slug = '') {
 		
 	}
 }
+
+
+/**
+ * Convierte un objeto en array
+ * @param  Object $obj Objeto
+ * @return array      Array con la información del objeto
+ */
+function to_array($obj)
+{
+	return json_decode(json_encode($obj), true);
+}

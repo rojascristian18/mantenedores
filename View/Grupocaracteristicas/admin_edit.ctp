@@ -194,6 +194,57 @@
 			</div>
 		</div> <!-- end col -->
 	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Agregar Competidores al Grupo</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-xs-12">
+						<div class="form-inline form-competidor">
+							<div class="form-group" style="width: 100%;">
+								<label>Ingrese el ID o nombre del competidor</label>
+							</div>
+							<div class="form-group" style="width: 50%;">
+								<input class="form-control input-competidor-buscar" placeholder="Competidor 1, Competidor 2,  etc." type="text"  style="width: 100%;">
+							</div>
+							<div class="form-group" style="width: 49%;">
+								<button class="btn btn-primary button-competidor-buscar"><span class="fa fa-plus"></span> Agregar</button>
+								<button class="btn btn-default button-competidor-agregar"><span class="fa fa-plus"></span> Crear</button>
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-stripped" id="tablaCompetidores">
+							<thead>
+								<th>Competidor</th>
+								<th style="max-width: 60px">Acción</th>
+							</thead>
+							<tbody>
+								<? if (!empty($this->request->data['Competidor'])) : ?>
+							
+								<? foreach ($this->request->data['Competidor'] as $indice => $competidor) : ?>
+								<tr>
+	    							<td><?= $this->Form->input('Competidor.Competidor.' . $competidor['id'], array('value' => $competidor['id'], 'type' => 'hidden')); ?><?=$competidor['nombre'];?></td>
+	    							<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>
+	    						</tr>
+								<? endforeach; ?>
+
+							<? endif; ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="pull-right">
+						<input type="submit" class="btn btn-primary esperar-carga" autocomplete="off" data-loading-text="Espera un momento..." value="Guardar cambios">
+						<?= $this->Html->link('Cancelar', array('action' => 'index'), array('class' => 'btn btn-danger')); ?>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <?= $this->Form->end(); ?>
 

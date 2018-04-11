@@ -4,7 +4,7 @@
 		<label>Creada el <?= $this->Time->format($this->request->data['Tarea']['created'], '%d de %m del %Y  a las %H:%M:%S'); ?></label>
 	</div>
 </div>
-<div class="page-content-wrap">
+<div class="page-content-wrap" id="tarea_container" data-tarea="<?=$this->request->data['Tarea']['id'];?>">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
@@ -238,7 +238,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
+	<!--<div class="row">
 		<div class="col-xs-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
@@ -332,7 +332,7 @@
 			<? endif; ?>
 			</div>
 		</div>
-	</div>
+	</div>-->
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="pull-right guardar-botones">

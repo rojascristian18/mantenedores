@@ -1,0 +1,132 @@
+
+
+body.sidebar-opened .page-container {
+	margin-left: -49%;
+}
+
+
+.sidebar {
+    position: fixed;
+    z-index: 10;
+    right: -50%;
+    top: 0px;
+    width: 50%;
+    height: 100%;
+    -webkit-transition: all 200ms ease;
+    -moz-transition: all 200ms ease;
+    -ms-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+}
+
+
+body.sidebar-opened .page-container::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    position: absolute;
+    z-index: 5;
+}
+
+#FormularioComentarios, #FormularioComentariosModal {
+	position: relative;
+	float: left;
+	width: 100%;
+}
+
+#FormularioComentariosModal {
+    height: 320px;
+}
+
+#FormularioComentariosModal .form-group label, #listadoTareasAjaxModal h4  {
+    color: #fff;
+}
+
+.respuestaMessage {
+    position: absolute;
+    width: 100%;
+    height: 0;
+    transition: height 0.1s linear;
+    overflow: hidden;
+}
+
+.respuestaMessage.success {
+	height: 100%;
+	z-index: 1;
+	background-color: #89AD4D;
+}
+
+
+.respuestaMessage.error {
+	height: 100%;
+	z-index: 1;
+	background-color: #B64645;
+}
+
+.respuestaMessage .cardTitle {
+	color: #fff;
+	font-size: 20px;
+	margin: 18% 0 5% 0;
+}
+
+#listadoTareasAjax .messages .item, #listadoTareasAjaxModal .messages .item  {
+    opacity: 1;
+}
+
+#listadoTareasAjax .messages .item .text, #listadoTareasAjax .messages .item:nth-child(2n) .text, #listadoTareasAjaxModal .messages .item .text, #listadoTareasAjaxModal .messages .item:nth-child(2n) .text {
+    background-color: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+#listadoTareasAjax .messages .item.in .text, #listadoTareasAjaxModal .messages .item.in .text {
+    background-color: rgba(255,255,255,0.3);
+}
+
+#listadoTareasAjaxModal .modal-content {
+    background: #101215;
+}
+
+#listadoTareasAjaxModal .modal-dialog {
+    display: flex;
+}
+
+@media screen and (min-width: 768px) {
+    #listadoTareasAjaxModal .modal-dialog {
+        width: 80%;
+    }
+}
+
+#listadoTareasAjaxModal .modal-header, #listadoTareasAjaxModal .modal-footer {
+    background: #101215;
+    border-color: #101215;
+}
+
+#listadoTareasAjaxModal .modal-header .modal-title {
+    color: #fff;
+}
+
+#listadoTareasAjaxModal .modal-body {
+    background-color: #191B1F;
+    height: 380px;
+    overflow-y: auto;
+}
+
+#listadoTareasAjaxModal .messages .item .text .heading, #listadoTareasAjaxModal .messages .item .text .heading a {
+    color: #fff !important;
+}
+
+#listadoTareasAjaxModal .modal-body li {
+    color: #fff;
+}
+
+#listadoTareasAjaxModal span.visto {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 8px;
+    color: #6c6c6c;
+}
+
+#listadoTareasAjaxModal span.visto > i.visto {
+    color: #95B75D;
+}

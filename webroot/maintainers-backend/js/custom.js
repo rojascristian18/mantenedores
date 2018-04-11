@@ -250,7 +250,7 @@ jQuery(document).ready(function($)
 	 */
 
 	if ( $('.validate-product').length ) {
-		$('.validate-product').validate({
+		var validateProduct = $('.validate-product').validate({
 			rules: {
 				'data[Producto][grupocaracteristica_id]': {
 					required: true
@@ -286,6 +286,9 @@ jQuery(document).ready(function($)
 					required: true,
 				},
 				'data[Producto][profundidad]': {
+					required: true,
+				},
+				'data[Producto][peso]': {
 					required: true,
 				},
 				'data[Producto][peso]': {
@@ -339,9 +342,15 @@ jQuery(document).ready(function($)
 		$.validator.messages.number = 'Ingrese solo números';
 		$.validator.messages.pattern = 'Carácteres no válidos';
 		$.validator.messages.required = 'Requerido';
+		$.validator.messages.url = 'URL no válida';
 
 		$.validator.addClassRules('not-blank', {
 			required: true  	
+		});
+
+		$.validator.addClassRules('is-url', {
+			required: true,
+			url : true  	
 		});
 	}
 
@@ -560,6 +569,33 @@ jQuery(document).ready(function($)
 
     }
 
+
+    function obtenerTablaCompetidores(grupo) {
+    	var $contexto 	= $('#competencias'),
+    		$producto 	= $('#ProductoId').val();
+
+    	if (typeof(grupo) != 'undefined' && typeof($producto) == 'undefined') {
+    		$.get( webroot + 'maintainers/productos/obtenerCompetidores/' + grupo, function(respuesta){
+				$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+				noAplica();
+		  	})
+		  	.fail(function(){
+				$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+			});
+    	}
+
+    	if (typeof(grupo) != 'undefined' && typeof($producto) != 'undefined') {
+    		$.get( webroot + 'maintainers/productos/obtenerCompetidores/' + grupo + '/' + $producto, function(respuesta){
+    			$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+    			noAplica();
+		  	})
+		  	.fail(function(){
+				$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+			});
+    	}
+
+    }
+
     /**
      * Preview de nombre de productos
      * @param  {[type]} $('.string_nombre_final').length [description]
@@ -588,6 +624,7 @@ jQuery(document).ready(function($)
 
     		insertarNombreFinal();
     		obtenerTablaCaracteristicas($('.string_grupo').val());
+    		obtenerTablaCompetidores($('.string_grupo').val());
     	});
 
     	$('.string_nombre').on('keyup', function(event){
@@ -612,6 +649,7 @@ jQuery(document).ready(function($)
 
     		insertarNombreFinal();
     		obtenerTablaCaracteristicas($(this).val());
+    		obtenerTablaCompetidores($(this).val());
     	});
 
     	$('.string_marca').on('change', function(){
@@ -632,6 +670,11 @@ jQuery(document).ready(function($)
         $("input.fileinput").bootstrapFileInput();
     }
 	//END Bootstrap file input
+
+
+	//Bootstrap Popover
+    $('body').popover({selector : '.popover-dismiss', placement : 'auto'});
+    	
 
 	// Carrusel
 	if($(".owl-carousel").length > 0){

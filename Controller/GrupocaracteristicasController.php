@@ -68,6 +68,10 @@ class GrupocaracteristicasController extends AppController
 			if ( empty($this->request->data['Palabraclave'])) {
 				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
 			}
+
+			if ( empty($this->request->data['Competidor'])) {
+				$this->request->data['Grupocaracteristica']['count_competidores'] = 0;
+			}
 			
 			$this->Grupocaracteristica->create();
 			if ( $this->Grupocaracteristica->save($this->request->data) )
@@ -145,6 +149,8 @@ class GrupocaracteristicasController extends AppController
 			$this->Grupocaracteristica->GrupocaracteristicaCategoria->deleteAll(array('GrupocaracteristicaCategoria.grupocaracteristica_id' => $id));
 			# Eliminar categorias anteriores Con callbacks
 			$this->Grupocaracteristica->GrupocaracteristicaPalabraclave->deleteAll(array('GrupocaracteristicaPalabraclave.grupocaracteristica_id' => $id));
+			# Eliminar categorias anteriores Con callbacks
+			$this->Grupocaracteristica->GrupocaracteristicaCompetidor->deleteAll(array('GrupocaracteristicaCompetidor.grupocaracteristica_id' => $id));
 
 					
 			if ( $this->Grupocaracteristica->save($this->request->data) )
@@ -161,7 +167,7 @@ class GrupocaracteristicasController extends AppController
 		{
 			$this->request->data	= $this->Grupocaracteristica->find('first', array(
 				'conditions'	=> array('Grupocaracteristica.id' => $id),
-				'contain' => array('Palabraclave')
+				'contain' => array('Palabraclave', 'Competidor')
 			));
 
 			# Se obtiene el listado de caracteristicas que tiene este registro
@@ -728,10 +734,12 @@ class GrupocaracteristicasController extends AppController
 		$unidamedida  = $this->Grupocaracteristica->UnidadMedida->find('first', $options);
 
 		if (!empty($unidamedida)) {
+			$urlunidadmedida = Router::url('/', true) . 'admin/unidadMedidas/edit/' . $unidamedida['UnidadMedida']['id'];
 			$res = array(
 				'code' => 202,
-				'message' => sprintf('<i class="fa fa-close" aria-hidden="true"></i> Unidad de medida <b>%s</b> ya existe. ¿Desea modificarla?', $this->request->data['nombre']),
-				'data' => $unidamedida
+				'message' => sprintf('<i class="fa fa-close" aria-hidden="true"></i> Unidad de medida <b>%s</b> ya existe. ¿Desea modificarlo?', $this->request->data['nombre'] ),
+				'data' => $unidamedida,
+				'urlEdit' => $urlunidadmedida
 			);
 			echo json_encode($res);
     		exit;
@@ -769,6 +777,180 @@ class GrupocaracteristicasController extends AppController
 			'code' => 200,
 			'message' => sprintf('<i class="fa fa-check" aria-hidden="true"></i> Unidad de medida <b>%s</b> creada con éxito', $this->request->data['nombre']),
 			'lista' => $lista
+		);
+
+		echo json_encode($res);
+		exit;
+
+	}
+
+	public function admin_buscarCompetidores($palabra = '', $idGrupo = '') {
+
+		if (empty($palabra)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+
+		# Se obtiene el listado de categorias que tiene este grupo
+		$competidoresDelGrupo = $this->Grupocaracteristica->GrupocaracteristicaCompetidor->find('all', array(
+			'conditions' => array(
+				'GrupocaracteristicaCompetidor.grupocaracteristica_id' => $idGrupo
+				),
+			'fields' => array(
+				'GrupocaracteristicaCompetidor.competidor_id'
+				)
+			));
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'Competidor.nombre LIKE "%' . $palabra . '%"',
+				'Competidor.id LIKE "%' . $palabra . '%"' 
+				)
+			);
+
+		# Consulta con grupo de categoria definido
+		if ( ! empty($competidoresDelGrupo) ) {
+			$options['conditions'] = array_replace_recursive($options['conditions'], array(
+				'OR' => array(
+					'Competidor.nombre LIKE "%' . $palabra . '%"',
+					'Competidor.id LIKE "%' . $palabra . '%"' 
+					),
+				'AND' => array(
+					'Competidor.id !=' => Hash::extract($competidoresDelGrupo, '{n}.GrupocaracteristicaCompetidor.competidor_id')
+					)
+				));
+		}
+
+		# Buscamos las categorias que no este asociados a este grupo
+		$competidores  = $this->Grupocaracteristica->Competidor->find('all', $options);
+		
+		if (empty($competidores)) {
+			echo json_encode(array('0' => array('id' => '', 'value' => 'No se encontraron coincidencias')));
+    		exit;
+		}
+		
+		$arrayCompetidores = array();
+		
+		# Creamos la lista de atributos
+		foreach ($competidores as $indice => $valor) {
+
+			$arrayCompetidores[$indice]['id'] = $valor['Competidor']['id'];
+			$arrayCompetidores[$indice]['value'] = sprintf('%s - %s', $valor['Competidor']['id'], $valor['Competidor']['nombre']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Competidor][Competidor][[*ID*]]" value="[*ID*]" class="js-input-id_competidor">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Competidor']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Competidor']['nombre'] , $tabla);
+
+			$arrayCompetidores[$indice]['todo'] = $tabla;
+		}
+
+		echo json_encode($arrayCompetidores);
+		exit;
+
+	}
+
+
+	public function admin_crearCompetidor()
+	{	
+		$res = array();
+		
+		if (!$this->request->is('post')) {
+			$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear al competidor'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		if (empty($this->request->data['nombre']) || empty($this->request->data['url'])) {
+			$res = array(
+				'code' => 500,
+				'message' => 'No se permite campo vacio'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		# Armamos las condiciones de la búsqueda base
+		$options['conditions'] = array(
+			'OR' => array(
+				'Competidor.nombre LIKE "' . $this->request->data['nombre'] . '"' 
+				)
+			);
+
+		
+		$competidor  = $this->Grupocaracteristica->Competidor->find('first', $options);
+
+		if (!empty($competidor)) {
+			$urlcompetidor = Router::url('/', true) . 'admin/competidores/edit/' . $competidor['Competidor']['id'];
+			$res = array(
+				'code' => 202,
+				'message' => sprintf('<i class="fa fa-close" aria-hidden="true"></i> Competidor <b>%s</b> ya existe. ¿Desea modificarlo?', $this->request->data['nombre']),
+				'data' => $competidor,
+				'urlEdit' => $urlcompetidor
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		$data = array(
+			'Competidor' => array(
+				'nombre'     => $this->request->data['nombre'],
+				'url'    => $this->request->data['url']
+			)
+		);
+
+		$this->Grupocaracteristica->Competidor->create();
+		if(!$this->Grupocaracteristica->Competidor->save($data)) {
+    		$res = array(
+				'code' => 500,
+				'message' => '<i class="fa fa-close" aria-hidden="true"></i> Error al crear al competidor'
+			);
+			echo json_encode($res);
+    		exit;
+		}
+
+		// Nuevas unidades de medida
+		$lista = $this->Grupocaracteristica->Competidor->find('all', array(
+			'conditions' => array('activo' => 1),
+			'order'      => array('id' => 'DESC'),
+			'limit'      => 1
+			)
+		);
+
+		$arrayCompetidores = array();
+		
+		# Creamos la lista de atributos
+		foreach ($lista as $indice => $valor) {
+
+			$arrayCompetidores[$indice]['id'] = $valor['Competidor']['id'];
+			$arrayCompetidores[$indice]['value'] = sprintf('%s - %s', $valor['Competidor']['id'], $valor['Competidor']['nombre']);
+
+			# Tabla todo
+			$tabla = '<tr>';
+	    	$tabla .= '<td><input type="hidden" name="data[Competidor][Competidor][[*ID*]]" value="[*ID*]" class="js-input-id_competidor">[*NOMBRE*]</td>';
+	    	$tabla .= '<td><button class="quitar btn btn-danger btn-xs">Quitar</button></td>';
+	    	$tabla .= '</tr>';
+
+	    	// Armamos la tabla
+			$tabla = str_replace('[*ID*]', $valor['Competidor']['id'] , $tabla);
+			$tabla = str_replace('[*NOMBRE*]', $valor['Competidor']['nombre'] , $tabla);
+
+			$arrayCompetidores = $tabla;
+		}
+
+		$res = array(
+			'code' => 200,
+			'message' => sprintf('<i class="fa fa-check" aria-hidden="true"></i> Competidor <b>%s</b> creado con éxito', $this->request->data['nombre']),
+			'todo' => $arrayCompetidores
 		);
 
 		echo json_encode($res);
@@ -853,6 +1035,10 @@ class GrupocaracteristicasController extends AppController
 			if ( empty($this->request->data['Palabraclave'])) {
 				$this->request->data['Grupocaracteristica']['count_palabras_claves'] = 0;
 			}
+
+			if ( empty($this->request->data['Palabraclave'])) {
+				$this->request->data['Grupocaracteristica']['count_competidores'] = 0;
+			}
 			
 			$this->Grupocaracteristica->create();
 			if ( $this->Grupocaracteristica->save($this->request->data) )
@@ -869,7 +1055,7 @@ class GrupocaracteristicasController extends AppController
 		{
 			$this->request->data	= $this->Grupocaracteristica->find('first', array(
 				'conditions'	=> array('Grupocaracteristica.id' => $id),
-				'contain' => array('Palabraclave')
+				'contain' => array('Palabraclave', 'Competidor')
 			));
 
 			# Se obtiene el listado de caracteristicas que tiene este registro
