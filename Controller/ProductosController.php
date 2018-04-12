@@ -345,6 +345,43 @@ class ProductosController extends AppController
 		return $this->request->data;
 	}
 
+	/**
+	 * Verifica la existencia de un producto dado suna referencia
+	 * La peticion puede ser ajax de tipo text o bool para lineal
+	 * @param  string $referencia  Referencia del producto a consultar
+	 * @param  string $type       text : Ajax bool : request lineal
+	 * @param  int 	$cantidad 		Segun el numero ingresado dependerá el resultado de la validacion
+	 * @return string || bool            Retornará verdadero o false segun corresponda
+	 */
+	public function verExistenciaPorReferencia($referencia = '', $cantidad = 0 , $type = 'text')
+	{
+		$producto = $this->Producto->find('count', array(
+			'conditions' => array(
+				'Producto.referencia' => trim($referencia)
+			)
+		));
+
+		if ($producto > $cantidad) {
+			if ($type = 'text') {
+				echo 1;
+				exit;	
+			}
+
+			if ($type = 'bool') {
+				return 1;	
+			}
+		}
+
+		if ($type = 'text') {
+			echo 0;
+			exit;	
+		}
+
+		if ($type = 'bool') {
+			return 0;
+		}
+	}
+
 
 	public function maintainers_add($tarea = null) {
 
@@ -358,6 +395,11 @@ class ProductosController extends AppController
 			# Validar campos
 			if( ! $this->validarCampos()) {
 				$errorValidacion[] = 'Debe completar todos los campos.';
+			}
+
+			# Verifica la existencia
+			if ($this->verExistenciaPorReferencia($this->request->data['Producto']['referencia'])) {
+				$errorValidacion[] = 'La referencia usada en éste producto ya está siendo usada en otro producto. Verifique con el administrador.';
 			}
 
 			# Validar imágenes

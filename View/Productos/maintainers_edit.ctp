@@ -136,7 +136,7 @@
 									</button>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto', 'class' => 'form-control string_referencia')); ?>
+									<?= $this->Form->input('referencia', array('placeholder' => 'Ingrese referencia del producto', 'class' => 'form-control string_referencia referencia_edit')); ?>
 								</div>
 							</div>
 							<div class="divisor-sm"></div>

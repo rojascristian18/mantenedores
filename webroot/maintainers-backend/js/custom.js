@@ -596,6 +596,7 @@ jQuery(document).ready(function($)
 
     }
 
+
     /**
      * Preview de nombre de productos
      * @param  {[type]} $('.string_nombre_final').length [description]
@@ -635,8 +636,35 @@ jQuery(document).ready(function($)
 
     	$('.string_referencia').on('keyup', function(event){
     		$('.string_nombre_final .referencia_preview').html($('.string_referencia').val());
-
     		insertarNombreFinal();
+    	});
+
+    	var valorInicial = $('.string_referencia.referencia_edit').val();
+
+    	$('.string_referencia').on('focusout', function(event){
+
+    		var $ths 			= $(this),
+    			cantidad 		= 0;
+
+    		if ($ths.hasClass('referencia_edit') && valorInicial == $ths.val()) {
+    			cantidad = 1;
+    		}
+
+    		$.get( webroot + '/productos/verExistenciaPorReferencia/' + $ths.val() + '/' + cantidad, function(respuesta){
+				
+    			if (respuesta == 1) {
+    				$('#modal_alertas #modal_alertas_label').html('<i class="fa fa-exclamation-circle" aria-hidden="true"></i> Alerta!');
+    				$('#modal_alertas #mensajeModal').html('La referencia <b>'+$ths.val()+'</b> ya está en uso para otro producto.<br> <br> Asegurese que la referencia corresponde al producto que está agregando, o de lo contrario consulte con el administrador.');
+    				$('#modal_alertas').addClass('open');
+    				playAudio('fail');
+    			}
+
+	      	}).fail(function(){
+	      		$('#modal_alertas #modal_alertas_label').html('<i class="fa fa-exclamation-circle" aria-hidden="true"></i> Alerta!');
+    			$('#modal_alertas #mensajeModal').html('<i class="fa fa-exclamation-circle" aria-hidden="true"></i> No es posible verificar la existencia de la referencia <b>'+$ths.val()+'</b>. Consulte con el administrador antes de crear éste producto.');
+    			$('#modal_alertas').addClass('open');
+    			playAudio('fail');
+			});
     	});
 
     	$('.string_grupo').on('change', function(){

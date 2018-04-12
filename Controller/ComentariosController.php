@@ -145,13 +145,13 @@ class ComentariosController extends AppController
 
 		if ($rol == 'admin') {
 			$options = array_replace_recursive($options, array(
-				'Tarea.administrador_id' => $id
+				'conditions' => array('Tarea.administrador_id' => $id)
 			));
 		}
 
 		if ($rol == 'usuario') {
 			$options = array_replace_recursive($options, array(
-				'Tarea.usuario_id' => $id
+				'conditions' => array('Tarea.usuario_id' => $id)
 			));
 		}
 
@@ -164,7 +164,7 @@ class ComentariosController extends AppController
 			'Administrador'
 			)
 		);*/
-
+		
 		$tareas = ClassRegistry::init('Tarea')->find('all', $options);
 
 		if (empty($tareas)) {

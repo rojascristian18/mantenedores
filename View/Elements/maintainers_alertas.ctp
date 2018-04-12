@@ -37,3 +37,22 @@
 	</div>
 </div>
 <? endif; ?>
+
+
+<!-- MESSAGE BOX-->
+<div class="message-box message-box-danger animated fadeIn" data-sound="alert" id="modal_alertas">
+    <div class="mb-container">
+        <div class="mb-middle">
+            <div class="mb-title" id="modal_alertas_label"></div>
+            <div class="mb-content">
+                <p id="mensajeModal"></p>                    
+            </div>
+            <div class="mb-footer">
+                <div class="pull-right">
+                    <button class="btn btn-default btn-lg mb-control-close">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END MESSAGE BOX-->
