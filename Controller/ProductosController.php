@@ -360,24 +360,24 @@ class ProductosController extends AppController
 				'Producto.referencia' => trim($referencia)
 			)
 		));
-
+		
 		if ($producto > $cantidad) {
-			if ($type = 'text') {
+			if ($type == 'text') {
 				echo 1;
 				exit;	
 			}
 
-			if ($type = 'bool') {
+			if ($type == 'bool') {
 				return 1;	
 			}
 		}
 
-		if ($type = 'text') {
+		if ($type == 'text') {
 			echo 0;
 			exit;	
 		}
 
-		if ($type = 'bool') {
+		if ($type == 'bool') {
 			return 0;
 		}
 	}
@@ -398,7 +398,7 @@ class ProductosController extends AppController
 			}
 
 			# Verifica la existencia
-			if ($this->verExistenciaPorReferencia($this->request->data['Producto']['referencia'])) {
+			if ($this->verExistenciaPorReferencia($this->request->data['Producto']['referencia'], 0, 'bool')) {
 				$errorValidacion[] = 'La referencia usada en éste producto ya está siendo usada en otro producto. Verifique con el administrador.';
 			}
 
