@@ -764,7 +764,7 @@ class PrisyncController extends AppController {
 				'name'         => trim($this->request->data['Producto']['name']),
 				'brand'        => trim($this->request->data['Producto']['brand']),
 				'category'     => trim($this->request->data['Producto']['category']),
-				'product_code' => trim($this->request->data['Producto']['product_code_id'] . ' | ' . $this->request->data['Producto']['product_code_reference']),
+				'product_code' => trim($this->request->data['Producto']['product_code_id'] . '|' . $this->request->data['Producto']['product_code_reference']),
 				'cost'         => str_replace('.', '', $this->request->data['Producto']['cost'])
 			);
 			#prx($this->request->data);
