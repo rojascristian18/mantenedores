@@ -455,6 +455,19 @@ class ProductosController extends AppController
 				foreach ($this->Producto->validationErrors as $key => $error) {
 					$errores .= '<li>' . $error[0] . '</li>'; 
 				}
+
+				foreach ($this->Producto->EspecificacionesProducto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
+				foreach ($this->Producto->Imagen->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
+				foreach ($this->Producto->CompetidoresProducto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
 				$errores .= '</ul>';
 				
 				$this->Session->setFlash('Por favor corrija los siguientes errores:' . $errores, null, array(), 'danger');
@@ -588,6 +601,18 @@ class ProductosController extends AppController
 			{	
 				$errores = '<ul>';
 				foreach ($this->Producto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
+				foreach ($this->Producto->EspecificacionesProducto->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
+				foreach ($this->Producto->Imagen->validationErrors as $key => $error) {
+					$errores .= '<li>' . $error[0] . '</li>'; 
+				}
+
+				foreach ($this->Producto->CompetidoresProducto->validationErrors as $key => $error) {
 					$errores .= '<li>' . $error[0] . '</li>'; 
 				}
 				$errores .= '</ul>';
@@ -792,9 +817,9 @@ class ProductosController extends AppController
 			$tabla .= '<input type="hidden" name="data[Competidor][' . $key . '][competidor_id]" value="' . $value['id'] . '">';
 
 			if ( isset($value['Producto'][0]['CompetidoresProducto']) && $value['Producto'][0]['CompetidoresProducto']['competidor_id'] == $value['id']) {
-				$tabla .= '<input url="url" type="text"  class="form-control js-url not-blank" name="data[Competidor][' . $key . '][url]" value="' . $value['Producto'][0]['CompetidoresProducto']['url'] . '" placeholder="Agregue url de la competencia">';
+				$tabla .= '<input url="url" type="text"  class="form-control js-url" name="data[Competidor][' . $key . '][url]" value="' . $value['Producto'][0]['CompetidoresProducto']['url'] . '" placeholder="Agregue url de la competencia">';
 			}else{
-				$tabla .= '<input url="url" type="text"  class="form-control js-url not-blank" name="data[Competidor][' . $key . '][url]" placeholder="Agregue url de la competencia" required>';
+				$tabla .= '<input url="url" type="text"  class="form-control js-url" name="data[Competidor][' . $key . '][url]" placeholder="Agregue url de la competencia" required>';
 			}
 
 			

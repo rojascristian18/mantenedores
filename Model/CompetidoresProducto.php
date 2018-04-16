@@ -34,13 +34,13 @@ class CompetidoresProducto extends AppModel
 
 	/**
 	 * VALIDACIONES
-	 */
+	 
 	public $validate = array(
 		'competidor_id' => array(
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Competidor es requerido',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -50,7 +50,7 @@ class CompetidoresProducto extends AppModel
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Producto es requerido',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
@@ -60,12 +60,12 @@ class CompetidoresProducto extends AppModel
 			'notBlank' => array(
 				'rule'			=> array('notBlank'),
 				'last'			=> true,
-				//'message'		=> 'Mensaje de validación personalizado',
+				'message'		=> 'Url es requerido',
 				//'allowEmpty'	=> true,
 				//'required'		=> false,
 				//'on'			=> 'update', // Solo valida en operaciones de 'create' o 'update'
 			),
 		)
-	);
+	);*/
 	
 }
