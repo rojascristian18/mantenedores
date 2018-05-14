@@ -63,6 +63,7 @@
 						<table class="table">
 							<thead>
 								<tr class="sort">
+									<th><?= $this->Paginator->sort('id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('tienda_id', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('nombre', null, array('title' => 'Haz click para ordenar por este criterio')); ?></th>
 									<th><?= $this->Paginator->sort('desripcion', 'Descripción', array('title' => 'Haz click para ordenar por este criterio')); ?></th>
@@ -75,6 +76,7 @@
 							<tbody>
 								<?php foreach ( $grupocaracteristicas as $grupocaracteristica ) : ?>
 								<tr>
+									<td><?= h($grupocaracteristica['Grupocaracteristica']['id']); ?>&nbsp;</td>
 									<td><?= h($grupocaracteristica['Tienda']['nombre']); ?>&nbsp;</td>
 									<td><?= h($grupocaracteristica['Grupocaracteristica']['nombre']); ?>&nbsp;</td>
 									<td><?= h($grupocaracteristica['Grupocaracteristica']['desripcion']); ?>&nbsp;</td>
