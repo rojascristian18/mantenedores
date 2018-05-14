@@ -518,16 +518,18 @@ jQuery(document).ready(function($)
 			$input.attr('data-pattern', $input.attr('pattern'));
 			$input.removeAttr('pattern');
 
-			if (typeof(agregar_texto) != 'undefined') {
+			if (typeof(agregar_texto) != 'undefined' && $input.val()) {
 				$input.val('Ingrese texto');
 			}
 		}else{
 
-			// Se recetea el input agregandole nuevamente la validación pattern
-			if($input.data('pattern').length) {
+			// Se resetea el input agregandole nuevamente la validación pattern
+			if( typeof($input.data('pattern')) != 'undefined' && $input.data('pattern').length ) {
 				$input.attr('pattern', $input.data('pattern'));
 			}
-			$input.val('');	
+
+			$input.val($input.data('val'));
+			
 		}
     }
 
@@ -624,8 +626,19 @@ jQuery(document).ready(function($)
     		$('.string_nombre_final .marca_preview').html(nombreMarca);
 
     		insertarNombreFinal();
-    		obtenerTablaCaracteristicas($('.string_grupo').val());
-    		obtenerTablaCompetidores($('.string_grupo').val());
+    		
+    		if ($('.js-add').length && $('.js-add').data('autoload')) {
+    			obtenerTablaCaracteristicas($('.string_grupo').val());
+    		}
+
+    		if ($('.js-add').length && !$('.js-add').data('autoload')) {
+    			noAplica();
+    		}
+
+    		if ($('.js-competidor-add').length && $('.js-competidor-add').data('autoload')) {
+    			obtenerTablaCompetidores($('.string_grupo').val());
+    		}
+
     	});
 
     	$('.string_nombre').on('keyup', function(event){

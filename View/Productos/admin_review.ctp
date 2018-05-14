@@ -103,14 +103,16 @@
 									<thead>
 										<th>Característica</th>
 										<th>Valor</th>
-										<th>Key:Value</th>
+										<th>Unidad de media</th>
+										<th>Campo validado <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="" data-original-title="Mantenedor quitó la validación clickiando el botón 'NO APLICA'"></i> </th>
 									</thead>
 									<tbody>
 									<? foreach($this->request->data['Especificacion'] as $ix => $especificacion) : ?>
 										<tr>
 											<td><b><?=$especificacion['Idioma'][0]['EspecificacionIdioma']['name']?></b></td>
 											<td><?=$especificacion['EspecificacionesProducto']['valor'];?></td>
-											<td><?=$especificacion['EspecificacionesProducto']['llave_valor'];?></td>
+											<td><?=$um  = (isset($especificacion['UnidadMedida']['nombre'])) ? $especificacion['UnidadMedida']['nombre'] : 'Sin unidad de medida' ;?></td>
+											<td><?=$nap = ($especificacion['EspecificacionesProducto']['no_aplica']) ? '<i class="fa fa-remove"></i>' : '<i class="fa fa-check"></i>' ; ?></td>
 										</tr>
 									<? endforeach;?>
 									</tbody>

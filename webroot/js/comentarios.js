@@ -401,13 +401,21 @@ $(function() {
         	}
         }
 
+         var iniciarComentarios = function() {
+        	if ($('#iniciarComentarios').length) {
+        		$('#iniciarComentarios').on('click', function(){
+        			obtenerTareas();
+        		});
+        	}
+        }
+
 		return {
 			init: function(){
 				uiScroller();
 				feBsFileInput();
 				enviarFormulario();
 				toogleFormulario();
-				obtenerTareas();
+				iniciarComentarios();
 				btnActualizarTareas();
 				slideMenu();
 				tareaSeleccionada();

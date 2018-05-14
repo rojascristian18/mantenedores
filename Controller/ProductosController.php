@@ -32,7 +32,8 @@ class ProductosController extends AppController
 				),
 			'contain' => array(
 				'Especificacion' => array(
-					'Idioma'
+					'Idioma',
+					'UnidadMedida'
 					),
 				'Proveedor',
 				'Fabricante',
@@ -44,7 +45,19 @@ class ProductosController extends AppController
 				)
 			)
 		);
-		
+
+		# Normalizar unidades de medida
+		foreach ($this->request->data['Especificacion'] as $ie => $especificacion) {
+			foreach ($especificacion['UnidadMedida'] as $iu => $unidad) {
+				if ($unidad['GrupocaracteristicaEspecificacion']['grupocaracteristica_id'] != $this->request->data['Producto']['grupocaracteristica_id']) {
+					unset($this->request->data['Especificacion'][$ie]['UnidadMedida'][$iu]);
+				}else{
+					unset($this->request->data['Especificacion'][$ie]['UnidadMedida'][$iu]);
+					$this->request->data['Especificacion'][$ie]['UnidadMedida'] = $unidad;
+				}
+			}
+		}
+
 		BreadcrumbComponent::add('Producto #' . $id);
 	}
 
@@ -635,7 +648,8 @@ class ProductosController extends AppController
 				'Imagen',
 				'Tarea',
 				'Grupocaracteristica',
-				'Marca'
+				'Marca',
+				'Competidor'
 				)
 			)
 		);
@@ -673,9 +687,13 @@ class ProductosController extends AppController
 			'tienda_id' => $miTarea['Tarea']['tienda_id']
 			)));
 
+		$tablaEspecificaciones = $this->maintainers_obtenerEspecificaciones($this->request->data['Producto']['grupocaracteristica_id'], $this->request->data['Producto']['id'], false);
+		
+		$tablaCompetidores = $this->maintainers_obtenerCompetidores($this->request->data['Producto']['grupocaracteristica_id'], $this->request->data['Producto']['id'], false);
+
 		BreadcrumbComponent::add(sprintf('Agregar producto a Tarea %s', $miTarea['Tarea']['nombre']));
 		
-		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes', 'marcas'));
+		$this->set(compact('miTarea', 'grupocaracteristicas', 'proveedores', 'fabricantes', 'marcas', 'tablaEspecificaciones', 'tablaCompetidores'));
 	}
 
 
@@ -754,7 +772,7 @@ class ProductosController extends AppController
 	}
 
 
-	public function maintainers_obtenerCompetidores($idGrupo = null, $idProducto = null) {
+	public function maintainers_obtenerCompetidores($idGrupo = null, $idProducto = null, $ajax = true) {
 		if(empty($idGrupo)) {
 			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
 			exit;
@@ -842,8 +860,13 @@ class ProductosController extends AppController
 
 		}
 
-		echo $tabla;
-		exit;
+		if ($ajax) {
+			echo $tabla;
+			exit;
+		}else{
+			return $tabla;
+		}
+		
 	}
 
 
@@ -855,7 +878,7 @@ class ProductosController extends AppController
 	 * @param 	$idProducto int 	Identificador del producto (opcional)
 	 * @return 	$tabla 		string 	Filas de tabla con las especificacion/caracteristicas permitidas para el producto.
 	 */
-	public function maintainers_obtenerEspecificaciones($idGrupo = null, $idProducto = null) {
+	public function maintainers_obtenerEspecificaciones($idGrupo = null, $idProducto = null, $ajax = true) {
 		if(empty($idGrupo)) {
 			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
 			exit;
@@ -955,10 +978,10 @@ class ProductosController extends AppController
 						}
 					}
 
-                    $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+                    $tabla .= '<input type="text" pattern="'.$pattern.'" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" data-val="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
                                          
 				}else{
-					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
+					$tabla .= '<input type="text" class="form-control not-blank" name="data[Especificacion][' . $key . '][valor]" placeholder="Ingrese valor" value="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" data-val="' . $value['Producto'][0]['EspecificacionesProducto']['valor'] . '" required>';
 				}
                 
                 $tabla .= '</div>';
@@ -1030,7 +1053,11 @@ class ProductosController extends AppController
 
 		}
 
-		echo $tabla;
-		exit;
+		if ($ajax) {
+			echo $tabla;
+			exit;
+		}else{
+			return $tabla;
+		}
 	}
 }

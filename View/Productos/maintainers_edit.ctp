@@ -230,8 +230,10 @@
 										<th>Unidad de medida</th>
 										<th>Ejemplo</th>
 									</thead>
-									<tbody class="js-add">
-										
+									<tbody class="js-add" data-autoload="<?= $autoload = (!empty($this->request->data['Especificacion'])) ? 'false' : 'true' ;?>">
+										<? if (!empty($this->request->data['Especificacion'])) : ?>
+											<?=$tablaEspecificaciones; ?>
+										<? endif; ?>
 									</tbody>
 								</table>
 							</div>
@@ -319,8 +321,8 @@
 										<th>Detalle</th>
 										<!--<th>Ejemplo</th>-->
 									</thead>
-									<tbody class="js-competidor-add">
-										
+									<tbody class="js-competidor-add" data-autoload="<?= $autoload = (!empty($this->request->data['Competidor'])) ? 'false' : 'true' ;?>">
+										<?=$tablaCompetidores;?>
 									</tbody>
 								</table>
 							</div>

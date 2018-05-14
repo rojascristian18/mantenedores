@@ -16,7 +16,7 @@
         <?=$this->element('maintainers_tareas'); ?>
     </li>
     <li class="pull-right">
-    	<a href="#" class="sidebar-toggle"><i class="fa fa-comments"></i></a>
+    	<a href="#" class="sidebar-toggle" id="iniciarComentarios"><i class="fa fa-comments"></i></a>
     	<div id="count_mensajes" class="informer informer-danger"><?=$comentariosNotificacion; ?></div>
     </li>
 </ul>

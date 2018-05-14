@@ -869,6 +869,9 @@ jQuery(document).ready(function($)
         });
     }
 
+    // Tooltip
+    $("body").tooltip({selector:'[data-toggle="tooltip"]',container:"body"});
+
 
 	/**
 	 * Agregar un nuevo clon
