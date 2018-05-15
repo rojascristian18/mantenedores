@@ -686,7 +686,7 @@ class ProductosController extends AppController
 			'activo' => 1, 
 			'tienda_id' => $miTarea['Tarea']['tienda_id']
 			)));
-
+		
 		$tablaEspecificaciones = $this->maintainers_obtenerEspecificaciones($this->request->data['Producto']['grupocaracteristica_id'], $this->request->data['Producto']['id'], false);
 		
 		$tablaCompetidores = $this->maintainers_obtenerCompetidores($this->request->data['Producto']['grupocaracteristica_id'], $this->request->data['Producto']['id'], false);
@@ -773,9 +773,13 @@ class ProductosController extends AppController
 
 
 	public function maintainers_obtenerCompetidores($idGrupo = null, $idProducto = null, $ajax = true) {
-		if(empty($idGrupo)) {
+		if(empty($idGrupo) && $ajax) {
 			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
 			exit;
+		}
+
+		if(empty($idGrupo) && !$ajax) {
+			return '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
 		}
 
 		# Obtenemos el grupo con sus pespecificaciones
@@ -818,9 +822,13 @@ class ProductosController extends AppController
 		$grupo = ClassRegistry::init('Grupocaracteristica')->find('first', $options);
 		
 		# Vemos si tiene especificaciones asociadas
-		if (empty($grupo['Competidor'])) {
+		if (empty($grupo['Competidor']) && $ajax) {
 			
 			exit;
+		}
+
+		if (empty($grupo['Competidor']) && !$ajax) {
+			return;
 		}
 		
 		$tabla = '';
@@ -879,9 +887,13 @@ class ProductosController extends AppController
 	 * @return 	$tabla 		string 	Filas de tabla con las especificacion/caracteristicas permitidas para el producto.
 	 */
 	public function maintainers_obtenerEspecificaciones($idGrupo = null, $idProducto = null, $ajax = true) {
-		if(empty($idGrupo)) {
+		if(empty($idGrupo) && $ajax) {
 			echo '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';
 			exit;
+		}
+
+		if(empty($idGrupo) && !$ajax) {
+			return '<tr><td colspan="2">Seleccione un tipo de producto.</td></tr>';	
 		}
 
 		# Cambiamos el datasource de los modelos que necesitamos externos
@@ -932,9 +944,15 @@ class ProductosController extends AppController
 		$grupo = ClassRegistry::init('Grupocaracteristica')->find('first', $options);
 
 		# Vemos si tiene especificaciones asociadas
-		if (empty($grupo['Especificacion'])) {
+		if (empty($grupo['Especificacion']) && $ajax) {
 			
 			exit;
+		}
+
+
+		if (empty($grupo['Especificacion']) && !$ajax) {
+			
+			return;
 		}
 		
 		$tabla = '';
