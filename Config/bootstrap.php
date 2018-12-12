@@ -143,7 +143,7 @@ function prx()
 
 // URL Base para consola
 if ( !defined('FULL_BASE_URL') ) {
-	define('FULL_BASE_URL', 'http://mantenedores.nodriza.cl/');
+	define('FULL_BASE_URL', 'https://mantenedores.nodriza.cl/');
 }
 
 

@@ -18,7 +18,7 @@
 			*/
 		)); ?>
 		<?= $this->fetch('css'); ?>
-		<?= $this->Html->scriptBlock("var webroot = 'http://mantenedores.nodriza.cl/';"); ?>
+		<?= $this->Html->scriptBlock("var webroot = 'https://mantenedores.nodriza.cl/';"); ?>
 		<?= $this->Html->scriptBlock("var fullwebroot = '{$this->Html->url('', true)}';"); ?>
 		<?= $this->Html->script(array(
 			'/backend/js/plugins/jquery/jquery.min',

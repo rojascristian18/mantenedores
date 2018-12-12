@@ -123,7 +123,7 @@
 									<?= $this->Form->label('nombre', _('Ingrese carácteristicas del producto como por ejemplo: <b>650W 1,7L 48"</b> (*)'));?>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<?= $this->Form->input('nombre', array('placeholder' => 'Ingrese características importantes del producto', 'class' => 'form-control string_nombre')); ?>
+									<?= $this->Form->input('nombre', array('placeholder' => 'Ingrese características importantes del producto', 'class' => 'form-control string_nombre', 'maxlength' => 70)); ?>
 								</div>
 							</div>
 							<div class="row form-group">
@@ -143,8 +143,8 @@
 									<?= $this->Form->label('nombre_final', 'Nombre final del producto <br/><small><b>(categoría + carácteristicas + marca + referencia)</b></small>'); ?>
 								</div>
 								<div class="col-xs-12 col-sm-8">
-									<span class="form-control string_nombre_final"><span class="grupo_preview"></span> <span class="nombre_preview"></span> <span class="marca_preview"></span> <span class="referencia_preview"></span>
-									<?= $this->Form->input('nombre_final', array('type' => 'hidden', 'class' => 'input_nombre_final')); ?>
+									<span class="hidden form-control string_nombre_final"><span class="grupo_preview"></span> <span class="nombre_preview"></span> <span class="marca_preview"></span> <span class="referencia_preview"></span></span>
+									<?= $this->Form->input('nombre_final', array('type' => 'text', 'class' => 'input_nombre_final form-control', 'readonly' => 'true')); ?>
 								</div>
 							</div>
 							<div class="divisor-md"></div>
