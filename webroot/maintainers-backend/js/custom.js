@@ -296,9 +296,6 @@ jQuery(document).ready(function($)
 					required: true,
 					maxlength: 199
 				},
-				'data[Producto][descripcion]': {
-					required: true,
-				},
 				'data[Producto][precio]': {
 					required: true,
 				},
