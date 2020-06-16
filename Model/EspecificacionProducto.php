@@ -6,7 +6,6 @@ class EspecificacionProducto extends AppModel
 	 * CONFIGURACION DB
 	 */
 	public $primaryKey		= 'id';
-
 	/**
 	 * BEHAVIORS
 	 */

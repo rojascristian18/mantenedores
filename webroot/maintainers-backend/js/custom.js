@@ -292,6 +292,13 @@ jQuery(document).ready(function($)
 					minlength: 50,
 					maxlength: 800
 				},
+				'data[Producto][nombre_final]': {
+					required: true,
+					maxlength: 199
+				},
+				'data[Producto][descripcion]': {
+					required: true,
+				},
 				'data[Producto][precio]': {
 					required: true,
 				},
@@ -334,6 +341,10 @@ jQuery(document).ready(function($)
 					required: 'Requerido',
 					minlength: '2 carácteres mínimo',
                     maxlength: '32 carácteres máximo'
+				},
+				'data[Producto][nombre_final]': {
+					required: 'El nombre final es obligatorio',
+					maxlength: '200 carácteres máximo'
 				},
 				'data[Producto][descripcion_corta]': {
 					required: 'Requerido',
@@ -697,7 +708,7 @@ jQuery(document).ready(function($)
 
     	var valorInicial = $('.string_referencia.referencia_edit').val();
 
-    	$('.string_referencia').on('focusout', function(event){
+    	$('.string_referencia').on('keyup', function(event){
 
     		var $ths 			= $(this),
     			cantidad 		= 0;
