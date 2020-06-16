@@ -38,8 +38,8 @@
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-file-input',
 			'/maintainers-backend/js/plugins/owl/owl.carousel.min',
 			'/maintainers-backend/js/plugins/tour/intro.min',
-			'/maintainers-backend/js/custom?v=' . date('I-m-s'),
-			'/js/comentarios?v=' . date('I-m-s'),
+			'/maintainers-backend/js/custom.js?v=' . date('I-m-s'),
+			'/js/comentarios.js?v=' . date('I-m-s'),
 			/*
 			'/maintainers-backend/js/plugins/bootstrap/bootstrap-datepicker',
 
