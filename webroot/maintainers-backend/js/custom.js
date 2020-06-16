@@ -95,7 +95,7 @@ jQuery(document).ready(function($)
     }
 	
 
-    ;(function($){
+    (function($){
 		$.fn.rut = function(opt){
 			var defaults = $.extend({
 				error_html: '<span class="rut-error">Rut incorrecto</span>',
@@ -249,13 +249,32 @@ jQuery(document).ready(function($)
 	 * Validate product
 	 */
 
-	if ( $('.validate-product').length ) {
-		var validateProduct = $('.validate-product').validate({
+	if ( $('#FormularioProducto').length ) {
+		$('#FormularioProducto').validate({
+			ignore: '.ignore, .note-editor input',
+			invalidHandler: function(event, validator) {
+				// 'this' refers to the form
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+					noty({text: 'Faltan completar ' + errors + ' campo/s', layout: 'topRight', type: 'error'});
+
+					setTimeout(function(){
+						$.noty.closeAll();
+					}, 10000);
+
+				} else {
+					$.noty.closeAll();
+				}
+			},
 			rules: {
 				'data[Producto][grupocaracteristica_id]': {
 					required: true
 				},
 				'data[Producto][fabricante_id]': {
+					required: true
+				},
+				'data[Producto][marca_id]': {
 					required: true
 				},
 				'data[Producto][nombre]': {
@@ -273,9 +292,6 @@ jQuery(document).ready(function($)
 					minlength: 50,
 					maxlength: 800
 				},
-				'data[Producto][descripcion]': {
-					required: true,
-				},
 				'data[Producto][precio]': {
 					required: true,
 				},
@@ -291,8 +307,11 @@ jQuery(document).ready(function($)
 				'data[Producto][peso]': {
 					required: true,
 				},
-				'data[Producto][peso]': {
-					required: true,
+				'data[Producto][nombre_final]': {
+					required: true
+				},
+				'data[Producto][referencia_proveedor]': {
+					required: true
 				}
 
 			},
@@ -301,6 +320,9 @@ jQuery(document).ready(function($)
 					required: 'Requerido'
 				},
 				'data[Producto][fabricante_id]': {
+					required: 'Requerido'
+				},
+				'data[Producto][marca_id]': {
 					required: 'Requerido'
 				},
 				'data[Producto][nombre]': {
@@ -318,9 +340,6 @@ jQuery(document).ready(function($)
 					minlength: '50 carácteres mínimo',
 					maxlength: '800 carácteres máximo'
 				},
-				'data[Producto][descripcion]': {
-					required: 'Requerido',
-				},
 				'data[Producto][precio]': {
 					required: "Requerido",
 				},
@@ -335,8 +354,14 @@ jQuery(document).ready(function($)
 				},
 				'data[Producto][peso]': {
 					required: 'Requerido',
+				},
+				'data[Producto][nombre_final]' : {
+					required: 'Requerido'
+				},
+				'data[Producto][referencia_proveedor]': {
+					required: 'Requerido'
 				}
-			}
+			},
 		});
 
 		$.validator.messages.number = 'Ingrese solo números';
@@ -504,8 +529,8 @@ jQuery(document).ready(function($)
 
     function insertarNombreFinal() {
     	var $campo = $('.input_nombre_final');
-    	console.info($('.string_nombre_final').text());
     	$campo.val( $('.string_nombre_final').text() );
+    	console.info($campo.val());
     }
 
     function doNoAplica(element, agregar_texto) {
@@ -546,6 +571,9 @@ jQuery(document).ready(function($)
 
 
     function obtenerTablaCaracteristicas(grupo) {
+
+    	$('.cargando').addClass('show');
+
     	var $contexto 	= $('#caracteristicas'),
     		$producto 	= $('#ProductoId').val();
 
@@ -556,6 +584,9 @@ jQuery(document).ready(function($)
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-add').eq(0).html(respuesta);
+			})
+			.always(function(){
+				$('.cargando').removeClass('show');
 			});
     	}
 
@@ -566,6 +597,9 @@ jQuery(document).ready(function($)
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-add').eq(0).html(respuesta);
+			})
+			.always(function(){
+				$('.cargando').removeClass('show');
 			});
     	}
 
@@ -573,6 +607,9 @@ jQuery(document).ready(function($)
 
 
     function obtenerTablaCompetidores(grupo) {
+
+    	$('.cargando').addClass('show');
+
     	var $contexto 	= $('#competencias'),
     		$producto 	= $('#ProductoId').val();
 
@@ -583,6 +620,9 @@ jQuery(document).ready(function($)
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+			})
+			.always(function(){
+				$('.cargando').removeClass('show');
 			});
     	}
 
@@ -593,6 +633,9 @@ jQuery(document).ready(function($)
 		  	})
 		  	.fail(function(){
 				$contexto.find('.js-competidor-add').eq(0).html(respuesta);
+			})
+			.always(function(){
+				$('.cargando').removeClass('show');
 			});
     	}
 
@@ -641,13 +684,13 @@ jQuery(document).ready(function($)
 
     	});
 
-    	$('.string_nombre').on('keyup', function(event){
+    	$('.string_nombre').on('keyup, focusout', function(event){
     		$('.string_nombre_final .nombre_preview').html($('.string_nombre').val());
 
     		insertarNombreFinal();
     	});
 
-    	$('.string_referencia').on('keyup', function(event){
+    	$('.string_referencia').on('keyup, focusout', function(event){
     		$('.string_nombre_final .referencia_preview').html($('.string_referencia').val());
     		insertarNombreFinal();
     	});

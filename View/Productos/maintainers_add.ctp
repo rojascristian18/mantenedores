@@ -1,6 +1,6 @@
-<?= $this->Form->create('Producto', array('class' => 'form-horizontal validate-product', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
-<?= $this->Form->input('tarea_id', array('type' => 'hidden', 'value' => $miTarea['Tarea']['id'])); ?>
-<?= $this->Form->input('usuario_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Mantenedor.id'))); ?>
+<?= $this->Form->create('Producto', array('id' => 'FormularioProducto', 'class' => 'form-horizontal validate-product', 'type' => 'file', 'inputDefaults' => array('label' => false, 'div' => false, 'class' => 'form-control'))); ?>
+<?= $this->Form->input('tarea_id', array('type' => 'hidden', 'value' => $miTarea['Tarea']['id'], 'class' => 'ignore')); ?>
+<?= $this->Form->input('usuario_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.Mantenedor.id'), 'class' => 'ignore')); ?>
 <div class="page-title">
 	<h2><span class="fa fa-shopping-bag"></span> Agregar nuevo producto</h2>
 	<div class="pull-right">
