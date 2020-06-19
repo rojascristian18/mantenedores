@@ -37,7 +37,11 @@ class ProductosController extends AppController
 					),
 				'Proveedor',
 				'Fabricante',
-				'Imagen',
+				'Imagen' => array(
+					'order' => array(
+						'Imagen.id' => 'asc'
+					)
+				),
 				'Tarea',
 				'Marca',
 				'Grupocaracteristica',
@@ -82,7 +86,11 @@ class ProductosController extends AppController
 					),
 				'Proveedor',
 				'Fabricante',
-				'Imagen',
+				'Imagen' => array(
+					'order' => array(
+						'Imagen.id' => 'asc'
+					)
+				),
 				'Marca',
 				'Tarea',
 				'Grupocaracteristica',
@@ -645,7 +653,11 @@ class ProductosController extends AppController
 					),
 				'Proveedor',
 				'Fabricante',
-				'Imagen',
+				'Imagen' => array(
+					'order' => array(
+						'Imagen.id' => 'asc'
+					)
+				),
 				'Tarea',
 				'Grupocaracteristica',
 				'Marca',
