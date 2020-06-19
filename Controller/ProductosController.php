@@ -984,7 +984,7 @@ class ProductosController extends AppController
 		                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $v['permitidos']));
 
 		                    	if ($v['tipo_campo'] == 'number') {
-		                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+		                    		$pattern = "^[0-9.,". implode('\\', $caracteresPermitidos) ."]+$";
 		                    	}
 
 		                    }else{
@@ -1023,7 +1023,7 @@ class ProductosController extends AppController
 		                    	$caracteresPermitidos = $this->normalizarExpR(explode(',', $v['permitidos']));
 
 		                    	if ($v['tipo_campo'] == 'number') {
-		                    		$pattern = "^[0-9.,". implode('', $caracteresPermitidos) ."]+$";
+		                    		$pattern = "^[0-9.,". implode('\\', $caracteresPermitidos) ."]+$";
 		                    	}
 
 		                    }else{
